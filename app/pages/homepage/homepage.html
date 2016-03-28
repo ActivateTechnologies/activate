@@ -1,0 +1,39 @@
+
+<ion-navbar *navbar>
+  <button menuToggle>
+    <ion-icon name="menu"></ion-icon>
+  </button>
+  <ion-title>Getting Started</ion-title>
+</ion-navbar>
+
+
+<ion-content class="homepage">
+
+  <ion-list padding>
+    <div *ngFor="#chatMessage of chatMessages" class="fade-in"
+        [class.align-right]="chatMessage.usersMessage">
+      <div [class.message-user]="chatMessage.usersMessage"
+          [class.message-bot]="!chatMessage.usersMessage">
+        {{chatMessage.message}}
+      </div>
+      <br>
+    </div>
+    <div class="message-typing fade-in" [hidden]="!typing">
+      <span class="message-typing-inside">...</span>
+    </div>
+  </ion-list>
+
+  <div class="replyBox">
+    <div *ngFor="#option of replyOptions" class="replyOption"
+     (click)="replyWithMessage(option)">
+      {{option.message}}
+    </div>
+  </div>
+
+</ion-content>
+
+<!-- <ion-toolbar position="bottom" padding class="fixed">
+  <div class="replyOption" *ngFor="#option of replyOptions">
+    {{option.message}}
+  </div>
+</ion-toolbar> -->

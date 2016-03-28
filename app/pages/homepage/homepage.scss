@@ -1,0 +1,101 @@
+.homepage {
+
+  p {
+    margin: 20px 0;
+    line-height: 22px;
+    font-size: 16px;
+  }
+
+  .message-bot {
+  	display: inline-block;
+  	max-width: 80%;
+  	font-size: 16px;
+  	padding: 6px;
+  	margin-top:5px;
+  	margin-bottom:5px;
+  	color: #303030;
+  	background-color: #e0e0e0;
+  	border-radius: 5px;
+  	text-align:left;
+  }
+
+  .message-user {
+  	display: inline-block;
+  	max-width: 80%;
+  	font-size: 16px;
+  	padding: 6px;
+  	margin-top:5px;
+  	margin-bottom:5px;
+  	color: #ffffff;
+  	background-color: #3366ff;
+  	border-radius: 5px;
+  	text-align:right;
+  }
+
+  .message-typing {
+  	display: inline-block;
+  	font-size: 16px;
+  	padding: 6px;
+  	margin-top:4px;
+  	margin-bottom:4px;
+  	color: #303030;
+  	background-color: #e0e0e0;
+  	border-radius: 5px;
+  	text-align:left;
+  }
+
+  .align-right {
+  	text-align: right;
+  }
+
+  .message-typing-inside {
+  	font-weight: bold;
+  	-webkit-animation:fade 1.5s linear infinite;
+    -moz-animation:fade 1.5s linear infinite;
+    animation:fade 1.5s linear infinite;
+  }
+
+  @-moz-keyframes fade { 50% { opacity: 0; } 100% { opacity: 1; } }
+	@-webkit-keyframes fade { 50% { opacity: 0; } 100% { opacity: 1; } }
+	@keyframes fade { 50% { opacity: 0; } 100% { opacity: 1; } }
+
+  .replyOption {
+  	float:left;
+  	padding: 6px;
+  	margin-left: 5px; margin-right: 5px;
+  	color: #ffffff;
+  	background-color: #3366ff;
+  	border-radius: 5px;
+  }
+
+  .replyBox {
+  	position:fixed;
+  	padding: 10px;
+  	width: 100%;
+  	min-height: 50px;
+  	bottom: 0px;
+  	border-top: 1px solid #a0a0a0;
+  	background-color: #e0e0e0;
+  	overflow: hidden;
+  }
+
+  @-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+	@-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+	@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+	.fade-in {
+    opacity: 0;
+    -webkit-animation:fadeIn ease-in 1;
+    -moz-animation:fadeIn ease-in 1;
+    animation:fadeIn ease-in 1;
+
+    -webkit-animation-fill-mode:forwards;
+    -moz-animation-fill-mode:forwards;
+    animation-fill-mode:forwards;
+
+    -webkit-animation-duration:0.25s;
+    -moz-animation-duration:0.25s;
+    animation-duration:0.25s;
+	}
+
+}
