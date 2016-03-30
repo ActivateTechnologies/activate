@@ -13,9 +13,10 @@
   	padding: 6px;
   	margin-top:5px;
   	margin-bottom:5px;
-  	color: #303030;
-  	background-color: #e0e0e0;
+  	color: #ffffff;
+  	background-color: #ff524f;
   	border-radius: 5px;
+    border-bottom-left-radius: 0px;
   	text-align:left;
   }
 
@@ -26,10 +27,12 @@
   	padding: 6px;
   	margin-top:5px;
   	margin-bottom:5px;
-  	color: #ffffff;
-  	background-color: #3366ff;
+  	color: #E5E5EA;
+  	background-color: #e0e0e0;
   	border-radius: 5px;
+    border-bottom-right-radius: 0px;
   	text-align:right;
+    color: #444444;
   }
 
   .message-typing {
@@ -38,8 +41,8 @@
   	padding: 6px;
   	margin-top:4px;
   	margin-bottom:4px;
-  	color: #303030;
-  	background-color: #e0e0e0;
+  	color: #ffffff;
+  	background-color: #ff524f;
   	border-radius: 5px;
   	text-align:left;
   }
@@ -60,12 +63,14 @@
 	@keyframes fade { 50% { opacity: 0; } 100% { opacity: 1; } }
 
   .replyOption {
-  	float:left;
   	padding: 6px;
   	margin-left: 5px; margin-right: 5px;
   	color: #ffffff;
-  	background-color: #3366ff;
+  	background-color: #1288F8;
   	border-radius: 5px;
+    margin: 15px;
+    border-bottom-right-radius: 0px;
+    font-size: 16px;
   }
 
   .replyBox {
@@ -74,8 +79,8 @@
   	width: 100%;
   	min-height: 50px;
   	bottom: 0px;
-  	border-top: 1px solid #a0a0a0;
-  	background-color: #e0e0e0;
+  	text-align: center;
+  	background-color: none;
   	overflow: hidden;
   }
 

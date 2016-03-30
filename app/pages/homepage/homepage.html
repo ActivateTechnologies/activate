@@ -1,10 +1,11 @@
-
+<!--
 <ion-navbar *navbar>
   <button menuToggle>
     <ion-icon name="menu"></ion-icon>
   </button>
   <ion-title>Getting Started</ion-title>
 </ion-navbar>
+-->
 
 
 <ion-content class="homepage">
@@ -24,10 +25,10 @@
   </ion-list>
 
   <div class="replyBox">
-    <div *ngFor="#option of replyOptions" class="replyOption"
+    <span *ngFor="#option of replyOptions" class="replyOption"
      (click)="replyWithMessage(option)">
       {{option.message}}
-    </div>
+    </span>
   </div>
 
 </ion-content>
