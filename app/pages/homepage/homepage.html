@@ -25,10 +25,10 @@
   </ion-list>
 
   <div class="replyBox">
-    <span *ngFor="#option of replyOptions" class="replyOption"
+    <div *ngFor="#option of replyOptions" class="replyOption"
      (click)="replyWithMessage(option)">
       {{option.message}}
-    </span>
+    </div>
     <!--<i class="em em---1"></i>-->
   </div>
 
