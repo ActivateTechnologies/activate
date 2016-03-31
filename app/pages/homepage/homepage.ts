@@ -15,8 +15,8 @@ export class HomePage {
     this.nav = nav;
     this.app = ionicApp;
     this.initialize();
-    this.THINKING_DELAY = 1000;
-    this.TYPING_DELAY = 1500;
+    this.THINKING_DELAY = 0; //1000;
+    this.TYPING_DELAY = 0; //1500;
   }
 
   initialize() {
@@ -49,7 +49,7 @@ export class HomePage {
       for (let i = 0; i < treeObject.get(Consts.TREEOBJECTS_CHILDRENCONNECTORS)[0].length; i++) {
         let replyOption:any = {
           message: treeObject.get(Consts.TREEOBJECTS_CHILDRENCONNECTORS)[0][i],
-          pointer: treeObject.get(Consts.TREEOBJECTS_CHILDREN)[0][i]
+          pointer: treeObject.get(Consts.TREEOBJECTS_CHILDREN)[i]
         }
         console.log('Reply Option', treeObject, replyOption);
         this.replyOptions.push(replyOption);

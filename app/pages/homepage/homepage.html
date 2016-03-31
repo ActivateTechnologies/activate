@@ -15,7 +15,7 @@
         [class.align-right]="chatMessage.usersMessage">
       <div [class.message-user]="chatMessage.usersMessage"
           [class.message-bot]="!chatMessage.usersMessage">
-        {{chatMessage.message}}
+        <span [innerHTML]="chatMessage.message"></span>
       </div>
       <br>
     </div>
@@ -29,7 +29,6 @@
      (click)="replyWithMessage(option)">
       {{option.message}}
     </div>
-    <!--<i class="em em---1"></i>-->
   </div>
 
 </ion-content>
