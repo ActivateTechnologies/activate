@@ -7,8 +7,8 @@
 </ion-navbar>
 -->
 
+<ion-content class="homepage" id="homepage-content">
 
-<ion-content class="homepage">
   <ion-list padding>
     <div *ngFor="#chatMessage of chatMessages" class="fade-in"
         [class.align-right]="chatMessage.usersMessage">
@@ -21,6 +21,7 @@
     <div class="message-typing fade-in" [hidden]="!typing">
       <span class="message-typing-inside">...</span>
     </div>
+    <span style="font-size: 24px;"><br>&nbsp;</span>
   </ion-list>
 
   <div class="replyBox">
@@ -29,7 +30,6 @@
       <span [innerHTML]="option.message"></span>
     </div>
   </div>
-
 
 </ion-content>
 

@@ -8,15 +8,17 @@ import {CloudFunctions} from '../../helpers/cloudfunctions';
 export class HomePage {
 
   nav:any; app:any; chatMessages:any[]; replyOptions:any[];
-  typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number;
+  typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number; SCROLL_DELAY:number;
 
 	constructor(ionicApp: IonicApp, nav: NavController) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = nav;
     this.app = ionicApp;
     this.initialize();
-    this.THINKING_DELAY = 0; //1000;
-    this.TYPING_DELAY = 0; //1500;
+    let dev:boolean = false;
+    this.THINKING_DELAY = (dev) ? 0 : 1000;
+    this.TYPING_DELAY = (dev) ? 0 : 1500;
+    this.SCROLL_DELAY = (dev) ? 0 : 3000;
   }
 
   initialize() {
@@ -33,6 +35,7 @@ export class HomePage {
 
   setTyping(typing:boolean) {
     this.typing = typing;
+    this.scrollToBottom();
   }
 
   processReceivedMessage(treeObject) {
@@ -44,6 +47,7 @@ export class HomePage {
       usersMessage: false
     }
     this.chatMessages.push(messageObject);
+    this.scrollToBottom();
     if (treeObject.get(Consts.TREEOBJECTS_CHILDRENCONNECTORS)[0].length > 0) {
       this.replyOptions = [];
       for (let i = 0; i < treeObject.get(Consts.TREEOBJECTS_CHILDRENCONNECTORS)[0].length; i++) {
@@ -80,11 +84,22 @@ export class HomePage {
       usersMessage: true
     }
     this.chatMessages.push(messageObject);
+    this.scrollToBottom();
+    this.replyOptions = [];
     setTimeout(() => {
       this.setTyping(true);
       setTimeout(() => {
         this.fetchAndProcessPointer(message.pointer);
       }, this.TYPING_DELAY);
     }, this.THINKING_DELAY);
+  }
+
+  scrollToBottom() {
+    let contentHandle:any = this.app.getComponent('homepage-content');
+    if (contentHandle && contentHandle.scrollElement) {
+      contentHandle.scrollTo(0, contentHandle.scrollElement.scrollHeight, this.SCROLL_DELAY);
+    } else {
+      console.log('Today elememt not found');
+    }
   }
 }
