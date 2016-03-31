@@ -26,7 +26,7 @@
   <div class="replyBox">
     <div *ngFor="#option of replyOptions" class="replyOption"
      (click)="replyWithMessage(option)">
-      {{option.message}}
+      <span [innerHTML]="option.message"></span>
     </div>
   </div>
 
