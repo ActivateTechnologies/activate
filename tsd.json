@@ -6,16 +6,16 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "node/node.d.ts": {
-      "commit": "80057d687aefa736511e434cd2a6c0e9a6bb02bc"
+      "commit": "e8f8e7471b8ca92ca417f8c878f64ae4d1067972"
     },
     "parse/parse.d.ts": {
-      "commit": "80057d687aefa736511e434cd2a6c0e9a6bb02bc"
+      "commit": "e8f8e7471b8ca92ca417f8c878f64ae4d1067972"
     },
     "underscore/underscore.d.ts": {
-      "commit": "80057d687aefa736511e434cd2a6c0e9a6bb02bc"
+      "commit": "e8f8e7471b8ca92ca417f8c878f64ae4d1067972"
     },
     "jquery/jquery.d.ts": {
-      "commit": "80057d687aefa736511e434cd2a6c0e9a6bb02bc"
+      "commit": "e8f8e7471b8ca92ca417f8c878f64ae4d1067972"
     }
   }
 }

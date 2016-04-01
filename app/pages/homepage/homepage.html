@@ -14,7 +14,8 @@
         [class.align-right]="chatMessage.usersMessage">
       <div [class.message-user]="chatMessage.usersMessage"
           [class.message-bot]="!chatMessage.usersMessage">
-        <span [innerHTML]="chatMessage.message"></span>
+        <span *ngIf="!chatMessage.isWidget" [innerHTML]="chatMessage.message"></span>
+        <Widget *ngIf="chatMessage.isWidget" [widget]="chatMessage.widget"></Widget>
       </div>
       <br>
     </div>
