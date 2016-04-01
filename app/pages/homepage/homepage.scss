@@ -73,6 +73,7 @@
     border-bottom-right-radius: 0px;
     font-size: 16px;
     display: inline-block;
+    margin-bottom: 10px;
   }
 
   .replyBox {
@@ -111,6 +112,39 @@
 
   .emojiBottom {
     font-size: 16px;
+  }
+
+  .chatBubbleMenu {
+    font-size: 28px;
+    color: #ECECEC;
+    padding-bottom: 30px;
+    padding-right: 10px;
+  }
+
+  .chatMenuDiv {
+    position: absolute;
+    z-index: 100;
+    bottom: 0;
+    right: 0;
+  }
+
+  .replyOptionsTopContainer {
+  }
+
+  .replyOptionsBottomContainer {
+    height: 20px;
+  }
+
+  .bottomReplyContainer {
+    width: 24%;
+    display: inline-block;
+    height: 20px;
+    margin: 0;
+  }
+
+  .bottomReplyIcon {
+    color: #CECECE;
+    font-size: 18px;
   }
 
 }

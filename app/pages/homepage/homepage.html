@@ -1,11 +1,12 @@
 
-<ion-navbar *navbar>
+<!--
+<ion-navbar *navbar class="navbar">
   <button menuToggle>
     <ion-icon name="menu"></ion-icon>
   </button>
   <ion-title>Activate</ion-title>
 </ion-navbar>
-
+-->
 
 <ion-content class="homepage" id="homepage-content">
 
@@ -24,10 +25,37 @@
     <span style="font-size: 24px;"><br>&nbsp;</span>
   </ion-list>
 
+  
+
   <div class="replyBox">
-    <div *ngFor="#option of replyOptions" class="replyOption"
-     (click)="replyWithMessage(option)">
-      <span [innerHTML]="option.message"></span>
+    <!--
+    <div class="chatMenuDiv">
+      <ion-icon name="chatbubbles" class="chatBubbleMenu"></ion-icon>
+    </div>
+    -->
+    <div class="replyOptionsTopContainer">
+      <div *ngFor="#option of replyOptions" class="replyOption"
+       (click)="replyWithMessage(option)">
+        <span [innerHTML]="option.message"></span>
+      </div>
+    </div>
+
+    <div class="replyOptionsBottomContainer">
+      <div class="bottomReplyContainer">
+        <ion-icon name="md-repeat" class="bottomReplyIcon"></ion-icon>
+      </div>
+
+      <div class="bottomReplyContainer">
+        <ion-icon name="md-checkmark-circle" class="bottomReplyIcon"></ion-icon>
+      </div>
+
+      <div class="bottomReplyContainer">
+        <ion-icon name="md-person" class="bottomReplyIcon"></ion-icon>
+      </div>
+
+      <div class="bottomReplyContainer">
+        <ion-icon name="md-settings" class="bottomReplyIcon"></ion-icon>
+      </div>
     </div>
   </div>
 
