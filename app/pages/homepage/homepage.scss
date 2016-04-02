@@ -149,7 +149,7 @@
   }
 
   .topNavbarWhiteBackground {
-    height: 15px;
+    height: 20px;
     width: 100%;
     background: #FFFFFF;
     position: fixed;
@@ -168,10 +168,14 @@
 
   .widget-facebookLogin-button {
     z-index: 100;
-    width: 100%;
+    width: 50px;
     margin-left: auto;
     margin-right: auto;
     display: block;
+  }
+
+  .replyOptionWidget {
+    color: #FFFFFF;
   }
 
 }

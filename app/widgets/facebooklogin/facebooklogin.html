@@ -1,7 +1,13 @@
 <ion-content class="facebookLogin">
 	<!-- When isReply -->
+	<!--
 	<div *ngIf="isReply" (click)="login()">
 		<img class="button" src="images/widget-facebookLogin-facebook.png" />
+		<span [hidden]="!loading" class="loading">&nbsp;...</span>
+	</div>
+	-->
+	<div *ngIf="isReply" (click)="login()" class="replyOptionWidget">
+		Facebook Login
 		<span [hidden]="!loading" class="loading">&nbsp;...</span>
 	</div>
 	<!-- When !isReply -->
