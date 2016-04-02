@@ -2,6 +2,7 @@ import {Page, NavController, IonicApp} from 'ionic-angular';
 import {Consts} from '../../helpers/consts';
 import {Widget} from '../../widgets/widget';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
+import {NgZone} from 'angular2/core';
 
 @Page({
   templateUrl: 'build/pages/homepage/homepage.html',
@@ -9,18 +10,22 @@ import {CloudFunctions} from '../../helpers/cloudfunctions';
 })
 export class HomePage {
 
-  nav:any; app:any; chatMessages:any[]; replyOptions:any[];
+  nav:any; app:any; zone:any; chatMessages:any[]; replyOptions:any[];
   typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number; SCROLL_DELAY:number;
-  dev:boolean = true;
+  dev:boolean = false;
 
-	constructor(ionicApp: IonicApp, nav: NavController) {
+  public widgetBoundCallback: Function;
+
+	constructor(ionicApp: IonicApp, nav: NavController, zone: NgZone) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = nav;
     this.app = ionicApp;
+    this.zone = zone;
     this.initialize();
     this.THINKING_DELAY = (this.dev) ? 0 : 1000;
     this.TYPING_DELAY = (this.dev) ? 0 : 1500;
     this.SCROLL_DELAY = (this.dev) ? 0 : 3000;
+    this.widgetBoundCallback = this.widgetCallback.bind(this);
   }
 
   initialize() {
@@ -47,6 +52,7 @@ export class HomePage {
     this.setTyping(false);
 
     let treeObjectMessages = treeObject.get(Consts.TREEOBJECTS_MESSAGES);
+    let treeObjectChildConnectors = treeObject.get(Consts.TREEOBJECTS_CHILDRENCONNECTORS);
     let randIndex:number = 0;
     let messageObject:any = {
       usersMessage: false
@@ -61,13 +67,18 @@ export class HomePage {
     this.chatMessages.push(messageObject);
     this.scrollToBottom();
     if (!messageObject.isWidget) {
-      if (treeObject.get(Consts.TREEOBJECTS_CHILDRENCONNECTORS)[0].length > 0) {
+      if (treeObjectChildConnectors[0].length > 0) {
         this.replyOptions = [];
-        for (let i = 0; i < treeObject.get(Consts.TREEOBJECTS_CHILDRENCONNECTORS)[0].length;
-           i++) {
+        for (let i = 0; i < treeObjectChildConnectors[0].length; i++) {
           let replyOption:any = {
-            message: treeObject.get(Consts.TREEOBJECTS_CHILDRENCONNECTORS)[0][i],
             pointer: treeObject.get(Consts.TREEOBJECTS_CHILDREN)[i]
+          }
+          if (treeObjectChildConnectors[0][i].widgetName) {
+            replyOption.isWidget = true;
+            replyOption.widget = treeObjectChildConnectors[0][i];
+          } else {
+            replyOption.isWidget = false;
+            replyOption.message = treeObjectChildConnectors[0][i];
           }
           //console.log('Reply Option', treeObject, replyOption);
           this.replyOptions.push(replyOption);
@@ -106,19 +117,43 @@ export class HomePage {
   }
 
   //Adds user choice to conversation and calls to fetch next treeObject
-  replyWithMessage(message:any) {
+  replyWithMessage(option:any) {
     //console.log('replyWithMessage', message);
-    let messageObject:any = {
-      message: message.message,
-      usersMessage: true
+    if (!option.isWidget) {
+      let messageObject:any = {
+        message: option.message,
+        usersMessage: true,
+        isWidget: false
+      }
+      this.chatMessages.push(messageObject);
+      this.scrollToBottom();
+      this.replyOptions = [];
+      setTimeout(() => {
+        this.setTyping(true);
+        setTimeout(() => {
+          this.fetchAndProcessPointer(option.pointer);
+        }, this.TYPING_DELAY);
+      }, this.THINKING_DELAY);
     }
-    this.chatMessages.push(messageObject);
-    this.scrollToBottom();
-    this.replyOptions = [];
+  }
+
+  widgetCallback(option:any) {
+    let messageObject:any = {
+      usersMessage: true,
+      isWidget: true,
+      widget: option.widget
+    }
+    this.zone.run(() => {
+      this.chatMessages.push(messageObject);
+      this.scrollToBottom();
+      this.replyOptions = [];
+    });
     setTimeout(() => {
       this.setTyping(true);
       setTimeout(() => {
-        this.fetchAndProcessPointer(message.pointer);
+        this.zone.run(() => {
+          this.fetchAndProcessPointer(option.pointer);
+        });
       }, this.TYPING_DELAY);
     }, this.THINKING_DELAY);
   }

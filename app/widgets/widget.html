@@ -1,3 +1,5 @@
 <ion-content class="widget">
-	<FacebookLogin *ngIf="widget.widgetName == 'facebookLogin'"></FacebookLogin>
+	<FacebookLogin *ngIf="widget.widgetName == 'facebookLogin'"
+	 [callbackFunction]="callbackFunction" [option]="option"
+	 [isReply]="isReply"></FacebookLogin>
 </ion-content>

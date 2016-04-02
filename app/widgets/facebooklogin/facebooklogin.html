@@ -1,3 +1,19 @@
 <ion-content class="facebookLogin">
-	<img (click)="login()" class="button" src="images/widget-facebookLogin-facebook.png">
+	<!-- When isReply -->
+	<div *ngIf="isReply" (click)="login()">
+		<img class="button" src="images/widget-facebookLogin-facebook.png" />
+		<span [hidden]="!loading" class="loading">&nbsp;...</span>
+	</div>
+	<!-- When !isReply -->
+	<div *ngIf="!isReply" (click)="login()">
+		<table class="table"><tr>
+			<td class="imageTd">
+				<img src="https://graph.facebook.com/{{currentUser.get('facebookId')}}/picture?width=200" class="profileImage">
+			</td>
+			<td class="textTd">
+				<span class="userName">{{currentUser.get('name')}}</span><br>
+		    <span class="loginMessage">Facebook user</span>
+			</td>
+		</tr></table>
+	</div>
 </ion-content>

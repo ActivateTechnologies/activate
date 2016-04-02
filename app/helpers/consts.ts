@@ -44,6 +44,8 @@ export class Consts {
   public static USER_PASSWORD = "password";
   //String - Username
   public static USER_USERNAME = "username";
+  //String - User's facebookId
+  public static USER_FACEBOOKID = "facebookId";
   //String - First Name (all lowercase)
   public static USER_SEARCHABLE_NAMEFIRST = "searchable_nameFirst";
   //String - Last Name (all lowercase)

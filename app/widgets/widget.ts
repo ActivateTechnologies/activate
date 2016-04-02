@@ -10,6 +10,9 @@ import {FacebookLogin} from './facebooklogin/facebooklogin';
 })
 export class Widget {
 	@Input() widget:any;
+	@Input() option:any;
+	@Input() isReply:boolean;
+	@Input() callbackFunction:Function;
 
 	constructor() {
 	}

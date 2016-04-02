@@ -1,9 +1,10 @@
+
 <!--
-<ion-navbar *navbar>
+<ion-navbar *navbar class="navbar">
   <button menuToggle>
     <ion-icon name="menu"></ion-icon>
   </button>
-  <ion-title>Getting Started</ion-title>
+  <ion-title>Activate</ion-title>
 </ion-navbar>
 -->
 
@@ -15,7 +16,9 @@
       <div [class.message-user]="chatMessage.usersMessage"
           [class.message-bot]="!chatMessage.usersMessage">
         <span *ngIf="!chatMessage.isWidget" [innerHTML]="chatMessage.message"></span>
-        <Widget *ngIf="chatMessage.isWidget" [widget]="chatMessage.widget"></Widget>
+        <Widget *ngIf="chatMessage.isWidget" [widget]="chatMessage.widget"
+         [callbackFunction]="widgetBoundCallback" [option]="chatMessage"
+         [isReply]="false"></Widget>
       </div>
       <br>
     </div>
@@ -26,9 +29,37 @@
   </ion-list>
 
   <div class="replyBox">
-    <div *ngFor="#option of replyOptions" class="replyOption"
-     (click)="replyWithMessage(option)">
-      <span [innerHTML]="option.message"></span>
+    <!--
+    <div class="chatMenuDiv">
+      <ion-icon name="chatbubbles" class="chatBubbleMenu"></ion-icon>
+    </div>
+    -->
+    <div class="replyOptionsTopContainer">
+      <div *ngFor="#option of replyOptions" class="replyOption"
+       (click)="replyWithMessage(option)">
+        <span *ngIf="!option.isWidget" [innerHTML]="option.message"></span>
+        <Widget *ngIf="option.isWidget" [widget]="option.widget"
+         [callbackFunction]="widgetBoundCallback" [option]="option"
+        [isReply]="true"></Widget>
+      </div>
+    </div>
+
+    <div class="replyOptionsBottomContainer">
+      <div class="bottomReplyContainer">
+        <ion-icon name="md-repeat" class="bottomReplyIcon"></ion-icon>
+      </div>
+
+      <div class="bottomReplyContainer">
+        <ion-icon name="md-checkmark-circle" class="bottomReplyIcon"></ion-icon>
+      </div>
+
+      <div class="bottomReplyContainer">
+        <ion-icon name="md-person" class="bottomReplyIcon"></ion-icon>
+      </div>
+
+      <div class="bottomReplyContainer">
+        <ion-icon name="md-settings" class="bottomReplyIcon"></ion-icon>
+      </div>
     </div>
   </div>
 
