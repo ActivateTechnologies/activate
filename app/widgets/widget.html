@@ -1,5 +1,8 @@
-<ion-content class="widget">
+<div class="widget">
 	<FacebookLogin *ngIf="widget.widgetName == 'facebookLogin'"
 	 [callbackFunction]="callbackFunction" [option]="option"
 	 [isReply]="isReply"></FacebookLogin>
-</ion-content>
+	<UserLocation *ngIf="widget.widgetName == 'userLocation'"
+	 [callbackFunction]="callbackFunction" [option]="option"
+	 [isReply]="isReply"></UserLocation>
+</div>

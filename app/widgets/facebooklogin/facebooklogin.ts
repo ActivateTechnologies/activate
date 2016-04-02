@@ -21,16 +21,21 @@ export class FacebookLogin {
   }
 
 	login() {
-		console.log('Will login through facebook;');
-		this.loading = true;
-		this.facebookParseLogin(null, () => {
-			console.log('Facebook login successful');
-			this.loading = false;
-			this.callbackFunction(this.option);
-		}, (message, error) => {
-			console.log('Error logging through facebook:', message);
-			alert('Error' + message);
-		});
+    if (this.isReply) {
+      if (this.currentUser) {
+        Parse.User.logOut();
+      }
+      console.log('Will login through facebook;');
+      this.loading = true;
+      this.facebookParseLogin(null, () => {
+        console.log('Facebook login successful');
+        this.loading = false;
+        this.callbackFunction(this.option);
+      }, (message, error) => {
+        console.log('Error logging through facebook:', message);
+        alert('Error' + message);
+      });
+    }
 	}
 
 	facebookParseLogin(authData, successCallback, errorCallback) {
