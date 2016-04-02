@@ -36,6 +36,7 @@ export class HomePage {
         this.processReceivedTreeObject(data.treeObject);
       } else {
         console.log('Error', error.message);
+        alert('There was an network error, please try again.');
       }
     });
   }
@@ -92,10 +93,6 @@ export class HomePage {
     }
   }
 
-  cool() {
-    console.log('cool')
-  }
-
   //Replaces hot keywords with dynamic data
   processMessage(message:string) {
     let editedString:string = message.replace("#~user_firstname~#", 
@@ -137,6 +134,7 @@ export class HomePage {
     }
   }
 
+  //Passed as a callback function to widgets
   widgetCallback(option:any) {
     let messageObject:any = {
       usersMessage: true,
@@ -166,5 +164,25 @@ export class HomePage {
     } else {
       console.log('Today elememt not found');
     }
+  }
+
+  navigateTreeTo(notesString) {
+    let TreeObjects:any = Parse.Object.extend(Consts.TREEOBJECTS_CLASS);
+    let query:any = new Parse.Query(TreeObjects);
+    query.equalTo(Consts.TREEOBJECTS_NOTES, notesString);
+    query.first({
+      success: (treeObject) => {
+        console.log('Got treeObject', treeObject)
+        this.chatMessages.push({
+          type:'line'
+        });
+        console.log(this.chatMessages);
+        this.processReceivedTreeObject(treeObject);
+      },
+      error: (error) => {
+        console.log("Error getting root TreeObject", error.message);
+        alert('There was an network error, please try again.');
+      }
+    });
   }
 }

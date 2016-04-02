@@ -16,13 +16,14 @@
   <ion-list padding>
     <div *ngFor="#chatMessage of chatMessages" class="fade-in"
         [class.align-right]="chatMessage.usersMessage">
-      <div [class.message-user]="chatMessage.usersMessage"
+      <div *ngIf="chatMessage.type != 'line'" [class.message-user]="chatMessage.usersMessage"
           [class.message-bot]="!chatMessage.usersMessage">
         <span *ngIf="!chatMessage.isWidget" [innerHTML]="chatMessage.message"></span>
         <Widget *ngIf="chatMessage.isWidget" [widget]="chatMessage.widget"
          [callbackFunction]="widgetBoundCallback" [option]="chatMessage"
          [isReply]="false"></Widget>
       </div>
+      <div *ngIf="chatMessage.type == 'line'" class="chat-break-line"></div>
       <br>
     </div>
     <div class="message-typing fade-in" [hidden]="!typing">
@@ -49,19 +50,23 @@
 
     <div class="replyOptionsBottomContainer">
       <div class="bottomReplyContainer">
-        <ion-icon name="md-repeat" class="bottomReplyIcon"></ion-icon>
+        <ion-icon name="md-repeat" class="bottomReplyIcon"
+         (click)="navigateTreeTo('beginning')"></ion-icon>
       </div>
 
       <div class="bottomReplyContainer">
-        <ion-icon name="md-checkmark-circle" class="bottomReplyIcon"></ion-icon>
+        <ion-icon name="md-checkmark-circle" class="bottomReplyIcon"
+         (click)="navigateTreeTo('goingGames')"></ion-icon>
       </div>
 
       <div class="bottomReplyContainer">
-        <ion-icon name="md-person" class="bottomReplyIcon"></ion-icon>
+        <ion-icon name="md-person" class="bottomReplyIcon"
+         (click)="openUserProfile()"></ion-icon>
       </div>
 
       <div class="bottomReplyContainer">
-        <ion-icon name="md-settings" class="bottomReplyIcon"></ion-icon>
+        <ion-icon name="md-settings" class="bottomReplyIcon"
+         (click)="openSettings()"></ion-icon>
       </div>
     </div>
   </div>

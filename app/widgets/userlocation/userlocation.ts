@@ -24,6 +24,7 @@ export class UserLocation {
     if (this.isReply) {
       this.loading = true;
       navigator.geolocation.getCurrentPosition((position) => {
+        console.log('Got location');
         this.loading = false;
         this.callbackFunction(this.option);
         /*if (this.placedMarker == null) {
