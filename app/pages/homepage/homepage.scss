@@ -155,4 +155,15 @@
     z-index: 200;
   }
 
+
+  /* WIDGETS */
+
+  .widget-facebookLogin-button {
+    z-index: 100;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+  }
+
 }

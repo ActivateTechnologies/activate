@@ -17,10 +17,10 @@ class MyApp {
 
     // used for an example of ngFor and navigation
     this.pages = [
-      { title: 'Restart'},
-      { title: 'Going' },
-      { title: 'Organising' },
-      { title: 'Settings' }
+      { title: 'Restart', component: SettingsPage },
+      { title: 'Going', component: SettingsPage },
+      { title: 'Organising', component: SettingsPage },
+      { title: 'Settings', component: SettingsPage }
     ];
 
   }

@@ -1,0 +1,49 @@
+.facebookLogin {
+
+  background-color:transparent;
+  padding: 0px;
+  margin-right: 0px;
+
+  .button {
+    display: inline;
+    z-index: 100;
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0px;
+    margin-bottom: 0px;
+    border: none;
+  }
+
+  .loading {
+    dispaly: inline;
+    color: #ffffff;
+  }
+
+  .table {
+
+  }
+
+  .imageTd {
+    width: 25%;
+  }
+
+  .textTd {
+    padding: 5px;
+    text-align: left;
+  }
+
+  .profileImage {
+    width:100%;
+  }
+
+  .userName {
+    text-align:left;
+  }
+
+  .loginMessage{
+    font-size:10px;
+  }
+
+
+}

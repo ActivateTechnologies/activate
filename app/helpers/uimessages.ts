@@ -11,12 +11,12 @@ export class UIMessages {
     if (!strings.message) {
       strings = {
         message: strings,
-        title: '';
+        title: ''
       }
     }
     let alertObject = Alert.create({
       title: strings.title,
-      body: strings.message,
+      message: strings.message,
       buttons: [{
         text: 'Ok',
         handler: (data) => {
@@ -50,7 +50,7 @@ export class UIMessages {
     }
     let alertObject = Alert.create({
       title: strings.title,
-      body: strings.message,
+      message: strings.message,
       buttons: [
         {
           text: cancelString,

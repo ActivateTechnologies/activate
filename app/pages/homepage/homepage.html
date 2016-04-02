@@ -18,7 +18,10 @@
         [class.align-right]="chatMessage.usersMessage">
       <div [class.message-user]="chatMessage.usersMessage"
           [class.message-bot]="!chatMessage.usersMessage">
-        <span [innerHTML]="chatMessage.message"></span>
+        <span *ngIf="!chatMessage.isWidget" [innerHTML]="chatMessage.message"></span>
+        <Widget *ngIf="chatMessage.isWidget" [widget]="chatMessage.widget"
+         [callbackFunction]="widgetBoundCallback" [option]="chatMessage"
+         [isReply]="false"></Widget>
       </div>
       <br>
     </div>
@@ -27,8 +30,6 @@
     </div>
     <span style="font-size: 24px;"><br>&nbsp;</span>
   </ion-list>
-
-  
 
   <div class="replyBox">
     <!--
@@ -39,7 +40,10 @@
     <div class="replyOptionsTopContainer">
       <div *ngFor="#option of replyOptions" class="replyOption"
        (click)="replyWithMessage(option)">
-        <span [innerHTML]="option.message"></span>
+        <span *ngIf="!option.isWidget" [innerHTML]="option.message"></span>
+        <Widget *ngIf="option.isWidget" [widget]="option.widget"
+         [callbackFunction]="widgetBoundCallback" [option]="option"
+        [isReply]="true"></Widget>
       </div>
     </div>
 
