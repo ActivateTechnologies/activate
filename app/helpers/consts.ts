@@ -52,6 +52,8 @@ export class Consts {
   public static USER_SEARCHABLE_NAMELAST = "searchable_nameLast";
   //Number - Number of games played
   public static USER_NOOFGAMES = "numGames";
+  //GeoPoint - User's last known location
+  public static USER_LASTLOCATION = "lastLocation";
 
   constructor() {
   }

@@ -1,20 +1,11 @@
-<div class="userlocation" (click)="getUserLocation()">
-	Yes <span [hidden]="!loading" class="loading">&nbsp;...</span>
+<div class="userlocation">
 	<!-- When isReply -->
-	<!-- <div *ngIf="isReply" (click)="login()">
-		<img class="button" src="images/widget-facebookLogin-facebook.png" />
-		<span [hidden]="!loading" class="loading">&nbsp;...</span>
-	</div> -->
+	<div *ngIf="isReply" (click)="getUserLocation()">
+		Yes <span [hidden]="!loading" class="loading">&nbsp;...</span>
+	</div>
 	<!-- When !isReply -->
-	<!-- <div *ngIf="!isReply" (click)="login()">
-		<table class="table"><tr>
-			<td class="imageTd">
-				<img src="https://graph.facebook.com/{{currentUser.get('facebookId')}}/picture?width=200" class="profileImage">
-			</td>
-			<td class="textTd">
-				<span class="userName">{{currentUser.get('name')}}</span><br>
-		    <span class="loginMessage">Facebook user</span>
-			</td>
-		</tr></table>
-	</div> -->
+	<div *ngIf="!isReply">
+		<img *ngIf="lastLocation" src="https://maps.googleapis.com/maps/api/staticmap?center={{lastLocation.latitude}},{{lastLocation.longitude}}&zoom=16&size=400x300&maptype=map&markers=color:red%7C{{lastLocation.latitude}},{{lastLocation.longitude}}" class="map-image"/>
+		<span *ngIf="!lastLocation">Location Permission Denied</span>
+	</div>
 </div>

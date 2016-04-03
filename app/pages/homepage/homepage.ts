@@ -21,6 +21,7 @@ export class HomePage {
     this.nav = nav;
     this.app = ionicApp;
     this.zone = zone;
+    this.chatMessages = [];
     this.initialize();
     this.THINKING_DELAY = (this.dev) ? 0 : 1000;
     this.TYPING_DELAY = (this.dev) ? 0 : 1500;
@@ -29,8 +30,11 @@ export class HomePage {
   }
 
   initialize() {
+    /*if (Parse.User.current()) {
+      this.navigateTreeTo('welcomeBack', false);
+      return;
+    }*/
     this.typing = true;
-    this.chatMessages = [];
     CloudFunctions.initConversation((data, error?) => {
       if (!error) {
         this.processReceivedTreeObject(data.treeObject);
@@ -52,9 +56,12 @@ export class HomePage {
     //console.log('processReceivedTreeObject', treeObject);
     this.setTyping(false);
 
-    let treeObjectMessages = treeObject.get(Consts.TREEOBJECTS_MESSAGES);
-    let treeObjectChildConnectors = treeObject.get(Consts.TREEOBJECTS_CHILDRENCONNECTORS);
-    let randIndex:number = 0;
+    let treeObjectMessages:any[] = treeObject.get(Consts.TREEOBJECTS_MESSAGES);
+    let treeObjectChildConnectors:any[]
+      = treeObject.get(Consts.TREEOBJECTS_CHILDRENCONNECTORS);
+    let randIndexMessages:number = Math.floor(Math.random()*treeObjectMessages.length);
+    let randIndexChildren:number
+      = Math.floor(Math.random()*treeObjectChildConnectors.length);
     let messageObject:any = {
       usersMessage: false
     }
@@ -63,23 +70,23 @@ export class HomePage {
       messageObject.widget = treeObjectMessages[0];
     } else {
       messageObject.isWidget = false;
-      messageObject.message = this.processMessage(treeObjectMessages[randIndex]);
+      messageObject.message = this.processMessage(treeObjectMessages[randIndexMessages]);
     }
     this.chatMessages.push(messageObject);
     this.scrollToBottom();
     if (!messageObject.isWidget) {
-      if (treeObjectChildConnectors[0].length > 0) {
+      if (treeObjectChildConnectors[randIndexChildren].length > 0) {
         this.replyOptions = [];
         for (let i = 0; i < treeObjectChildConnectors[0].length; i++) {
           let replyOption:any = {
             pointer: treeObject.get(Consts.TREEOBJECTS_CHILDREN)[i]
           }
-          if (treeObjectChildConnectors[0][i].widgetName) {
+          if (treeObjectChildConnectors[randIndexChildren][i].widgetName) {
             replyOption.isWidget = true;
-            replyOption.widget = treeObjectChildConnectors[0][i];
+            replyOption.widget = treeObjectChildConnectors[randIndexChildren][i];
           } else {
             replyOption.isWidget = false;
-            replyOption.message = treeObjectChildConnectors[0][i];
+            replyOption.message = treeObjectChildConnectors[randIndexChildren][i];
           }
           //console.log('Reply Option', treeObject, replyOption);
           this.replyOptions.push(replyOption);
@@ -166,18 +173,24 @@ export class HomePage {
     }
   }
 
-  navigateTreeTo(notesString) {
+  navigateTreeTo(notesString, insertLine) {
     let TreeObjects:any = Parse.Object.extend(Consts.TREEOBJECTS_CLASS);
     let query:any = new Parse.Query(TreeObjects);
     query.equalTo(Consts.TREEOBJECTS_NOTES, notesString);
     query.first({
       success: (treeObject) => {
         console.log('Got treeObject', treeObject)
-        this.chatMessages.push({
-          type:'line'
-        });
-        console.log(this.chatMessages);
-        this.processReceivedTreeObject(treeObject);
+        if (insertLine) {
+          this.chatMessages.push({
+            type:'line'
+          });
+        }
+        setTimeout(() => {
+          this.setTyping(true);
+          setTimeout(() => {
+            this.processReceivedTreeObject(treeObject);
+          }, this.TYPING_DELAY);
+        }, 0); //this.THINKING_DELAY
       },
       error: (error) => {
         console.log("Error getting root TreeObject", error.message);

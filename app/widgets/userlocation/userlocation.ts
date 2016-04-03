@@ -13,24 +13,28 @@ export class UserLocation {
   @Input() isReply:boolean;
 	@Input() callbackFunction:Function;
 
-	loading:boolean = false; currentUser:any;
+	loading:boolean = false; currentUser:any; lastLocation:Parse.GeoPoint;
 
   ngOnInit() {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.currentUser = Parse.User.current();
+    if (!this.isReply) {
+      this.lastLocation = this.currentUser.get(Consts.USER_LASTLOCATION);
+    }
   }
 
 	getUserLocation() {
     if (this.isReply) {
       this.loading = true;
       navigator.geolocation.getCurrentPosition((position) => {
-        console.log('Got location');
+        console.log('Got location', position.coords);
+        Parse.User.current().set(Consts.USER_LASTLOCATION, new Parse.GeoPoint({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        }));
+        (<Parse.Object> Parse.User.current()).save();
         this.loading = false;
         this.callbackFunction(this.option);
-        /*if (this.placedMarker == null) {
-          let latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-          this.map.setCenter(latLng);
-        }*/
       }, (error) => {
         switch(error.code) {
           case error.PERMISSION_DENIED:
