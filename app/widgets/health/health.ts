@@ -33,23 +33,15 @@ export class Health {
     this.loading = false;
   }
 
+
+
   initHealth() {
     this.loading = true;
     if (navigator.health) {
       navigator.health.isAvailable(() => {
         this.healthApiStatus = "Available";
         console.log('Health available');
-        navigator.health.query({
-          startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
-          endDate: new Date(), // now
-          dataType: 'steps'
-        }, (data) => {
-          console.log('Got steps:', data)
-          alert(data);
-        }, (error) => {
-          console.log('Error:', error);
-          alert('Error:'+error);
-        })
+        this.initAuth();
         this.loading = false;
         this.callbackFunction(this.option);
       }, () => {
@@ -64,5 +56,27 @@ export class Health {
       this.loading = false;
       this.callbackFunction(this.option);
     }
+  }
+
+  initAuth() {
+    navigator.health.requestAuthorization(['steps'],
+      () => {
+        alert('Auth success');
+        navigator.health.query({
+          startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
+          endDate: new Date(), // now
+          dataType: 'steps'
+        }, (data) => {
+          console.log('Got steps:', data)
+          alert(data);
+        }, (error) => {
+          console.log('Error:', error);
+          alert('Error:'+error);
+        });
+      }, (err) => {
+        alert('Auth error: '+err);
+        console.log('Auth Error', err);
+      }
+    );
   }
 }
