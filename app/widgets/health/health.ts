@@ -33,8 +33,6 @@ export class Health {
     this.loading = false;
   }
 
-
-
   initHealth() {
     this.loading = true;
     if (navigator.health) {
@@ -59,20 +57,70 @@ export class Health {
   }
 
   initAuth() {
-    navigator.health.requestAuthorization(['steps'],
+    navigator.health.requestAuthorization(['steps', 'distance', 'activity'],
       () => {
         alert('Auth success');
-        navigator.health.query({
+        /*navigator.health.queryAggregated({
           startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
           endDate: new Date(), // now
           dataType: 'steps'
         }, (data) => {
           console.log('Got steps:', data)
-          alert(data);
+          //alert(data);
+          if (data.value) {
+            alert(data.value + ' steps walked since yesterday!');
+          }
         }, (error) => {
           console.log('Error:', error);
           alert('Error:'+error);
         });
+        navigator.health.queryAggregated({
+          startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
+          endDate: new Date(), // now
+          dataType: 'distance'
+        }, (data) => {
+          console.log('Got distance:', data)
+          //alert(data);
+          if (data.value) {
+            alert(data.value + data.unit + ' covered since yesterday!');
+          }
+        }, (error) => {
+          console.log('Error:', error);
+          alert('Error:'+error);
+        });
+        navigator.health.queryAggregated({
+          startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
+          endDate: new Date(), // now
+          dataType: 'activity'
+        }, (data) => {
+          console.log('Got activity:', data)
+          //alert(data);
+          if (data.value) {
+            alert(data.value + ' activity since yesterday!');
+          }
+        }, (error) => {
+          console.log('Error:', error);
+          alert('Error:'+error);
+        });*/
+
+        let props:any = {
+          seconds: 10,
+          fps: 30
+        };
+
+        if (heartbeat) {
+          heartbeat.take(props,
+            (bpm) => {
+              console.log("Your heart beat per minute is:" + bpm);
+              alert("Your heart beat per minute is:" + bpm);
+            }, (error) => {
+              console.log("Has not possible measure your heart beat");
+              alert("Has not possible measure your heart beat");
+            }
+          );
+        } else{
+          console.log('Heartbeat plugin not found');
+        }
       }, (err) => {
         alert('Auth error: '+err);
         console.log('Auth Error', err);
