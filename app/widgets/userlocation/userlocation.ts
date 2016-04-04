@@ -18,7 +18,7 @@ export class UserLocation {
   ngOnInit() {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.currentUser = Parse.User.current();
-    if (!this.isReply) {
+    if (!this.isReply && this.currentUser) {
       this.lastLocation = this.currentUser.get(Consts.USER_LASTLOCATION);
     }
   }
@@ -28,11 +28,13 @@ export class UserLocation {
       this.loading = true;
       navigator.geolocation.getCurrentPosition((position) => {
         console.log('Got location', position.coords);
-        Parse.User.current().set(Consts.USER_LASTLOCATION, new Parse.GeoPoint({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        }));
-        (<Parse.Object> Parse.User.current()).save();
+        if (Parse.User.current() != null) {
+          Parse.User.current().set(Consts.USER_LASTLOCATION, new Parse.GeoPoint({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          }));
+          (<Parse.Object> Parse.User.current()).save();
+        }
         this.loading = false;
         this.callbackFunction(this.option);
       }, (error) => {
