@@ -12,7 +12,7 @@ export class HomePage {
 
   nav:any; app:any; zone:any; chatMessages:any[]; replyOptions:any[];
   typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number; SCROLL_DELAY:number;
-  dev:boolean = false;
+  dev:boolean = true;
 
   public widgetBoundCallback: Function;
 

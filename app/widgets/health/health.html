@@ -1,0 +1,13 @@
+<div class="health">
+	<!-- When isReply -->
+	<div *ngIf="isReply" (click)="initHealth()">
+		Yes<span [hidden]="!loading" class="loading">&nbsp;...</span>
+	</div>
+	<!-- When !isReply -->
+	<div *ngIf="!isReply">
+		{{healthApi}}
+		{{healthApiStatus}}
+		<!-- <img *ngIf="lastLocation" src="https://maps.googleapis.com/maps/api/staticmap?center={{lastLocation.latitude}},{{lastLocation.longitude}}&zoom=16&size=400x300&maptype=map&markers=color:red%7C{{lastLocation.latitude}},{{lastLocation.longitude}}" class="map-image"/>
+		<span *ngIf="!lastLocation">Location Permission Denied</span> -->
+	</div>
+</div>

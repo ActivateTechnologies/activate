@@ -3,11 +3,12 @@ import {Component, Input} from 'angular2/core'
 import {Consts} from '../helpers/consts';
 import {FacebookLogin} from './facebooklogin/facebooklogin';
 import {UserLocation} from './userlocation/userlocation';
+import {Health} from './health/health';
 
 @Component({
 	selector: 'Widget',
   templateUrl: 'build/widgets/widget.html',
-  directives: [FacebookLogin, UserLocation]
+  directives: [FacebookLogin, UserLocation, Health]
 })
 export class Widget {
 	@Input() widget:any;
