@@ -7,12 +7,12 @@
   <ion-title>Activate</ion-title>
 </ion-navbar>
 -->
-
-<ion-content class="homepage" id="homepage-content">
-
-  <div class="topNavbarWhiteBackground">
+  <div class="homepage">
+    <div class="topNavbarWhiteBackground">
+    </div>
   </div>
 
+<ion-content class="homepage" id="homepage-content">
   <ion-list padding>
     <div *ngFor="#chatMessage of chatMessages" class="fade-in"
         [class.align-right]="chatMessage.usersMessage">
@@ -32,75 +32,49 @@
     <span style="font-size: 24px;"><br>&nbsp;</span>
   </ion-list>
 
-  <div class="replyBox">
-    <!--
-    <div class="chatMenuDiv">
-      <ion-icon name="chatbubbles" class="chatBubbleMenu"></ion-icon>
-    </div>
-    -->
-    <div class="replyOptionsTopContainer">
-      <div *ngFor="#option of replyOptions" class="replyOption"
-       (click)="replyWithMessage(option)">
-        <span *ngIf="!option.isWidget" [innerHTML]="option.message"></span>
-        <Widget *ngIf="option.isWidget" [widget]="option.widget"
-         [callbackFunction]="widgetBoundCallback" [option]="option"
-        [isReply]="true"></Widget>
-      </div>
-    </div>
-
-    
-    <div class="replyOptionsBottomContainer">
-      <div class="bottomReplyContainer">
-        <ion-icon name="md-person" class="bottomReplyIcon"
-         (click)="navigateTreeTo('beginning', true)"></ion-icon>
-      </div>
-
-      <div class="bottomReplyContainer">
-        <ion-icon name="md-stopwatch" class="bottomReplyIcon"
-         (click)="navigateTreeTo('goingGames', true)"></ion-icon>
-      </div>
-
-      <div class="bottomReplyContainer">
-        <ion-icon name="md-arrow-dropup-circle" class="bottomReplyIcon"
-         (click)="openUserProfile()"></ion-icon>
-      </div>
-
-      <div class="bottomReplyContainer">
-        <ion-icon name="md-settings" class="bottomReplyIcon"
-         (click)="openSettings()"></ion-icon>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- FUTURE
-  <div class="replyOptionsBottomContainer">
-      <div class="bottomReplyContainer2">
-        <ion-icon name="md-people" class="bottomReplyIcon"
-         (click)="navigateTreeTo('beginning')"></ion-icon>
-      </div>
-
-      <div class="bottomReplyContainer2">
-        <ion-icon name="md-basket" class="bottomReplyIcon"></ion-icon>
-      </div>
-
-      <div class="bottomReplyContainer2">
-        <ion-icon name="md-stopwatch" class="bottomReplyIcon"></ion-icon>
-      </div>
-
-      <div class="bottomReplyContainer2">
-        <ion-icon name="md-person" class="bottomReplyIcon"></ion-icon>
-      </div>
-
-      <div class="bottomReplyContainer2">
-        <ion-icon name="md-settings" class="bottomReplyIcon"
-         (click)="openSettings()"></ion-icon>
-      </div>
-    </div>
-   
-  </div> -->
-
 </ion-content>
+
+<ion-content class="bottom-content">
+  <div class="replyBox">
+      <!--
+      <div class="chatMenuDiv">
+        <ion-icon name="chatbubbles" class="chatBubbleMenu"></ion-icon>
+      </div>
+      -->
+      <div class="replyOptionsTopContainer">
+        <div *ngFor="#option of replyOptions" class="replyOption"
+         (click)="replyWithMessage(option)">
+          <span *ngIf="!option.isWidget" [innerHTML]="option.message"></span>
+          <Widget *ngIf="option.isWidget" [widget]="option.widget"
+           [callbackFunction]="widgetBoundCallback" [option]="option"
+          [isReply]="true"></Widget>
+        </div>
+      </div>
+
+      
+      <div class="replyOptionsBottomContainer">
+        <div class="bottomReplyContainer">
+          <ion-icon name="md-person" class="bottomReplyIcon"
+           (click)="navigateTreeTo('beginning', true)"></ion-icon>
+        </div>
+
+        <div class="bottomReplyContainer">
+          <ion-icon name="md-stopwatch" class="bottomReplyIcon"
+           (click)="navigateTreeTo('goingGames', true)"></ion-icon>
+        </div>
+
+        <div class="bottomReplyContainer">
+          <ion-icon name="md-arrow-dropup-circle" class="bottomReplyIcon"
+           (click)="openUserProfile()"></ion-icon>
+        </div>
+
+        <div class="bottomReplyContainer">
+          <ion-icon name="md-settings" class="bottomReplyIcon"
+           (click)="openSettings()"></ion-icon>
+        </div>
+      </div>
+    </div>
+  </ion-content>
 
 <!-- <ion-toolbar position="bottom" padding class="fixed">
   <div class="replyOption" *ngFor="#option of replyOptions">
