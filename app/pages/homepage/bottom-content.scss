@@ -1,4 +1,8 @@
-.homepage {
+.bottom-content {
+    background: none;
+    height: 40px;
+    position: absolute;
+    bottom: 0;
 
   p {
     margin: 20px 0;
@@ -137,7 +141,7 @@
   }
 
   .bottomReplyContainer {
-    width: 24%;
+    width: 32%;
     display: inline-block;
     height: 20px;
     margin: 0;
@@ -183,7 +187,5 @@
   .replyOptionWidget {
     color: #FFFFFF;
   }
-
-  
 
 }

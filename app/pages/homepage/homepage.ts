@@ -3,6 +3,7 @@ import {Consts} from '../../helpers/consts';
 import {Widget} from '../../widgets/widget';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {NgZone} from 'angular2/core';
+import {Modal, NavController, ViewController} from 'ionic-angular';
 
 @Page({
   templateUrl: 'build/pages/homepage/homepage.html',
