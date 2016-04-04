@@ -158,9 +158,9 @@ export class UserFunctions {
       },
       error: (user, error) => {
         console.log("User cancelled the Facebook login or did not fully authorize.");
-        /*this.message = 'Please ensure you authorize Kickabout to log you in through facebook.';
+        /*this.message = 'Please ensure you authorize Activate to log you in through facebook.';
         this.loading = false;*/
-        errorCallback('Please ensure you authorize Kickabout to log you in through facebook.', error);
+        errorCallback('Please ensure you authorize Activate to log you in through facebook.', error);
       }
     });
   }

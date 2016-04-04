@@ -12,7 +12,7 @@ export class HomePage {
 
   nav:any; app:any; zone:any; chatMessages:any[]; replyOptions:any[];
   typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number; SCROLL_DELAY:number;
-  dev:boolean = true;
+  dev:boolean = false;
 
   public widgetBoundCallback: Function;
 
@@ -47,7 +47,9 @@ export class HomePage {
 
   //Set state of typing, controls display of typing indicator
   setTyping(typing:boolean) {
-    this.typing = typing;
+    this.zone.run(() => {
+      this.typing = typing;
+    });
     this.scrollToBottom();
   }
 
@@ -72,11 +74,15 @@ export class HomePage {
       messageObject.isWidget = false;
       messageObject.message = this.processMessage(treeObjectMessages[randIndexMessages]);
     }
-    this.chatMessages.push(messageObject);
+    this.zone.run(() => {
+      this.chatMessages.push(messageObject);
+    });
     this.scrollToBottom();
     if (!messageObject.isWidget) {
       if (treeObjectChildConnectors[randIndexChildren].length > 0) {
-        this.replyOptions = [];
+        this.zone.run(() => {
+          this.replyOptions = [];
+        });
         for (let i = 0; i < treeObjectChildConnectors[0].length; i++) {
           let replyOption:any = {
             pointer: treeObject.get(Consts.TREEOBJECTS_CHILDREN)[i]
@@ -89,7 +95,9 @@ export class HomePage {
             replyOption.message = treeObjectChildConnectors[randIndexChildren][i];
           }
           //console.log('Reply Option', treeObject, replyOption);
-          this.replyOptions.push(replyOption);
+          this.zone.run(() => {
+            this.replyOptions.push(replyOption);
+          });
         }
       } else {
         this.setTyping(true);
@@ -129,9 +137,13 @@ export class HomePage {
         usersMessage: true,
         isWidget: false
       }
-      this.chatMessages.push(messageObject);
+      this.zone.run(() => {
+        this.chatMessages.push(messageObject);
+      });
       this.scrollToBottom();
-      this.replyOptions = [];
+      this.zone.run(() => {
+        this.replyOptions = [];
+      });
       setTimeout(() => {
         this.setTyping(true);
         setTimeout(() => {
@@ -181,8 +193,10 @@ export class HomePage {
       success: (treeObject) => {
         console.log('Got treeObject', treeObject)
         if (insertLine) {
-          this.chatMessages.push({
-            type:'line'
+          this.zone.run(() => {
+            this.chatMessages.push({
+              type:'line'
+            });
           });
         }
         setTimeout(() => {
