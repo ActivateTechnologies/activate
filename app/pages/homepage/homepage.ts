@@ -31,7 +31,6 @@ export class HomePage {
   }
 
   initialize() {
-    alert('homepage initialize');
     /*if (Parse.User.current()) {
       this.navigateTreeTo('welcomeBack', false);
       return;

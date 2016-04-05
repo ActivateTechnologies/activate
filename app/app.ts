@@ -13,7 +13,6 @@ class MyApp {
   pages: Array<{title: string, component: any}>
 
   constructor(private app: IonicApp, private platform: Platform) {
-    alert('app.ts const');
     this.initializeApp();
 
     // used for an example of ngFor and navigation
