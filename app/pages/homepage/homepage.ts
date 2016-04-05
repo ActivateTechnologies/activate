@@ -1,9 +1,8 @@
-import {Page, NavController, IonicApp} from 'ionic-angular';
+import {Page, NavController, IonicApp, Platform, Modal, ViewController} from 'ionic-angular';
 import {Consts} from '../../helpers/consts';
 import {Widget} from '../../widgets/widget';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {NgZone} from 'angular2/core';
-import {Modal, NavController, ViewController} from 'ionic-angular';
 
 @Page({
   templateUrl: 'build/pages/homepage/homepage.html',
@@ -11,17 +10,18 @@ import {Modal, NavController, ViewController} from 'ionic-angular';
 })
 export class HomePage {
 
-  nav:any; app:any; zone:any; chatMessages:any[]; replyOptions:any[];
+  nav:any; app:any; zone:any; platform:any; chatMessages:any[]; replyOptions:any[];
   typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number; SCROLL_DELAY:number;
   dev:boolean = true;
 
   public widgetBoundCallback: Function;
 
-	constructor(ionicApp: IonicApp, nav: NavController, zone: NgZone) {
+	constructor(ionicApp: IonicApp, nav: NavController, zone: NgZone, platform: Platform) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = nav;
     this.app = ionicApp;
     this.zone = zone;
+    this.platform = platform;
     this.chatMessages = [];
     this.initialize();
     this.THINKING_DELAY = (this.dev) ? 0 : 1000;
@@ -111,8 +111,14 @@ export class HomePage {
 
   //Replaces hot keywords with dynamic data
   processMessage(message:string) {
-    let editedString:string = message.replace("#~user_firstname~#", 
+    let editedString:string = message;
+
+    editedString = editedString.replace("#~user_firstname~#", 
       (Parse.User.current()) ? Parse.User.current().get(Consts.USER_FIRSTNAME) : "Stranger");
+    editedString = editedString.replace("#~nativeHealthApi~#", 
+      (this.platform.is('android')) ? "Google Fit" : 
+        (this.platform.is('ios')) ? "HealthKit" : "Health Api");
+
     return editedString;
   }
 
@@ -154,12 +160,15 @@ export class HomePage {
     }
   }
 
-  //Passed as a callback function to widgets
-  widgetCallback(option:any) {
+  //Passed as a callback function to widgets that were in replies
+  widgetCallback(option:any, data:any?) {
     let messageObject:any = {
       usersMessage: true,
       isWidget: true,
       widget: option.widget
+    }
+    if (data) {
+      messageObject.data = data;
     }
     this.zone.run(() => {
       this.chatMessages.push(messageObject);
