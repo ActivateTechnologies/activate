@@ -4,6 +4,7 @@ Parse.Cloud.define("initConversation", function(request, response) {
   query.equalTo('notes', 'activateRoot');
   query.find({
   	success: function(parseObject) {
+      console.log({log:'Called initConversation'});
   		response.success({
   			status: 'Ok',
   			treeObject: parseObject[0]
