@@ -3,6 +3,8 @@ import {Consts} from './consts';
 
 export class UserFunctions {
 
+  static message:string;
+
   constructor() {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
   }
@@ -45,10 +47,10 @@ export class UserFunctions {
     }
     facebookConnectPlugin.login(['email'],
       (response) => {
-        console.log(response);
+        //console.log(response);
         if (!response.authResponse){
           console.log('Cannot find the authResponse:', response);
-          errorCallback('Facebook Login Error. Please try again.', error);
+          errorCallback('Facebook Login Error. Please try again.', {message:''});
           return;
         }
         let expDate = new Date(
@@ -105,7 +107,7 @@ export class UserFunctions {
         FB.api('/me', {
           fields: 'name, email, first_name, last_name, gender' //, age_range
         }, (response) => {
-          console.log('Facebook user data', response);
+          //console.log('Facebook user data', response);
           let currentUser = Parse.User.current();
           currentUser.set(Consts.USER_FACEBOOKID, response.id);
           if (response.name) {
@@ -120,19 +122,19 @@ export class UserFunctions {
           if (response.email) {
             currentUser.set(Consts.USER_EMAIL, response.email);
           }
-          if (response.gender) {
+          /*if (response.gender) {
             currentUser.set(Consts.USER_GENDER, response.gender);
-          }
+          }*/
           /*if (response.age_range && response.age_range.min) {
             currentUser.set(Consts.USER_AGEMIN, parseInt(response.age_range.min));
           }*/
-          if (!currentUser.get(Consts.USER_STARVOTES)) {
+          /*if (!currentUser.get(Consts.USER_STARVOTES)) {
             currentUser.set(Consts.USER_STARVOTES, 0);
-          }
+          }*/
           if (!currentUser.get(Consts.USER_NOOFGAMES)) {
             currentUser.set(Consts.USER_NOOFGAMES, 0);
           }
-          currentUser.save(null, {
+          (<Parse.Object> currentUser).save(null, {
             success: (user) => {
               successCallback();
             },
@@ -145,7 +147,7 @@ export class UserFunctions {
             }
           })
         });
-        FB.api('/me/friends?fields=installed', function(response) {
+        /*FB.api('/me/friends?fields=installed', function(response) {
           let friends = response.data;
           let friendsFbIds = [];
           for (let i = 0; i < friends.length; i++) {
@@ -154,7 +156,7 @@ export class UserFunctions {
           Parse.Cloud.run('updateFriends', { friendsFbIdArray: friendsFbIds })
             .then(function(data) {
           });
-        });
+        });*/
       },
       error: (user, error) => {
         console.log("User cancelled the Facebook login or did not fully authorize.");

@@ -1,13 +1,26 @@
 <div class="health">
 	<!-- When isReply -->
 	<div *ngIf="isReply" (click)="initHealth()">
-		Yes<span [hidden]="!loading" class="loading">&nbsp;...</span>
+		<div *ngIf="widgetType == 'initHealth'">
+			Yes<span [hidden]="!loading" class="loading">&nbsp;...</span>
+		</div>
+		<div *ngIf="widgetType == 'showData'">
+			<!-- Nothing should be here --> Error
+		</div>
+		<div *ngIf="widgetType == 'measureHeart'">
+			Measure Away
+		</div>
 	</div>
 	<!-- When !isReply -->
 	<div *ngIf="!isReply">
-		{{healthApi}}
-		{{healthApiStatus}}
-		<!-- <img *ngIf="lastLocation" src="https://maps.googleapis.com/maps/api/staticmap?center={{lastLocation.latitude}},{{lastLocation.longitude}}&zoom=16&size=400x300&maptype=map&markers=color:red%7C{{lastLocation.latitude}},{{lastLocation.longitude}}" class="map-image"/>
-		<span *ngIf="!lastLocation">Location Permission Denied</span> -->
+		<div *ngIf="widgetType == 'initHealth'">
+			{{initHealthString}}
+		</div>
+		<div *ngIf="widgetType == 'showData'">
+			{{data.summaryString}}
+		</div>
+		<div *ngIf="widgetType == 'measureHeart'">
+			{{data.summaryString}}
+		</div>
 	</div>
 </div>

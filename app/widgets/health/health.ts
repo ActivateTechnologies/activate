@@ -9,74 +9,190 @@ import {CloudFunctions} from '../../helpers/cloudfunctions';
 })
 export class Health {
 
-	@Input() option:any;
+  //The entire chat object, to pass back in callback
+	@Input() chatObject:any;
+  //Options to specify to the widget
+  @Input() options:any;
+  //Passed back in from plugin, usually specified only when isReply = false
+  @Input() data:any;
+  //isReply = true if this widget is in the user reply section, false if it's bot's message
   @Input() isReply:boolean;
+  //Called after the widget has performed its task
 	@Input() callbackFunction:Function;
 
 	loading:boolean = false; currentUser:any; lastLocation:Parse.GeoPoint;
-  platform:any; healthApi:string; healthApiStatus:string;
+  platform:any; healthApiAvailable:boolean = false; healthApiAccessGranted:boolean = false;
+  platformId:string; widgetType:string; initHealthString:string;
 
   constructor(platform: Platform) {
+    Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
+    this.currentUser = Parse.User.current();
+    this.loading = true;
     this.platform = platform;
-    if (this.platform.is('android')) {
-      this.healthApi = 'Google Fit access granted';
-    } else if (this.platform.is('ios')) {
-      this.healthApi = 'HealthKit access granted';
-    } else {
-      this.healthApi = 'Running in browser';
-    }
   }
 
   ngOnInit() {
-    Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
-    this.currentUser = Parse.User.current();
-    this.loading = false;
+    //Types: initHealth, showData, measureHeart
+    this.widgetType = this.options.type;
+
+    this.initializeStatusVars(() => {
+      if (!this.isReply && this.widgetType == 'initHealth') {
+        this.initHealthString = this.constructInitHealthString();
+      }
+    });
   }
 
+  //Initialize various status variables incluring platformId and health api statuses
+  initializeStatusVars(callback) {
+    if (this.platform.is('android')) {
+      this.platformId = 'android';
+    } else if (this.platform.is('ios')) {
+      this.platformId = 'ios'
+    } else {
+      this.platformId = 'browser';
+    }
 
+    if (localStorage['healthApiAccessGranted']) {
+      this.healthApiAccessGranted = localStorage['healthApiAccessGranted'];
+    }
 
-  initHealth() {
-    this.loading = true;
-    if (navigator.health) {
+    if (this.platformId != 'browser' && navigator.health) {
       navigator.health.isAvailable(() => {
-        this.healthApiStatus = "Available";
-        console.log('Health available');
-        this.initAuth();
+        this.healthApiAvailable = true;
         this.loading = false;
-        this.callbackFunction(this.option);
+        callback();
       }, () => {
-        this.healthApiStatus = "Not Available";
         console.log('Health not available');
         this.loading = false;
-        this.callbackFunction(this.option);
+        callback();
       });
-    } else {
-      this.healthApiStatus = "Not Available"
-      console.log('Health not available, browser');
-      this.loading = false;
-      this.callbackFunction(this.option);
     }
   }
 
-  initAuth() {
-    navigator.health.requestAuthorization(['steps'],
+  //Called when user clicks to grant access to Health Apis
+  initHealth() {
+    this.loading = true;
+    navigator.health.requestAuthorization(['steps', 'distance', 'activity'],
       () => {
-        alert('Auth success');
-        navigator.health.query({
-          startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
-          endDate: new Date(), // now
-          dataType: 'steps'
-        }, (data) => {
-          console.log('Got steps:', data)
-          alert(data);
-        }, (error) => {
-          console.log('Error:', error);
-          alert('Error:'+error);
-        });
+        localStorage['healthApiAccessGranted'] = true;
+        this.callbackFunction(this.chatObject);
       }, (err) => {
-        alert('Auth error: '+err);
-        console.log('Auth Error', err);
+        localStorage['healthApiAccessGranted'] = false;
+        console.log('Health auth error', err);
+        this.callbackFunction(this.chatObject);
       }
     );
+  }
+
+  //Constructs the appropriate message to display after user has been asked to grant access
+  constructInitHealthString():string {
+    if (this.platformId == 'browser') {
+      return 'Health api not available in browser.'
+    } else {
+      if (!this.healthApiAvailable) {
+        return (this.platformId == 'android') ?
+         'Google Fit is not available on your device.'
+          : 'HealthKit is not available on your device.';
+      } else {
+        if (this.healthApiAccessGranted) {
+          return (this.platformId == 'android') ?
+           'Google Fit is all set!'
+            : 'HealthKit is all set!';
+        } else {
+          return (this.platformId == 'android') ?
+           'Google Fit permission deined.'
+            : 'HealthKit permission denied.';
+        }
+      }
+    }
+  }
+
+  //Get all data and call processData. If even one has error,
+  //call callback function with no data
+  showData() {
+    let steps:any; 
+    let distance:any;
+    let activity:any;
+
+    if (localStorage['healthApiAccessGranted']) {
+      this.loading = true;
+      navigator.health.queryAggregated({
+        startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
+        endDate: new Date(), // now
+        dataType: 'steps'
+      }, (data) => {
+        console.log('Got steps:', data)
+        steps = data;
+        this.processData(steps, distance, activity);
+      }, (error) => {
+        console.log('Error:', error);
+        this.callbackFunction(this.chatObject);
+      });
+      navigator.health.queryAggregated({
+        startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
+        endDate: new Date(), // now
+        dataType: 'distance'
+      }, (data) => {
+        console.log('Got distance:', data)
+        distance = data;
+        this.processData(steps, distance, activity);
+      }, (error) => {
+        console.log('Error:', error);
+        this.callbackFunction(this.chatObject);
+      });
+      navigator.health.queryAggregated({
+        startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
+        endDate: new Date(), // now
+        dataType: 'activity'
+      }, (data) => {
+        console.log('Got activity:', data)
+        activity = data;
+        this.processData(steps, distance, activity);
+      }, (error) => {
+        console.log('Error:', error);
+        this.callbackFunction(this.chatObject);
+      });
+    }
+  }
+
+  //Called by showData
+  processData(steps:any, distance:any, activity:any) {
+    if (steps != null && distance != null && activity != null) {
+      let summaryString:string = 'You walked ' + steps.value + ' steps yesterday '
+        + 'which covered ' + distance.value + distance.unit;
+      console.log(summaryString);
+      this.callbackFunction(this.chatObject, {
+        summaryString: summaryString,
+        steps: steps,
+        distance: distance,
+        activity: activity
+      });
+    }
+  }
+
+  measureHeart() {
+    this.loading = true;
+    let props:any = {
+      seconds: 10,
+      fps: 30
+    };
+    if (heartbeat) {
+      heartbeat.take(props,
+        (bpm) => {
+          console.log("Your heart beat per minute is:" + bpm);
+          this.callbackFunction(this.chatObject, {
+            summaryString: "Your heart beat per minute is:" + bpm,
+            bmp: bpm
+          });
+        }, (error) => {
+          console.log("Error measuring heart beat", error);
+          alert("Error measuring heart beat");
+          this.callbackFunction(this.chatObject);
+        }
+      );
+    } else{
+      console.log('Heartbeat plugin not found');
+      this.callbackFunction(this.chatObject);
+    }
   }
 }

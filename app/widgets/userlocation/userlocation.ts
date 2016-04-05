@@ -9,9 +9,16 @@ import {CloudFunctions} from '../../helpers/cloudfunctions';
 })
 export class UserLocation {
 
-	@Input() option:any;
+	//The entire chat object, to pass back in callback
+  @Input() chatObject:any;
+  //Options to specify to the widget
+  @Input() options:any;
+  //Passed back in from plugin, usually specified only when isReply = false
+  @Input() data:any;
+  //isReply = true if this widget is in the user reply section, false if it's bot's message
   @Input() isReply:boolean;
-	@Input() callbackFunction:Function;
+  //Called after the widget has performed its task
+  @Input() callbackFunction:Function;
 
 	loading:boolean = false; currentUser:any; lastLocation:Parse.GeoPoint;
 
@@ -36,7 +43,7 @@ export class UserLocation {
           (<Parse.Object> Parse.User.current()).save();
         }
         this.loading = false;
-        this.callbackFunction(this.option);
+        this.callbackFunction(this.chatObject);
       }, (error) => {
         switch(error.code) {
           case error.PERMISSION_DENIED:
@@ -53,7 +60,7 @@ export class UserLocation {
             break;
         }
         this.loading = false;
-        this.callbackFunction(this.option);
+        this.callbackFunction(this.chatObject);
       });
     }
 	}

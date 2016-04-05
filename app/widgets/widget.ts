@@ -11,11 +11,24 @@ import {Health} from './health/health';
   directives: [FacebookLogin, UserLocation, Health]
 })
 export class Widget {
-	@Input() widget:any;
-	@Input() option:any;
+	@Input() chatObject:any;
 	@Input() isReply:boolean;
 	@Input() callbackFunction:Function;
 
+	options:any; widget:any; data:any;
+
 	constructor() {
+		
+	}
+
+	ngOnInit() {
+		this.widget = this.chatObject.widget;
+		console.log('Widget inside widget.ts', this.widget);
+		/*if (this.widget.options) {
+			this.options = this.widget.options;
+		}
+		if (this.chatObject.data) {
+			this.data = this.chatObject.data
+		}*/
 	}
 }
