@@ -188,4 +188,31 @@
     color: #FFFFFF;
   }
 
+
+  .subMenuContainer {
+    background: #CECECE;
+    width: 28px;
+    height: 28px;
+    test-align: center;
+    border-radius: 50%;
+
+
+
+    margin-right: auto;
+    margin-left: auto;
+    display: block;
+
+  
+  }
+
+  .emSubMenu {
+    font-size: 16px;
+    margin-top: 3px;
+
+  }
+
+   .replyOptionsBottomContainerSubMenu {
+    height: 40px;
+  }
+
 }
