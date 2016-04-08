@@ -1,3 +1,5 @@
+/// <reference path="../typings/parse/parse.d.ts" />
+/// <reference path="../typings/custom_activate/custom_activate.d.ts" />
 import {App, IonicApp, Platform} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {HomePage} from './pages/homepage/homepage';

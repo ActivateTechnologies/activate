@@ -23,7 +23,6 @@ export class Widget {
 
 	ngOnInit() {
 		this.widget = this.chatObject.widget;
-		console.log('Widget inside widget.ts', this.widget);
 		/*if (this.widget.options) {
 			this.options = this.widget.options;
 		}

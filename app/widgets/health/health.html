@@ -1,26 +1,26 @@
 <div class="health">
 	<!-- When isReply -->
-	<div *ngIf="isReply" (click)="initHealth()">
-		<div *ngIf="widgetType == 'initHealth'">
+	<div *ngIf="isReply">
+		<div *ngIf="widgetType == 'initHealth'" (click)="initHealth()">
 			Yes<span [hidden]="!loading" class="loading">&nbsp;...</span>
 		</div>
 		<div *ngIf="widgetType == 'showData'">
 			<!-- Nothing should be here --> Error
 		</div>
-		<div *ngIf="widgetType == 'measureHeart'">
-			Measure Away
+		<div *ngIf="widgetType == 'measureHeart'" (click)="measureHeart()">
+			Measure Away<span [hidden]="!loading" class="loading">&nbsp;...</span>
 		</div>
 	</div>
 	<!-- When !isReply -->
 	<div *ngIf="!isReply">
 		<div *ngIf="widgetType == 'initHealth'">
-			{{initHealthString}}
+			{{initHealthString}}<span [hidden]="!loading" class="loading">&nbsp;...</span>
 		</div>
 		<div *ngIf="widgetType == 'showData'">
-			{{data.summaryString}}
+			{{summaryString}}<span [hidden]="!loading" class="loading">&nbsp;...</span>
 		</div>
 		<div *ngIf="widgetType == 'measureHeart'">
-			{{data.summaryString}}
+			{{data.summaryString}}<span [hidden]="!loading" class="loading">&nbsp;...</span>
 		</div>
 	</div>
 </div>

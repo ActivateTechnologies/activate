@@ -45,7 +45,7 @@ export class UserFunctions {
       UserFunctions.facebookParseLogin(null, successCallback, errorCallback);
       return;
     }
-    facebookConnectPlugin.login(['email'],
+    window.facebookConnectPlugin.login(['email'],
       (response) => {
         //console.log(response);
         if (!response.authResponse){
@@ -84,7 +84,7 @@ export class UserFunctions {
 
   public static userLogout(successCallback, errorCallback) {
     if (window.cordova && Parse.User.current().get(Consts.USER_FACEBOOKID)) {
-      facebookConnectPlugin.logout(
+      window.facebookConnectPlugin.logout(
         () => {
           Parse.User.logOut();
           successCallback();
@@ -104,7 +104,7 @@ export class UserFunctions {
     Parse.FacebookUtils.logIn(authData, {
       success: (user) => {
         this.message = '';
-        FB.api('/me', {
+        window.FB.api('/me', {
           fields: 'name, email, first_name, last_name, gender' //, age_range
         }, (response) => {
           //console.log('Facebook user data', response);

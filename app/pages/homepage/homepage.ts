@@ -32,7 +32,7 @@ export class HomePage {
 
   initialize() {
     /*if (Parse.User.current()) {
-      this.navigateTreeTo('welcomeBack', false);
+      this.navigateTreeTo('welcomeback', false); //healthApi
       return;
     }*/
     this.typing = true;
@@ -79,7 +79,7 @@ export class HomePage {
       this.chatMessages.push(messageObject);
     });
     this.scrollToBottom();
-    if (!messageObject.isWidget) {
+    //if (!messageObject.isWidget) {
       if (treeObjectChildConnectors[randIndexChildren].length > 0) {
         this.zone.run(() => {
           this.replyOptions = [];
@@ -106,7 +106,7 @@ export class HomePage {
           this.fetchAndProcessPointer(treeObject.get(Consts.TREEOBJECTS_CHILDREN)[0]);
         }, this.TYPING_DELAY);
       }
-    }
+    //}
   }
 
   //Replaces hot keywords with dynamic data
@@ -125,6 +125,16 @@ export class HomePage {
   //Fetches a parse object from server when given one, and calls processReceivedTreeObject
   fetchAndProcessPointer(pointer:any) {
     //console.log('Going to fetch:', pointer);
+    if (pointer == null) {
+      console.log('Pointer is null, likely end of tree.');
+      this.chatMessages.push({
+        message: "- End of tree -",
+        usersMessage: false,
+        isWidget: false
+      });
+      this.setTyping(false);
+      return;
+    }
     pointer.fetch({
       success: (parseObject) => {
         this.processReceivedTreeObject(parseObject);
@@ -161,7 +171,8 @@ export class HomePage {
   }
 
   //Passed as a callback function to widgets that were in replies
-  widgetCallback(option:any, data:any?) {
+  widgetCallback(option:any, data?:any) {
+    console.log('data', data);
     let messageObject:any = {
       usersMessage: true,
       isWidget: true,
