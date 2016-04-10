@@ -18,6 +18,7 @@
 		</div>
 		<div *ngIf="widgetType == 'showData'">
 			{{summaryString}}<span [hidden]="!loading" class="loading">&nbsp;...</span>
+			<textarea id="activityJsonString" style="color:black;"></textarea>
 		</div>
 		<div *ngIf="widgetType == 'measureHeart'">
 			{{data.summaryString}}<span [hidden]="!loading" class="loading">&nbsp;...</span>

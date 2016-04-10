@@ -146,12 +146,26 @@ export class Health {
         console.log('Error:', error);
         this.callbackFunction(this.chatObject, {error: "Error accessing distance"});
       });
-      navigator.health.queryAggregated({
+      /*navigator.health.queryAggregated({
         startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
         endDate: new Date(), // now
         dataType: 'activity'
       }, (data) => {
-        //console.log('Got activity:', data)
+        //console.log('Got activity:', data);
+        activity = data;
+        this.processData(steps, distance, activity);
+      }, (error) => {
+        console.log('Error:', error);
+        this.callbackFunction(this.chatObject, {error: "Error accessing activity"});
+      });*/
+      navigator.health.query({
+        startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
+        endDate: new Date(), // now
+        dataType: 'activity'
+      }, (data) => {
+        console.log('Got activity:', data);
+        console.log('Activity JSON:', JSON.stringify(data));
+        document.getElementById('activityJsonString').value = JSON.stringify(data);
         activity = data;
         this.processData(steps, distance, activity);
       }, (error) => {

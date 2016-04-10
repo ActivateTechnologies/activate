@@ -31,10 +31,10 @@ export class HomePage {
   }
 
   initialize() {
-    /*if (Parse.User.current()) {
-      this.navigateTreeTo('welcomeback', false); //healthApi
+    if (Parse.User.current()) {
+      this.navigateTreeTo('healthApi', false); //healthApi
       return;
-    }*/
+    }
     this.typing = true;
     CloudFunctions.initConversation((data, error?) => {
       if (!error) {
