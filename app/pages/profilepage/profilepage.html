@@ -1,0 +1,12 @@
+<ion-navbar *navbar>
+  <ion-title>Profile</ion-title>
+</ion-navbar>
+
+<ion-content class="profilepage">
+
+  <div style="width:100vw; text-align: center;">
+    <img src="https://graph.facebook.com/{{currentUser.get('facebookId')}}/picture?width=400">
+    <h2 style="padding:5px;">{{currentUser.get('name')}}</h2>
+  </div>
+
+</ion-content>

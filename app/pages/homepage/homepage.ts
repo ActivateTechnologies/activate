@@ -3,6 +3,7 @@ import {Consts} from '../../helpers/consts';
 import {Widget} from '../../widgets/widget';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {NgZone} from 'angular2/core';
+import {ProfilePage} from '../profilepage/profilepage';
 
 @Page({
   templateUrl: 'build/pages/homepage/homepage.html',
@@ -31,10 +32,10 @@ export class HomePage {
   }
 
   initialize() {
-    if (Parse.User.current()) {
-      this.navigateTreeTo('healthApi', false); //healthApi
+    /*if (Parse.User.current()) {
+      this.navigateTreeTo('welcomeBack', false); //healthApi
       return;
-    }
+    }*/
     this.typing = true;
     CloudFunctions.initConversation((data, error?) => {
       if (!error) {
@@ -232,5 +233,11 @@ export class HomePage {
         alert('There was an network error, please try again.');
       }
     });
+  }
+
+  openUserProfile() {
+    if (Parse.User.current() != null) {
+      this.nav.push(ProfilePage);
+    }
   }
 }

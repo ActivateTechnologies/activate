@@ -5,7 +5,7 @@
 	</div>
 	<!-- When !isReply -->
 	<div *ngIf="!isReply">
-		<img *ngIf="lastLocation" src="https://maps.googleapis.com/maps/api/staticmap?center={{lastLocation.latitude}},{{lastLocation.longitude}}&zoom=16&size=400x300&maptype=map&markers=color:red%7C{{lastLocation.latitude}},{{lastLocation.longitude}}" class="map-image"/>
+		<img *ngIf="lastLocation" class="map-image" src="https://maps.googleapis.com/maps/api/staticmap?center={{lastLocation.latitude}},{{lastLocation.longitude}}&zoom=16&size=400x300&maptype=map&markers=color:red%7C{{lastLocation.latitude}},{{lastLocation.longitude}}"/>
 		<span *ngIf="!lastLocation">Location Permission Denied</span>
 	</div>
 </div>

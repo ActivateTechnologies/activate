@@ -1,0 +1,69 @@
+.profilepage {
+	.logoutButton {
+		margin-right: auto;
+		margin-left: auto;
+		display: block;
+	}
+
+	ion-list > .item:first-child, ion-list > ion-item-sliding:first-child .item {
+    	border: none;
+    }
+
+    ion-list .item-inner {
+    	border: none;
+	}
+
+	ion-list > .item:last-child, ion-list > ion-item-sliding:last-child .item {
+    	border: none;
+	}
+
+	.friendProfileList {
+		text-align: center;
+	}
+
+	.messageProfilePic {
+		height: 30px;
+		width: 30px;
+		display: inline;
+	    border-radius: 100%;
+	    margin-right: 5px;
+	    margin-top: -5px;
+	    margin-left: 5px;
+	}
+	
+	.profilePicContainer {
+		display: inline-block;
+	    width: 20px;
+	    height: 20px;
+	    overflow: hidden;
+	    border-radius: 100%;
+	    margin-bottom: -5px;
+	    margin-right: 5px;
+	}
+
+	.cardProfilePic {
+	    background-position: center;
+    	background-size: cover;
+    	height: 20px;
+    	width: auto;
+    	display: block;
+	}
+
+	.friendNameShare {
+		color: #444444;
+		display: inline;
+		font-size: 14px;
+		margin-top: 2px;
+		position: absolute;
+	}
+
+	.profileFriendsListDiv {
+		width: 300px;
+		text-align: center;
+		margin-top: 10px;
+	}
+
+	.addFriendsButtonProfile {
+		margin-bottom: 10px;
+	}
+}

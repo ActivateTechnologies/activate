@@ -72,22 +72,29 @@ export class Health {
         this.loading = false;
         callback();
       });
+    } else {
+      this.loading = false;
     }
   }
 
   //Called when user clicks to grant access to Health Apis
   initHealth() {
-    this.loading = true;
-    navigator.health.requestAuthorization(['steps', 'distance', 'activity'],
-      () => {
-        localStorage['healthApiAccessGranted'] = true;
-        this.callbackFunction(this.chatObject, {log:1});
-      }, (err) => {
-        localStorage['healthApiAccessGranted'] = false;
-        console.log('Health auth error', err);
-        this.callbackFunction(this.chatObject, {log:2});
-      }
-    );
+    if (this.platformId != 'browser') {
+      this.loading = true;
+      navigator.health.requestAuthorization(['steps', 'distance', 'activity'],
+        () => {
+          localStorage['healthApiAccessGranted'] = true;
+          this.callbackFunction(this.chatObject);
+        }, (err) => {
+          localStorage['healthApiAccessGranted'] = false;
+          console.log('Health auth error', err);
+          this.callbackFunction(this.chatObject);
+        }
+      );
+    } else {
+      this.callbackFunction(this.chatObject, {});
+    }
+      
   }
 
   //Constructs the appropriate message to display after user has been asked to grant access
@@ -146,7 +153,7 @@ export class Health {
         console.log('Error:', error);
         this.callbackFunction(this.chatObject, {error: "Error accessing distance"});
       });
-      /*navigator.health.queryAggregated({
+      navigator.health.queryAggregated({
         startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
         endDate: new Date(), // now
         dataType: 'activity'
@@ -157,8 +164,8 @@ export class Health {
       }, (error) => {
         console.log('Error:', error);
         this.callbackFunction(this.chatObject, {error: "Error accessing activity"});
-      });*/
-      navigator.health.query({
+      });
+      /*navigator.health.query({
         startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
         endDate: new Date(), // now
         dataType: 'activity'
@@ -171,7 +178,7 @@ export class Health {
       }, (error) => {
         console.log('Error:', error);
         this.callbackFunction(this.chatObject, {error: "Error accessing activity"});
-      });
+      });*/
     }
   }
 
