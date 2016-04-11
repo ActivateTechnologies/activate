@@ -30,16 +30,6 @@
 	    margin-top: -5px;
 	    margin-left: 5px;
 	}
-	
-	.profilePicContainer {
-		display: inline-block;
-	    width: 20px;
-	    height: 20px;
-	    overflow: hidden;
-	    border-radius: 100%;
-	    margin-bottom: -5px;
-	    margin-right: 5px;
-	}
 
 	.cardProfilePic {
 	    background-position: center;
@@ -65,5 +55,90 @@
 
 	.addFriendsButtonProfile {
 		margin-bottom: 10px;
+	}
+
+	.settings-cog {
+		text-align: right;
+		padding-right: 20px;
+		font-size: 16px;
+		color: #FFFFFF;
+		
+	}
+
+	.back-button-text {
+		display: none;
+	}
+
+	.back-button {
+		color: #FFFFFF;
+	}
+
+	.profilePic {
+		width: 100px;
+		height: 100px;
+		border-radius: 50%;
+	}
+
+	.profilePicContainer {
+		text-align: center;
+	}
+
+	.nameProfile {
+		text-align: center;
+		font-weight: 600;
+		font-size: 18px;
+		color: #FFFFFF;
+		margin-top: 0px;
+		padding-bottom: 10px;
+
+	}
+
+	.profileTopContainer {
+		background: #ff524f;
+	}
+
+	.navbarProfile {
+		background: #ff524f;
+	}
+
+	.toolbar-background {
+		background: #ff524f;
+	}
+
+	.containerProfilePageContent {
+		height: auto;
+		background: #e0e0e0;
+		width: 92%;
+		border-radius: 5px;
+		padding: 6px;
+
+		margin-right: auto;
+		margin-left: auto;
+		display: block;
+	}
+
+	.sectionHeader {
+		font-weight: 500;
+		margin: 0;
+	}
+
+	.sectionBody {
+		margin: 0;
+		width: 100%;
+	}
+
+	.sectionBeneath {
+		margin-bottom: 6px;
+	}
+
+	.emojiContainer {
+		width: 24%;
+		display: inline-block;
+		text-align: center;
+		padding-top: 2px;
+	}
+
+	.textProfileBelowEmoji {
+		margin: 0;
 	}
 }

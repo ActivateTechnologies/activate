@@ -1,12 +1,68 @@
-<ion-navbar *navbar>
-  <ion-title>Profile</ion-title>
+<ion-navbar *navbar class="profilepage navbarProfile">
+  <div class="settings-cog">
+  	<ion-icon name="settings"></ion-icon>
+  </div>
 </ion-navbar>
 
 <ion-content class="profilepage">
 
-  <div style="width:100vw; text-align: center;">
-    <img src="https://graph.facebook.com/{{currentUser.get('facebookId')}}/picture?width=400">
-    <h2 style="padding:5px;">{{currentUser.get('name')}}</h2>
-  </div>
+	<div class="profileTopContainer">
+	  <div class="profilePicContainer">
+	    <img class="profilePic" src="https://graph.facebook.com/{{currentUser.get('facebookId')}}/picture?width=400">  
+	  </div>
+
+	  <p class="nameProfile">{{currentUser.get('name')}}</p>
+
+	</div>
+
+	<div class="containerProfilePageContent">
+		<p class="sectionHeader">Totals:</p>
+
+		<div class="sectionBody sectionBeneath">
+			<div class="emojiContainer">
+				<i class="em em-walking emojiProfileContainer"></i> 
+				<p class="textProfileBelowEmoji">2 hrs</p>
+			</div>
+
+			<div class="emojiContainer">
+				<i class="em em-runner"></i> 
+				<p class="textProfileBelowEmoji">20 mins</p>
+			</div>
+
+			<div class="emojiContainer">
+				<i class="em em-bicyclist"></i> 
+				<p class="textProfileBelowEmoji">10 mins</p>
+			</div>
+
+			<div class="emojiContainer">
+				<i class="em em-sleeping"></i>
+				<p class="textProfileBelowEmoji">10 mins<p>
+			</div>
+		</div>
+
+		<p class="sectionHeader">This Week Average:</p>
+
+		<div class="sectionBody">
+			<div class="emojiContainer">
+				<i class="em em-walking emojiProfileContainer"></i> 
+				<p class="textProfileBelowEmoji">2 hrs</p>
+			</div>
+
+			<div class="emojiContainer">
+				<i class="em em-runner"></i> 
+				<p class="textProfileBelowEmoji">20 mins</p>
+			</div>
+
+			<div class="emojiContainer">
+				<i class="em em-bicyclist"></i> 
+				<p class="textProfileBelowEmoji">10 mins</p>
+			</div>
+
+			<div class="emojiContainer">
+				<i class="em em-sleeping"></i>
+				<p class="textProfileBelowEmoji">10 mins<p>
+			</div> 
+		</div>
+	</div>
 
 </ion-content>
