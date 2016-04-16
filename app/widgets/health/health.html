@@ -10,7 +10,7 @@
 		</div>
 		<div *ngIf="widgetType == 'measureHeart'" (click)="measureHeart()">
 			Measure Away<span [hidden]="!loading" class="loading">&nbsp;...</span>
-			<span *ngIf="platformId == 'browser'">(not supported in browser)</span>
+			<span *ngIf="platformId == 'browser'">(simulating in browser)</span>
 		</div>
 	</div>
 	<!-- When !isReply -->

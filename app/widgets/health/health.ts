@@ -130,7 +130,7 @@ export class Health {
     if (localStorage['healthApiAccessGranted']) {
       this.loading = true;
       navigator.health.queryAggregated({
-        startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
+        startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // one day ago
         endDate: new Date(), // now
         dataType: 'steps'
       }, (data) => {
@@ -142,7 +142,7 @@ export class Health {
         this.callbackFunction(this.chatObject, {error: "Error accessing steps"});
       });
       navigator.health.queryAggregated({
-        startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
+        startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // one day ago
         endDate: new Date(), // now
         dataType: 'distance'
       }, (data) => {
@@ -208,12 +208,14 @@ export class Health {
     if (window.heartbeat) {
       window.heartbeat.take(props,
         (bpm) => {
-          console.log("Your heart beat per minute is:" + bpm);
-          this.loading = false;
-          this.callbackFunction(this.chatObject, {
-            summaryString: "Your heart beat per minute is:" + bpm,
-            bmpCount: bpm
-          });
+          console.log("Your heart beat per minute is: " + bpm);
+          this.saveHeartRate(bpm, () => {
+            this.loading = false;
+            this.callbackFunction(this.chatObject, {
+              summaryString: "Your heart beat per minute is: " + bpm,
+              bmpCount: bpm
+            });
+          })
         }, (error) => {
           this.summaryString = "Error measuring heart rate";
           this.loading = false;
@@ -224,11 +226,40 @@ export class Health {
         }
       );
     } else {
-      this.loading = false;
-      console.log('Heartbeat plugin not found');
-      this.callbackFunction(this.chatObject, {
+      console.log('Heartbeat plugin not found, simulating');
+      setTimeout(() => {
+        this.loading = false;
+        let bpm:number = 60;
+        this.saveHeartRate(bpm, () => {
+          this.callbackFunction(this.chatObject, {
+            summaryString: "Your heart beat per minute is: " + bpm,
+            bmpCount: bpm
+          });
+        });
+      }, 2000);
+
+      /*this.callbackFunction(this.chatObject, {
         summaryString: "Heartbeat feature not present"
-      });
+      });*/
     }
+  }
+
+  saveHeartRate(bpm, callback) {
+    let HeartData = Parse.Object.extend(Consts.HEARTDATA_CLASS);
+    let heartData = new HeartData();
+
+    heartData.set(Consts.HEARTDATA_USER, Parse.User.current());
+    heartData.set(Consts.HEARTDATA_HEARTRATE, bpm);
+    heartData.set(Consts.HEARTDATA_REFERENCE, 1);
+
+    heartData.save({
+      success: (parseObject) => {
+        callback();
+      },
+      error: (parseObject, error) => {
+        console.log("Error saving HeartData:", error.message);
+        callback();
+      }
+    });
   }
 }

@@ -32,10 +32,10 @@ export class HomePage {
   }
 
   initialize() {
-    /*if (Parse.User.current()) {
-      this.navigateTreeTo('welcomeBack', false); //healthApi
+    if (Parse.User.current()) {
+      this.navigateTreeTo('healthApi', false); //healthApi
       return;
-    }*/
+    }
     this.typing = true;
     CloudFunctions.initConversation((data, error?) => {
       if (!error) {
@@ -45,6 +45,10 @@ export class HomePage {
         alert('There was an network error, please try again.');
       }
     });
+  }
+
+  onPageDidEnter() {
+    //this.openUserProfile();
   }
 
   //Set state of typing, controls display of typing indicator

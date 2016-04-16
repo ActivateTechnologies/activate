@@ -16,33 +16,35 @@
 	</div>
 
 	<div class="containerProfilePageContent">
-		<p class="sectionHeader">Totals:</p>
-
-		<div class="sectionBody sectionBeneath">
+		<p class="sectionHeader">Daily Average:</p>
+		<span [hidden]="!aveDataLoading">Analysing how active you've been ...</span>
+		<div [hidden]="aveDataLoading" class="sectionBody sectionBeneath">
 			<div class="emojiContainer">
 				<i class="em em-walking emojiProfileContainer"></i> 
-				<p class="textProfileBelowEmoji">2 hrs</p>
+				<p class="textProfileBelowEmoji">{{formatTimeDuration(walkingTimeAve)}}</p>
 			</div>
 
 			<div class="emojiContainer">
 				<i class="em em-runner"></i> 
-				<p class="textProfileBelowEmoji">20 mins</p>
+				<p class="textProfileBelowEmoji">{{formatTimeDuration(runningTimeAve)}}</p>
 			</div>
 
 			<div class="emojiContainer">
 				<i class="em em-bicyclist"></i> 
-				<p class="textProfileBelowEmoji">10 mins</p>
+				<p class="textProfileBelowEmoji">{{formatTimeDuration(cyclingTimeAve)}}</p>
 			</div>
 
 			<div class="emojiContainer">
 				<i class="em em-sleeping"></i>
-				<p class="textProfileBelowEmoji">10 mins<p>
+				<p class="textProfileBelowEmoji">{{formatTimeDuration(sleepingTimeAve)}}<p>
 			</div>
 		</div>
 
 		<p class="sectionHeader">This Week Average:</p>
+		<span [hidden]="!weekDataLoading">Counting all those steps ...</span>
+		<canvas id="myChart" [hidden]="weekDataLoading"></canvas>
 
-		<div class="sectionBody">
+		<!-- <div class="sectionBody">
 			<div class="emojiContainer">
 				<i class="em em-walking emojiProfileContainer"></i> 
 				<p class="textProfileBelowEmoji">2 hrs</p>
@@ -62,7 +64,7 @@
 				<i class="em em-sleeping"></i>
 				<p class="textProfileBelowEmoji">10 mins<p>
 			</div> 
-		</div>
+		</div> -->
 	</div>
 
 </ion-content>

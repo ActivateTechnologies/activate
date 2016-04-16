@@ -55,6 +55,15 @@ export class Consts {
   //GeoPoint - User's last known location
   public static USER_LASTLOCATION = "lastLocation";
 
+  //HeartData Class
+  public static HEARTDATA_CLASS = "HeartData";
+  //Pointer <_User>
+  public static HEARTDATA_USER = "user";
+  //Number - heart beats per min
+  public static HEARTDATA_HEARTRATE = "heartRate";
+  //Number - 1:Before workout
+  public static HEARTDATA_REFERENCE = "reference";
+
   constructor() {
   }
 }

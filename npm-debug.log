@@ -1,0 +1,551 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files (x86)\\nodejs\\node.exe',
+1 verbose cli   'C:\\Program Files (x86)\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'install',
+1 verbose cli   'ng2-charts',
+1 verbose cli   '--save' ]
+2 info using npm@2.14.7
+3 info using node@v4.2.2
+4 verbose install initial load of D:\Kickabout\activate\package.json
+5 warn package.json activate@ No repository field.
+6 warn package.json activate@ No README data
+7 warn package.json activate@ No license field.
+8 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\angular2\package.json
+9 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\awesome-typescript-loader\package.json
+10 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\del\package.json
+11 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\es6-promise\package.json
+12 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\es6-shim\package.json
+13 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\gulp\package.json
+14 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\gulp-watch\package.json
+15 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\ionic-angular\package.json
+16 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\ionic-gulp-fonts-copy\package.json
+17 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\ionic-gulp-html-copy\package.json
+18 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\ionic-gulp-sass-build\package.json
+19 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\ionic-gulp-webpack-build\package.json
+20 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\ionic-native\package.json
+21 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\ionicons\package.json
+22 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\parse\package.json
+23 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\reflect-metadata\package.json
+24 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\rxjs\package.json
+25 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\strip-sourcemap-loader\package.json
+26 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\typescript\package.json
+27 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\typings\package.json
+28 verbose installManyTop reading scoped package data from D:\Kickabout\activate\node_modules\zone.js\package.json
+29 info package.json ionic-gulp-fonts-copy@1.0.0 No repository field.
+30 info package.json ionic-gulp-fonts-copy@1.0.0 No license field.
+31 info package.json strip-sourcemap-loader@0.0.1 No repository field.
+32 verbose readDependencies loading dependencies from D:\Kickabout\activate\package.json
+33 silly cache add args [ 'ng2-charts', null ]
+34 verbose cache add spec ng2-charts
+35 silly cache add parsed spec Result {
+35 silly cache add   raw: 'ng2-charts',
+35 silly cache add   scope: null,
+35 silly cache add   name: 'ng2-charts',
+35 silly cache add   rawSpec: '',
+35 silly cache add   spec: '*',
+35 silly cache add   type: 'range' }
+36 silly addNamed ng2-charts@*
+37 verbose addNamed "*" is a valid semver range for ng2-charts
+38 silly addNameRange { name: 'ng2-charts', range: '*', hasData: false }
+39 silly mapToRegistry name ng2-charts
+40 silly mapToRegistry using default registry
+41 silly mapToRegistry registry https://registry.npmjs.org/
+42 silly mapToRegistry uri https://registry.npmjs.org/ng2-charts
+43 verbose addNameRange registry:https://registry.npmjs.org/ng2-charts not in flight; fetching
+44 verbose request uri https://registry.npmjs.org/ng2-charts
+45 verbose request no auth needed
+46 info attempt registry request try #1 at 6:49:00 PM
+47 verbose request id b0fc9e6b2c2a341a
+48 http request GET https://registry.npmjs.org/ng2-charts
+49 http 200 https://registry.npmjs.org/ng2-charts
+50 verbose headers { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+50 verbose headers   etag: '"3F24ULFZ64NHKNNG3037GSE2B"',
+50 verbose headers   'content-type': 'application/json',
+50 verbose headers   'content-encoding': 'gzip',
+50 verbose headers   'cache-control': 'max-age=300',
+50 verbose headers   'content-length': '4962',
+50 verbose headers   'accept-ranges': 'bytes',
+50 verbose headers   date: 'Sat, 16 Apr 2016 17:49:01 GMT',
+50 verbose headers   via: '1.1 varnish',
+50 verbose headers   age: '0',
+50 verbose headers   connection: 'keep-alive',
+50 verbose headers   'x-served-by': 'cache-ams4121-AMS',
+50 verbose headers   'x-cache': 'MISS',
+50 verbose headers   'x-cache-hits': '0',
+50 verbose headers   'x-timer': 'S1460828940.508895,VS0,VE726',
+50 verbose headers   vary: 'Accept-Encoding' }
+51 silly get cb [ 200,
+51 silly get   { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+51 silly get     etag: '"3F24ULFZ64NHKNNG3037GSE2B"',
+51 silly get     'content-type': 'application/json',
+51 silly get     'content-encoding': 'gzip',
+51 silly get     'cache-control': 'max-age=300',
+51 silly get     'content-length': '4962',
+51 silly get     'accept-ranges': 'bytes',
+51 silly get     date: 'Sat, 16 Apr 2016 17:49:01 GMT',
+51 silly get     via: '1.1 varnish',
+51 silly get     age: '0',
+51 silly get     connection: 'keep-alive',
+51 silly get     'x-served-by': 'cache-ams4121-AMS',
+51 silly get     'x-cache': 'MISS',
+51 silly get     'x-cache-hits': '0',
+51 silly get     'x-timer': 'S1460828940.508895,VS0,VE726',
+51 silly get     vary: 'Accept-Encoding' } ]
+52 verbose get saving ng2-charts to C:\Users\AvinashJ\AppData\Roaming\npm-cache\registry.npmjs.org\ng2-charts\.cache.json
+53 silly addNameRange number 2 { name: 'ng2-charts', range: '*', hasData: true }
+54 silly addNameRange versions [ 'ng2-charts',
+54 silly addNameRange   [ '0.0.0', '0.46.0', '1.0.0-beta.0', '1.0.2', '1.0.3' ] ]
+55 silly addNamed ng2-charts@1.0.3
+56 verbose addNamed "1.0.3" is a plain semver version for ng2-charts
+57 silly mapToRegistry name ng2-charts
+58 silly mapToRegistry using default registry
+59 silly mapToRegistry registry https://registry.npmjs.org/
+60 silly mapToRegistry uri https://registry.npmjs.org/ng2-charts
+61 verbose addRemoteTarball https://registry.npmjs.org/ng2-charts/-/ng2-charts-1.0.3.tgz not in flight; adding
+62 verbose addRemoteTarball [ 'https://registry.npmjs.org/ng2-charts/-/ng2-charts-1.0.3.tgz',
+62 verbose addRemoteTarball   '60bdca2459bae122874bc1e7db2541c21b6e065a' ]
+63 info retry fetch attempt 1 at 6:49:01 PM
+64 info attempt registry request try #1 at 6:49:01 PM
+65 http fetch GET https://registry.npmjs.org/ng2-charts/-/ng2-charts-1.0.3.tgz
+66 http fetch 200 https://registry.npmjs.org/ng2-charts/-/ng2-charts-1.0.3.tgz
+67 silly fetchAndShaCheck shasum 60bdca2459bae122874bc1e7db2541c21b6e065a
+68 verbose addTmpTarball C:\Users\AvinashJ\AppData\Local\Temp\npm-44912-cd86ba41\registry.npmjs.org\ng2-charts\-\ng2-charts-1.0.3.tgz not in flight; adding
+69 verbose addTmpTarball already have metadata; skipping unpack for ng2-charts@1.0.3
+70 silly cache afterAdd ng2-charts@1.0.3
+71 verbose afterAdd C:\Users\AvinashJ\AppData\Roaming\npm-cache\ng2-charts\1.0.3\package\package.json not in flight; writing
+72 verbose afterAdd C:\Users\AvinashJ\AppData\Roaming\npm-cache\ng2-charts\1.0.3\package\package.json written
+73 silly install resolved [ { name: 'ng2-charts',
+73 silly install resolved     version: '1.0.3',
+73 silly install resolved     description: 'Reactive, responsive, beautiful charts for Angular2 based on Chart.js',
+73 silly install resolved     scripts:
+73 silly install resolved      { 'flow.install:typings': 'typings install',
+73 silly install resolved        'flow.compile': 'npm run flow.install:typings && npm run flow.compile:common && npm run flow.compile:system ',
+73 silly install resolved        'flow.compile:common': 'tsc',
+73 silly install resolved        'flow.compile:system': './.config/bundle-system.js',
+73 silly install resolved        'flow.copy:src': 'cpy ng2-charts.ts "components/**/*.ts" ts --parents',
+73 silly install resolved        'flow.clean': 'del bundles coverage demo-build typings "components/**/*.+(js|d.ts|js.map)" dist "ng2-bootstrap.+(js|d.ts|js.map)"',
+73 silly install resolved        'flow.deploy:gh-pages': 'npm run flow.build:prod && ./node_modules/.bin/gh-pages -d demo-build',
+73 silly install resolved        'flow.eslint': 'eslint --ignore-path .gitignore  --ext js --fix . .config',
+73 silly install resolved        'flow.tslint': 'gulp lint',
+73 silly install resolved        'flow.lint': 'npm run flow.eslint && npm run flow.tslint',
+73 silly install resolved        'flow.changelog': 'conventional-changelog -i CHANGELOG.md -s -p angular -v',
+73 silly install resolved        'flow.github-release': 'conventional-github-releaser -p angular',
+73 silly install resolved        'flow.build:prod': 'NODE_ENV=production ./node_modules/.bin/webpack --progress --color',
+73 silly install resolved        'flow.build:dev': 'webpack --progress --color',
+73 silly install resolved        'flow.serve:dev': 'webpack-dev-server --hot --inline --colors --display-error-details --display-cached',
+73 silly install resolved        'flow.serve:prod': 'NODE_ENV=production ./node_modules/.bin/webpack-dev-server --hot --inline --colors --display-error-details --display-cached',
+73 silly install resolved        prepublish: 'npm run flow.clean && npm run flow.compile && npm run flow.copy:src',
+73 silly install resolved        postpublish: 'npm run flow.deploy:gh-pages',
+73 silly install resolved        start: 'npm run flow.serve:dev',
+73 silly install resolved        test: 'npm run flow.lint',
+73 silly install resolved        'karma-test': 'NODE_ENV=test ./node_modules/.bin/karma start',
+73 silly install resolved        preversion: 'npm test',
+73 silly install resolved        version: 'npm run flow.changelog && git add -A',
+73 silly install resolved        postversion: 'git push origin development && git push --tags' },
+73 silly install resolved     main: 'ng2-charts.js',
+73 silly install resolved     typings: 'ng2-charts.d.ts',
+73 silly install resolved     keywords: [ 'angular2', 'angularjs', 'charts' ],
+73 silly install resolved     author: { name: 'Dmitriy Shekhovtsov', email: 'valorkin@gmail.com' },
+73 silly install resolved     license: 'MIT',
+73 silly install resolved     repository:
+73 silly install resolved      { type: 'git',
+73 silly install resolved        url: 'git+ssh://git@github.com/valor-software/ng2-charts.git' },
+73 silly install resolved     bugs: { url: 'https://github.com/valor-software/ng2-charts/issues' },
+73 silly install resolved     homepage: 'https://github.com/valor-software/ng2-charts#readme',
+73 silly install resolved     peerDependencies: { angular2: '2.0.0-beta.15' },
+73 silly install resolved     dependencies: { 'chart.js': '1.0.2' },
+73 silly install resolved     devDependencies:
+73 silly install resolved      { angular2: '2.0.0-beta.15',
+73 silly install resolved        async: '2.0.0-rc.3',
+73 silly install resolved        bootstrap: '3.3.6',
+73 silly install resolved        'chart.js': '1.0.2',
+73 silly install resolved        'clean-webpack-plugin': '0.1.8',
+73 silly install resolved        'compression-webpack-plugin': '0.3.1',
+73 silly install resolved        'conventional-changelog-cli': '1.1.1',
+73 silly install resolved        'conventional-github-releaser': '1.1.1',
+73 silly install resolved        'copy-webpack-plugin': '2.0.1',
+73 silly install resolved        'cpy-cli': '1.0.0',
+73 silly install resolved        'del-cli': '0.2.0',
+73 silly install resolved        'es6-promise': '3.1.2',
+73 silly install resolved        'es6-shim': '0.35.0',
+73 silly install resolved        'eslint-config-valorsoft': '0.0.10',
+73 silly install resolved        'exports-loader': '0.6.3',
+73 silly install resolved        'gh-pages': '0.11.0',
+73 silly install resolved        gulp: '3.9.1',
+73 silly install resolved        'gulp-clean': '0.3.2',
+73 silly install resolved        'gulp-eslint': '2.0.0',
+73 silly install resolved        'gulp-size': '2.1.0',
+73 silly install resolved        'gulp-tsc': '1.1.5',
+73 silly install resolved        'gulp-tslint': '4.3.5',
+73 silly install resolved        'html-loader': '0.4.3',
+73 silly install resolved        'html-webpack-plugin': '2.15.0',
+73 silly install resolved        'markdown-loader': '0.1.7',
+73 silly install resolved        marked: '0.3.5',
+73 silly install resolved        'ng2-bootstrap': '1.0.13',
+73 silly install resolved        'pre-commit': '1.1.2',
+73 silly install resolved        prismjs: '1.4.1',
+73 silly install resolved        'prismjs-loader': '0.0.2',
+73 silly install resolved        'raw-loader': '0.5.1',
+73 silly install resolved        'reflect-metadata': '0.1.3',
+73 silly install resolved        'require-dir': '0.3.0',
+73 silly install resolved        rxjs: '5.0.0-beta.6',
+73 silly install resolved        'systemjs-builder': '0.15.15',
+73 silly install resolved        'transfer-webpack-plugin': '0.1.4',
+73 silly install resolved        'ts-loader': '0.8.2',
+73 silly install resolved        'tslint-config-valorsoft': '0.0.3',
+73 silly install resolved        typescript: '1.8.10',
+73 silly install resolved        typings: '0.7.12',
+73 silly install resolved        webpack: '1.13.0',
+73 silly install resolved        'webpack-dev-server': '1.14.1',
+73 silly install resolved        'zone.js': '0.6.11' },
+73 silly install resolved     contributors: [ [Object], [Object] ],
+73 silly install resolved     gitHead: 'f114e9e52e5e34f4c5d52fcdf976a8c69d02da65',
+73 silly install resolved     _id: 'ng2-charts@1.0.3',
+73 silly install resolved     _shasum: '60bdca2459bae122874bc1e7db2541c21b6e065a',
+73 silly install resolved     _from: 'ng2-charts@*',
+73 silly install resolved     _npmVersion: '3.8.6',
+73 silly install resolved     _nodeVersion: '4.4.3',
+73 silly install resolved     _npmUser: { name: 'valorkin', email: 'valorkin@gmail.com' },
+73 silly install resolved     dist:
+73 silly install resolved      { shasum: '60bdca2459bae122874bc1e7db2541c21b6e065a',
+73 silly install resolved        tarball: 'https://registry.npmjs.org/ng2-charts/-/ng2-charts-1.0.3.tgz' },
+73 silly install resolved     maintainers: [ [Object] ],
+73 silly install resolved     _npmOperationalInternal:
+73 silly install resolved      { host: 'packages-16-east.internal.npmjs.com',
+73 silly install resolved        tmp: 'tmp/ng2-charts-1.0.3.tgz_1460731201526_0.7435887365136296' },
+73 silly install resolved     directories: {},
+73 silly install resolved     _resolved: 'https://registry.npmjs.org/ng2-charts/-/ng2-charts-1.0.3.tgz' } ]
+74 info install ng2-charts@1.0.3 into D:\Kickabout\activate
+75 info installOne ng2-charts@1.0.3
+76 verbose installOne of ng2-charts to D:\Kickabout\activate not in flight; installing
+77 verbose lock using C:\Users\AvinashJ\AppData\Roaming\npm-cache\_locks\ng2-charts-7a2d7a54aa7e9ceb.lock for D:\Kickabout\activate\node_modules\ng2-charts
+78 silly install write writing ng2-charts 1.0.3 to D:\Kickabout\activate\node_modules\ng2-charts
+79 verbose unbuild node_modules\ng2-charts
+80 silly gentlyRm D:\Kickabout\activate\node_modules\ng2-charts is being purged from base D:\Kickabout\activate
+81 verbose gentlyRm don't care about contents; nuking D:\Kickabout\activate\node_modules\ng2-charts
+82 verbose tar unpack C:\Users\AvinashJ\AppData\Roaming\npm-cache\ng2-charts\1.0.3\package.tgz
+83 verbose tar unpacking to D:\Kickabout\activate\node_modules\ng2-charts
+84 silly gentlyRm D:\Kickabout\activate\node_modules\ng2-charts is being purged
+85 verbose gentlyRm don't care about contents; nuking D:\Kickabout\activate\node_modules\ng2-charts
+86 silly gunzTarPerm modes [ '777', '666' ]
+87 silly gunzTarPerm extractEntry package.json
+88 silly gunzTarPerm modified mode [ 'package.json', 420, 438 ]
+89 silly gunzTarPerm extractEntry .npmignore
+90 silly gunzTarPerm modified mode [ '.npmignore', 420, 438 ]
+91 silly gunzTarPerm extractEntry README.md
+92 silly gunzTarPerm modified mode [ 'README.md', 420, 438 ]
+93 silly gunzTarPerm extractEntry LICENSE
+94 silly gunzTarPerm modified mode [ 'LICENSE', 420, 438 ]
+95 silly gunzTarPerm extractEntry gulpfile.js
+96 silly gunzTarPerm modified mode [ 'gulpfile.js', 420, 438 ]
+97 silly gunzTarPerm extractEntry ng2-charts.js
+98 silly gunzTarPerm modified mode [ 'ng2-charts.js', 420, 438 ]
+99 silly gunzTarPerm extractEntry CHANGELOG.md
+100 silly gunzTarPerm modified mode [ 'CHANGELOG.md', 420, 438 ]
+101 silly gunzTarPerm extractEntry .eslintrc.json
+102 silly gunzTarPerm modified mode [ '.eslintrc.json', 420, 438 ]
+103 silly gunzTarPerm extractEntry bundles/ng2-charts.js
+104 silly gunzTarPerm modified mode [ 'bundles/ng2-charts.js', 420, 438 ]
+105 silly gunzTarPerm extractEntry bundles/ng2-charts.min.js
+106 silly gunzTarPerm modified mode [ 'bundles/ng2-charts.min.js', 420, 438 ]
+107 silly gunzTarPerm extractEntry bundles/ng2-charts.js.gz
+108 silly gunzTarPerm modified mode [ 'bundles/ng2-charts.js.gz', 420, 438 ]
+109 silly gunzTarPerm extractEntry bundles/ng2-charts.js.map.gz
+110 silly gunzTarPerm modified mode [ 'bundles/ng2-charts.js.map.gz', 420, 438 ]
+111 silly gunzTarPerm extractEntry bundles/ng2-charts.min.js.gz
+112 silly gunzTarPerm modified mode [ 'bundles/ng2-charts.min.js.gz', 420, 438 ]
+113 silly gunzTarPerm extractEntry bundles/ng2-charts.min.js.map.gz
+114 silly gunzTarPerm modified mode [ 'bundles/ng2-charts.min.js.map.gz', 420, 438 ]
+115 silly gunzTarPerm extractEntry components/charts/charts.js
+116 silly gunzTarPerm modified mode [ 'components/charts/charts.js', 420, 438 ]
+117 silly gunzTarPerm extractEntry components/charts/charts.d.ts
+118 silly gunzTarPerm modified mode [ 'components/charts/charts.d.ts', 420, 438 ]
+119 silly gunzTarPerm extractEntry components/charts/readme.md
+120 silly gunzTarPerm modified mode [ 'components/charts/readme.md', 420, 438 ]
+121 silly gunzTarPerm extractEntry components/charts/title.md
+122 silly gunzTarPerm modified mode [ 'components/charts/title.md', 420, 438 ]
+123 silly gunzTarPerm extractEntry .editorconfig
+124 silly gunzTarPerm modified mode [ '.editorconfig', 420, 438 ]
+125 silly gunzTarPerm extractEntry ng2-charts.d.ts
+126 silly gunzTarPerm modified mode [ 'ng2-charts.d.ts', 420, 438 ]
+127 silly gunzTarPerm extractEntry .config/bundle-system.js
+128 silly gunzTarPerm modified mode [ '.config/bundle-system.js', 493, 511 ]
+129 silly gunzTarPerm extractEntry typings.json
+130 silly gunzTarPerm modified mode [ 'typings.json', 420, 438 ]
+131 silly gunzTarPerm extractEntry .travis.yml
+132 silly gunzTarPerm modified mode [ '.travis.yml', 420, 438 ]
+133 silly gunzTarPerm extractEntry tsconfig.json
+134 silly gunzTarPerm modified mode [ 'tsconfig.json', 420, 438 ]
+135 silly gunzTarPerm extractEntry tslint.json
+136 silly gunzTarPerm modified mode [ 'tslint.json', 420, 438 ]
+137 verbose write writing to D:\Kickabout\activate\node_modules\ng2-charts\package.json
+138 info preinstall ng2-charts@1.0.3
+139 verbose readDependencies loading dependencies from D:\Kickabout\activate\node_modules\ng2-charts\package.json
+140 silly prepareForInstallMany adding chart.js@1.0.2 from ng2-charts dependencies
+141 silly prepareForInstallMany adding angular2@2.0.0-beta.15 from ng2-charts peerDependencies
+142 warn peerDependencies The peer dependency angular2@2.0.0-beta.15 included from ng2-charts will no
+143 warn peerDependencies longer be automatically installed to fulfill the peerDependency
+144 warn peerDependencies in npm 3+. Your application will need to depend on it explicitly.
+145 verbose readDependencies loading dependencies from D:\Kickabout\activate\node_modules\ng2-charts\package.json
+146 silly cache add args [ 'chart.js@1.0.2', null ]
+147 verbose cache add spec chart.js@1.0.2
+148 silly cache add parsed spec Result {
+148 silly cache add   raw: 'chart.js@1.0.2',
+148 silly cache add   scope: null,
+148 silly cache add   name: 'chart.js',
+148 silly cache add   rawSpec: '1.0.2',
+148 silly cache add   spec: '1.0.2',
+148 silly cache add   type: 'version' }
+149 silly addNamed chart.js@1.0.2
+150 verbose addNamed "1.0.2" is a plain semver version for chart.js
+151 silly mapToRegistry name chart.js
+152 silly mapToRegistry using default registry
+153 silly mapToRegistry registry https://registry.npmjs.org/
+154 silly mapToRegistry uri https://registry.npmjs.org/chart.js
+155 verbose addNameVersion registry:https://registry.npmjs.org/chart.js not in flight; fetching
+156 verbose request uri https://registry.npmjs.org/chart.js
+157 verbose request no auth needed
+158 info attempt registry request try #1 at 6:49:02 PM
+159 http request GET https://registry.npmjs.org/chart.js
+160 http 200 https://registry.npmjs.org/chart.js
+161 verbose headers { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+161 verbose headers   etag: '"D8A6JTWKOU5XJPHNKN8DMF9XO"',
+161 verbose headers   'content-type': 'application/json',
+161 verbose headers   'cache-control': 'max-age=300',
+161 verbose headers   'content-length': '11306',
+161 verbose headers   'accept-ranges': 'bytes',
+161 verbose headers   date: 'Sat, 16 Apr 2016 17:49:03 GMT',
+161 verbose headers   via: '1.1 varnish',
+161 verbose headers   age: '0',
+161 verbose headers   connection: 'keep-alive',
+161 verbose headers   'x-served-by': 'cache-ams4125-AMS',
+161 verbose headers   'x-cache': 'HIT',
+161 verbose headers   'x-cache-hits': '1',
+161 verbose headers   'x-timer': 'S1460828942.644814,VS0,VE719',
+161 verbose headers   vary: 'Accept-Encoding' }
+162 silly get cb [ 200,
+162 silly get   { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+162 silly get     etag: '"D8A6JTWKOU5XJPHNKN8DMF9XO"',
+162 silly get     'content-type': 'application/json',
+162 silly get     'cache-control': 'max-age=300',
+162 silly get     'content-length': '11306',
+162 silly get     'accept-ranges': 'bytes',
+162 silly get     date: 'Sat, 16 Apr 2016 17:49:03 GMT',
+162 silly get     via: '1.1 varnish',
+162 silly get     age: '0',
+162 silly get     connection: 'keep-alive',
+162 silly get     'x-served-by': 'cache-ams4125-AMS',
+162 silly get     'x-cache': 'HIT',
+162 silly get     'x-cache-hits': '1',
+162 silly get     'x-timer': 'S1460828942.644814,VS0,VE719',
+162 silly get     vary: 'Accept-Encoding' } ]
+163 verbose get saving chart.js to C:\Users\AvinashJ\AppData\Roaming\npm-cache\registry.npmjs.org\chart.js\.cache.json
+164 silly mapToRegistry name chart.js
+165 silly mapToRegistry using default registry
+166 silly mapToRegistry registry https://registry.npmjs.org/
+167 silly mapToRegistry uri https://registry.npmjs.org/chart.js
+168 verbose addRemoteTarball https://registry.npmjs.org/chart.js/-/chart.js-1.0.2.tgz not in flight; adding
+169 verbose addRemoteTarball [ 'https://registry.npmjs.org/chart.js/-/chart.js-1.0.2.tgz',
+169 verbose addRemoteTarball   'ad57d2229cfd8ccf5955147e8121b4911e69dfe7' ]
+170 info retry fetch attempt 1 at 6:49:03 PM
+171 info attempt registry request try #1 at 6:49:03 PM
+172 http fetch GET https://registry.npmjs.org/chart.js/-/chart.js-1.0.2.tgz
+173 http fetch 200 https://registry.npmjs.org/chart.js/-/chart.js-1.0.2.tgz
+174 silly fetchAndShaCheck shasum ad57d2229cfd8ccf5955147e8121b4911e69dfe7
+175 verbose addTmpTarball C:\Users\AvinashJ\AppData\Local\Temp\npm-44912-cd86ba41\registry.npmjs.org\chart.js\-\chart.js-1.0.2.tgz not in flight; adding
+176 verbose addTmpTarball already have metadata; skipping unpack for chart.js@1.0.2
+177 silly cache afterAdd chart.js@1.0.2
+178 verbose afterAdd C:\Users\AvinashJ\AppData\Roaming\npm-cache\chart.js\1.0.2\package\package.json not in flight; writing
+179 verbose afterAdd C:\Users\AvinashJ\AppData\Roaming\npm-cache\chart.js\1.0.2\package\package.json written
+180 silly install resolved [ { name: 'chart.js',
+180 silly install resolved     homepage: 'http://www.chartjs.org',
+180 silly install resolved     description: 'Simple HTML5 charts using the canvas element.',
+180 silly install resolved     version: '1.0.2',
+180 silly install resolved     main: 'Chart.js',
+180 silly install resolved     repository: { type: 'git', url: 'https://github.com/nnnick/Chart.js.git' },
+180 silly install resolved     dependences: {},
+180 silly install resolved     devDependencies:
+180 silly install resolved      { gulp: '3.5.x',
+180 silly install resolved        'gulp-concat': '~2.1.x',
+180 silly install resolved        'gulp-connect': '~2.0.5',
+180 silly install resolved        'gulp-jshint': '~1.5.1',
+180 silly install resolved        'gulp-replace': '^0.4.0',
+180 silly install resolved        'gulp-size': '~0.4.0',
+180 silly install resolved        'gulp-uglify': '~0.2.x',
+180 silly install resolved        'gulp-util': '~2.2.x',
+180 silly install resolved        'gulp-html-validator': '^0.0.2',
+180 silly install resolved        inquirer: '^0.5.1',
+180 silly install resolved        semver: '^3.0.1' },
+180 silly install resolved     spm: { main: 'Chart.js' },
+180 silly install resolved     gitHead: '930b16a0af59201dcfcd1594b0e7540db4d04c9f',
+180 silly install resolved     bugs: { url: 'https://github.com/nnnick/Chart.js/issues' },
+180 silly install resolved     _id: 'chart.js@1.0.2',
+180 silly install resolved     scripts: {},
+180 silly install resolved     _shasum: 'ad57d2229cfd8ccf5955147e8121b4911e69dfe7',
+180 silly install resolved     _from: 'chart.js@1.0.2',
+180 silly install resolved     _npmVersion: '1.4.20',
+180 silly install resolved     _npmUser: { name: 'nnnick', email: 'hello@nickdownie.com' },
+180 silly install resolved     maintainers: [ [Object] ],
+180 silly install resolved     dist:
+180 silly install resolved      { shasum: 'ad57d2229cfd8ccf5955147e8121b4911e69dfe7',
+180 silly install resolved        tarball: 'https://registry.npmjs.org/chart.js/-/chart.js-1.0.2.tgz' },
+180 silly install resolved     directories: {},
+180 silly install resolved     _resolved: 'https://registry.npmjs.org/chart.js/-/chart.js-1.0.2.tgz' } ]
+181 info install chart.js@1.0.2 into D:\Kickabout\activate\node_modules\ng2-charts
+182 info installOne chart.js@1.0.2
+183 verbose installOne of chart.js to D:\Kickabout\activate\node_modules\ng2-charts not in flight; installing
+184 verbose lock using C:\Users\AvinashJ\AppData\Roaming\npm-cache\_locks\chart-js-a88ee544eba91ed4.lock for D:\Kickabout\activate\node_modules\ng2-charts\node_modules\chart.js
+185 silly install write writing chart.js 1.0.2 to D:\Kickabout\activate\node_modules\ng2-charts\node_modules\chart.js
+186 verbose unbuild node_modules\ng2-charts\node_modules\chart.js
+187 silly gentlyRm D:\Kickabout\activate\node_modules\ng2-charts\node_modules\chart.js is being purged from base D:\Kickabout\activate
+188 verbose gentlyRm don't care about contents; nuking D:\Kickabout\activate\node_modules\ng2-charts\node_modules\chart.js
+189 verbose tar unpack C:\Users\AvinashJ\AppData\Roaming\npm-cache\chart.js\1.0.2\package.tgz
+190 verbose tar unpacking to D:\Kickabout\activate\node_modules\ng2-charts\node_modules\chart.js
+191 silly gentlyRm D:\Kickabout\activate\node_modules\ng2-charts\node_modules\chart.js is being purged
+192 verbose gentlyRm don't care about contents; nuking D:\Kickabout\activate\node_modules\ng2-charts\node_modules\chart.js
+193 silly gunzTarPerm modes [ '777', '666' ]
+194 silly gunzTarPerm extractEntry package.json
+195 silly gunzTarPerm modified mode [ 'package.json', 420, 438 ]
+196 silly gunzTarPerm extractEntry .npmignore
+197 silly gunzTarPerm modified mode [ '.npmignore', 420, 438 ]
+198 silly gunzTarPerm extractEntry README.md
+199 silly gunzTarPerm modified mode [ 'README.md', 420, 438 ]
+200 silly gunzTarPerm extractEntry Chart.js
+201 silly gunzTarPerm modified mode [ 'Chart.js', 420, 438 ]
+202 silly gunzTarPerm extractEntry Chart.min.js
+203 silly gunzTarPerm modified mode [ 'Chart.min.js', 420, 438 ]
+204 silly gunzTarPerm extractEntry gulpfile.js
+205 silly gunzTarPerm modified mode [ 'gulpfile.js', 420, 438 ]
+206 silly gunzTarPerm extractEntry src/Chart.Bar.js
+207 silly gunzTarPerm modified mode [ 'src/Chart.Bar.js', 420, 438 ]
+208 silly gunzTarPerm extractEntry src/Chart.Core.js
+209 silly gunzTarPerm modified mode [ 'src/Chart.Core.js', 493, 511 ]
+210 silly gunzTarPerm extractEntry src/Chart.Doughnut.js
+211 silly gunzTarPerm modified mode [ 'src/Chart.Doughnut.js', 420, 438 ]
+212 silly gunzTarPerm extractEntry src/Chart.Line.js
+213 silly gunzTarPerm modified mode [ 'src/Chart.Line.js', 420, 438 ]
+214 silly gunzTarPerm extractEntry src/Chart.PolarArea.js
+215 silly gunzTarPerm modified mode [ 'src/Chart.PolarArea.js', 420, 438 ]
+216 silly gunzTarPerm extractEntry src/Chart.Radar.js
+217 silly gunzTarPerm modified mode [ 'src/Chart.Radar.js', 420, 438 ]
+218 silly gunzTarPerm extractEntry .travis.yml
+219 silly gunzTarPerm modified mode [ '.travis.yml', 420, 438 ]
+220 silly gunzTarPerm extractEntry docs/00-Getting-Started.md
+221 silly gunzTarPerm modified mode [ 'docs/00-Getting-Started.md', 420, 438 ]
+222 silly gunzTarPerm extractEntry docs/01-Line-Chart.md
+223 silly gunzTarPerm modified mode [ 'docs/01-Line-Chart.md', 420, 438 ]
+224 silly gunzTarPerm extractEntry docs/02-Bar-Chart.md
+225 silly gunzTarPerm modified mode [ 'docs/02-Bar-Chart.md', 420, 438 ]
+226 silly gunzTarPerm extractEntry docs/03-Radar-Chart.md
+227 silly gunzTarPerm modified mode [ 'docs/03-Radar-Chart.md', 420, 438 ]
+228 silly gunzTarPerm extractEntry docs/04-Polar-Area-Chart.md
+229 silly gunzTarPerm modified mode [ 'docs/04-Polar-Area-Chart.md', 420, 438 ]
+230 silly gunzTarPerm extractEntry docs/05-Pie-Doughnut-Chart.md
+231 silly gunzTarPerm modified mode [ 'docs/05-Pie-Doughnut-Chart.md', 420, 438 ]
+232 silly gunzTarPerm extractEntry docs/06-Advanced.md
+233 silly gunzTarPerm modified mode [ 'docs/06-Advanced.md', 420, 438 ]
+234 silly gunzTarPerm extractEntry docs/07-Notes.md
+235 silly gunzTarPerm modified mode [ 'docs/07-Notes.md', 420, 438 ]
+236 silly gunzTarPerm extractEntry CONTRIBUTING.md
+237 silly gunzTarPerm modified mode [ 'CONTRIBUTING.md', 420, 438 ]
+238 silly gunzTarPerm extractEntry samples/bar.html
+239 silly gunzTarPerm modified mode [ 'samples/bar.html', 420, 438 ]
+240 silly gunzTarPerm extractEntry samples/doughnut.html
+241 silly gunzTarPerm modified mode [ 'samples/doughnut.html', 420, 438 ]
+242 silly gunzTarPerm extractEntry samples/line-customTooltips.html
+243 silly gunzTarPerm modified mode [ 'samples/line-customTooltips.html', 420, 438 ]
+244 silly gunzTarPerm extractEntry samples/line.html
+245 silly gunzTarPerm modified mode [ 'samples/line.html', 420, 438 ]
+246 silly gunzTarPerm extractEntry samples/pie-customTooltips.html
+247 silly gunzTarPerm modified mode [ 'samples/pie-customTooltips.html', 420, 438 ]
+248 silly gunzTarPerm extractEntry samples/pie.html
+249 silly gunzTarPerm modified mode [ 'samples/pie.html', 420, 438 ]
+250 silly gunzTarPerm extractEntry samples/polar-area.html
+251 silly gunzTarPerm modified mode [ 'samples/polar-area.html', 420, 438 ]
+252 silly gunzTarPerm extractEntry samples/radar.html
+253 silly gunzTarPerm modified mode [ 'samples/radar.html', 420, 438 ]
+254 silly gunzTarPerm extractEntry LICENSE.md
+255 silly gunzTarPerm modified mode [ 'LICENSE.md', 420, 438 ]
+256 silly gunzTarPerm extractEntry bower.json
+257 silly gunzTarPerm modified mode [ 'bower.json', 420, 438 ]
+258 verbose write writing to D:\Kickabout\activate\node_modules\ng2-charts\node_modules\chart.js\package.json
+259 info preinstall chart.js@1.0.2
+260 verbose readDependencies loading dependencies from D:\Kickabout\activate\node_modules\ng2-charts\node_modules\chart.js\package.json
+261 verbose readDependencies loading dependencies from D:\Kickabout\activate\node_modules\ng2-charts\node_modules\chart.js\package.json
+262 silly install resolved []
+263 verbose about to build D:\Kickabout\activate\node_modules\ng2-charts\node_modules\chart.js
+264 info build D:\Kickabout\activate\node_modules\ng2-charts\node_modules\chart.js
+265 info linkStuff chart.js@1.0.2
+266 silly linkStuff chart.js@1.0.2 has D:\Kickabout\activate\node_modules\ng2-charts\node_modules as its parent node_modules
+267 verbose linkBins chart.js@1.0.2
+268 verbose linkMans chart.js@1.0.2
+269 verbose rebuildBundles chart.js@1.0.2
+270 info install chart.js@1.0.2
+271 info postinstall chart.js@1.0.2
+272 verbose unlock done using C:\Users\AvinashJ\AppData\Roaming\npm-cache\_locks\chart-js-a88ee544eba91ed4.lock for D:\Kickabout\activate\node_modules\ng2-charts\node_modules\chart.js
+273 verbose about to build D:\Kickabout\activate\node_modules\ng2-charts
+274 info build D:\Kickabout\activate\node_modules\ng2-charts
+275 info linkStuff ng2-charts@1.0.3
+276 silly linkStuff ng2-charts@1.0.3 has D:\Kickabout\activate\node_modules as its parent node_modules
+277 verbose linkBins ng2-charts@1.0.3
+278 verbose linkMans ng2-charts@1.0.3
+279 verbose rebuildBundles ng2-charts@1.0.3
+280 verbose rebuildBundles [ 'chart.js' ]
+281 info install ng2-charts@1.0.3
+282 info postinstall ng2-charts@1.0.3
+283 verbose readDependencies loading dependencies from D:\Kickabout\activate\package.json
+284 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\angular2\package.json
+285 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\awesome-typescript-loader\package.json
+286 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\del\package.json
+287 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\es6-promise\package.json
+288 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\es6-shim\package.json
+289 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\gulp\package.json
+290 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\gulp-watch\package.json
+291 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\ionic-angular\package.json
+292 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\ionic-gulp-fonts-copy\package.json
+293 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\ionic-gulp-html-copy\package.json
+294 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\ionic-gulp-sass-build\package.json
+295 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\ionic-gulp-webpack-build\package.json
+296 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\ionic-native\package.json
+297 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\ionicons\package.json
+298 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\ng2-charts\package.json
+299 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\parse\package.json
+300 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\reflect-metadata\package.json
+301 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\rxjs\package.json
+302 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\strip-sourcemap-loader\package.json
+303 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\typescript\package.json
+304 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\typings\package.json
+305 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\zone.js\package.json
+306 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\.bin\gulp\package.json
+307 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\.bin\gulp.cmd\package.json
+308 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\.bin\tsc\package.json
+309 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\.bin\tsc.cmd\package.json
+310 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\.bin\tsserver\package.json
+311 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\.bin\tsserver.cmd\package.json
+312 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\.bin\typings\package.json
+313 verbose targetResolver reading package data from D:\Kickabout\activate\node_modules\.bin\typings.cmd\package.json
+314 verbose already installed skipping angular2@2.0.0-beta.15 D:\Kickabout\activate
+315 silly install resolved []
+316 verbose unlock done using C:\Users\AvinashJ\AppData\Roaming\npm-cache\_locks\ng2-charts-7a2d7a54aa7e9ceb.lock for D:\Kickabout\activate\node_modules\ng2-charts
+317 verbose validateInstall loading D:\Kickabout\activate\package.json for validation
+318 verbose stack Error: The package angular2@2.0.0-beta.8 does not satisfy its siblings' peerDependencies requirements!
+318 verbose stack     at C:\Program Files (x86)\nodejs\node_modules\npm\lib\install.js:125:32
+318 verbose stack     at C:\Program Files (x86)\nodejs\node_modules\npm\lib\install.js:268:7
+318 verbose stack     at C:\Program Files (x86)\nodejs\node_modules\npm\node_modules\read-installed\read-installed.js:142:5
+318 verbose stack     at C:\Program Files (x86)\nodejs\node_modules\npm\node_modules\read-installed\read-installed.js:263:14
+318 verbose stack     at cb (C:\Program Files (x86)\nodejs\node_modules\npm\node_modules\slide\lib\async-map.js:47:24)
+318 verbose stack     at C:\Program Files (x86)\nodejs\node_modules\npm\node_modules\read-installed\read-installed.js:263:14
+318 verbose stack     at cb (C:\Program Files (x86)\nodejs\node_modules\npm\node_modules\slide\lib\async-map.js:47:24)
+318 verbose stack     at C:\Program Files (x86)\nodejs\node_modules\npm\node_modules\read-installed\read-installed.js:263:14
+318 verbose stack     at cb (C:\Program Files (x86)\nodejs\node_modules\npm\node_modules\slide\lib\async-map.js:47:24)
+318 verbose stack     at C:\Program Files (x86)\nodejs\node_modules\npm\node_modules\read-installed\read-installed.js:263:14
+319 verbose cwd D:\Kickabout\activate
+320 error Windows_NT 10.0.10586
+321 error argv "C:\\Program Files (x86)\\nodejs\\node.exe" "C:\\Program Files (x86)\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install" "ng2-charts" "--save"
+322 error node v4.2.2
+323 error npm  v2.14.7
+324 error code EPEERINVALID
+325 error peerinvalid The package angular2@2.0.0-beta.8 does not satisfy its siblings' peerDependencies requirements!
+325 error peerinvalid Peer ionic-angular@2.0.0-beta.3 wants angular2@^2.0.0-beta.6
+325 error peerinvalid Peer ng2-charts@1.0.3 wants angular2@2.0.0-beta.15
+326 verbose exit [ 1, true ]
