@@ -18,4 +18,16 @@ export class CloudFunctions {
       }
     });
   }
+
+  public static getWeekHeartData(callback) {
+    Parse.Cloud.run('getWeekHeartData', {}, {
+      success: (data) => {
+        callback(data);
+      },
+      error: (error) => {
+        console.log('Error calling getWeekHeartData:', error.message);
+        callback({}, error);
+      }
+    });
+  }
 }

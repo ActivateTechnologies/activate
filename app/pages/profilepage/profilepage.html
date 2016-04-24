@@ -12,11 +12,10 @@
 	  </div>
 
 	  <p class="nameProfile">{{currentUser.get('name')}}</p>
-
 	</div>
 
 	<div class="containerProfilePageContent">
-		<p class="sectionHeader">Daily Average:</p>
+		<!-- <p class="sectionHeader">Daily Average:</p>
 		<span [hidden]="!aveDataLoading">Analysing how active you've been ...</span>
 		<div [hidden]="aveDataLoading" class="sectionBody sectionBeneath">
 			<div class="emojiContainer">
@@ -36,13 +35,17 @@
 
 			<div class="emojiContainer">
 				<i class="em em-sleeping"></i>
-				<p class="textProfileBelowEmoji">{{formatTimeDuration(sleepingTimeAve)}}<p>
+				<p class="textProfileBelowEmoji">{{formatTimeDuration(sleepTimeAve)}}<p>
 			</div>
-		</div>
+		</div> -->
 
-		<p class="sectionHeader">This Week Average:</p>
-		<span [hidden]="!weekDataLoading">Counting all those steps ...</span>
-		<canvas id="myChart" [hidden]="weekDataLoading"></canvas>
+		<p class="sectionHeader">Distance travelled<span *ngIf="distanceDataUnit">&nbsp;({{distanceDataUnit}})</span>:</p>
+		<span [hidden]="!distanceDataLoading">Counting all those steps ...</span>
+		<canvas id="distanceChart" [hidden]="distanceDataLoading"></canvas>
+
+		<p class="sectionHeader">Average heart rate:</p>
+		<span [hidden]="!heartDataLoading">Counting all those steps ...</span>
+		<canvas id="heartChart" [hidden]="heartDataLoading"></canvas>
 
 		<!-- <div class="sectionBody">
 			<div class="emojiContainer">
