@@ -37,16 +37,18 @@ export class ProfilePage {
   }
 
   initAveData() {
-    let noDays:number = 60;
-    let beginning:Date = new Date((new Date()).getTime() - (noDays * 86400 * 1000));
+    let noDays:number = 30;
+    let beginning:Date = new Date((new Date()).getTime() - (7 * 86400 * 1000));
+    let endtemp:Date = new Date((new Date()).getTime() - (0 * 86400 * 1000));
     let timeNow:number = (new Date()).getTime();
     navigator.health.queryAggregated({
       startDate: beginning,
-      endDate: new Date(), // now
+      endDate: endtemp, //new Date(), // now
       dataType: 'activity'
     }, (data) => {
       console.log('Query time', (new Date()).getTime() - timeNow);
       console.log('Got activity:', data);
+      //this.activityDataOut = data;
       /*let durationWalking:number = 0;
       for (let i = 0; i < data.length; i++) {
         if (data[i].value == 'walking') {
@@ -63,6 +65,9 @@ export class ProfilePage {
       }
       if (data.value.biking) {
         this.cyclingTimeAve = data.value.biking.duration/noDays;
+      }
+      if (data.value.sleep) {
+        this.sleepTimeAve = data.value.sleep.duration/noDays;
       }
       this.zone.run(() => {
         this.aveDataLoading = false;
@@ -95,11 +100,12 @@ export class ProfilePage {
           endDate: new Date(start.getTime() + (i + 1) * 86400 * 1000),
           dataType: 'activity'
         }, (data) => {
+          this.activityDataOut = data;
           callbacksRemaining--;
           //console.log('Activity', i, data);
-          if (data.value.walking) {
+          if (data.value.sleep) {
             this.walkingTimeWeek[i]
-             = Math.round(data.value.walking.duration * 10 / 3600) / 10;
+             = Math.round(data.value.sleep.duration * 10 / 3600) / 10;
           }  
           if (data.value.running) {
             this.runningTimeWeek[i]

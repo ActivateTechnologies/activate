@@ -12,6 +12,8 @@
 	  </div>
 
 	  <p class="nameProfile">{{currentUser.get('name')}}</p>
+	  <br>
+	  {{walkingTimeWeek | json}}
 
 	</div>
 
@@ -36,7 +38,7 @@
 
 			<div class="emojiContainer">
 				<i class="em em-sleeping"></i>
-				<p class="textProfileBelowEmoji">{{formatTimeDuration(sleepingTimeAve)}}<p>
+				<p class="textProfileBelowEmoji">{{formatTimeDuration(sleepTimeAve)}}<p>
 			</div>
 		</div>
 
