@@ -13,7 +13,6 @@
 
 	  <p class="nameProfile">{{currentUser.get('name')}}</p>
 	  <br>
-	  {{walkingTimeWeek | json}}
 	</div>
 
 	<div class="containerProfilePageContent">
@@ -41,7 +40,7 @@
 			</div>
 		</div> -->
 
-		<p class="sectionHeader">Distance travelled<span *ngIf="distanceDataUnit">&nbsp;({{distanceDataUnit}})</span>:</p>
+		<p class="sectionHeader">Distance travelled (km):</p>
 		<span [hidden]="!distanceDataLoading">Counting all those steps ...</span>
 		<canvas id="distanceChart" [hidden]="distanceDataLoading"></canvas>
 
