@@ -12,21 +12,43 @@
 	  </div>
 
 	  <p class="nameProfile">{{currentUser.get('name')}}</p>
-	  <br>
 	</div>
 
 	<div class="containerProfilePageContent">
+		<!-- <p class="sectionHeader">Daily Average:</p>
+		<span [hidden]="!aveDataLoading">Analysing how active you've been ...</span>
+		<div [hidden]="aveDataLoading" class="sectionBody sectionBeneath">
+			<div class="emojiContainer">
+				<i class="em em-walking emojiProfileContainer"></i> 
+				<p class="textProfileBelowEmoji">{{formatTimeDuration(walkingTimeAve)}}</p>
+			</div>
 
-		<p class="sectionHeader"><i class="em em-walking em-profileContainer"></i> + <i class="em em-running em-profileContainer"></i> (km)<span *ngIf="distanceDataUnit"><!--({{distanceDataUnit}})--></span></p>
+			<div class="emojiContainer">
+				<i class="em em-runner"></i> 
+				<p class="textProfileBelowEmoji">{{formatTimeDuration(runningTimeAve)}}</p>
+			</div>
+
+			<div class="emojiContainer">
+				<i class="em em-bicyclist"></i> 
+				<p class="textProfileBelowEmoji">{{formatTimeDuration(cyclingTimeAve)}}</p>
+			</div>
+
+			<div class="emojiContainer">
+				<i class="em em-sleeping"></i>
+				<p class="textProfileBelowEmoji">{{formatTimeDuration(sleepTimeAve)}}<p>
+			</div>
+		</div> -->
+
+		<p class="sectionHeader">Distance travelled (km):</p>
 		<span [hidden]="!distanceDataLoading">Counting all those steps ...</span>
 		<canvas id="distanceChart" [hidden]="distanceDataLoading"></canvas>
 
-	</div>
+		<p class="sectionHeader">Calories burned (kcal):</p>
+		<span [hidden]="!caloriesDataLoading">Collecting those calories ...</span>
+		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
 
-	<div class="containerProfilePageContent">
-
-		<p class="sectionHeader"><i class="em em-heart em-profileContainer"></i> (bpm)</p>
-		<span [hidden]="!heartDataLoading">Working out data ...</span>
+		<p class="sectionHeader">Average heart rate (bpm):</p>
+		<span [hidden]="!heartDataLoading">Counting all those steps ...</span>
 		<canvas id="heartChart" [hidden]="heartDataLoading"></canvas>
 
 	</div>

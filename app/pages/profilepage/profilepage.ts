@@ -1,4 +1,4 @@
-import {Page, IonicApp, NavController, ViewController, NavParams} from 'ionic-angular';
+import {Page, IonicApp, NavController, ViewController, NavParams, Platform} from 'ionic-angular';
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {NgZone} from 'angular2/core';
@@ -8,7 +8,7 @@ import {NgZone} from 'angular2/core';
 })
 export class ProfilePage {
 
-  nav:any;viewController:any; user:any; currentUser:any; zone:any;
+  nav:any;viewController:any; user:any; currentUser:any; zone:any; platform:any;
   message:string; friendStatus:any; respondToRequest:boolean;
   userRelationshipNumber:number; friends:any[]; relationship:any;
   walkingTimeAve:number; runningTimeAve:number;
@@ -16,20 +16,23 @@ export class ProfilePage {
   walkingTimeWeek:number[]; runningTimeWeek:number[]; cyclingTimeWeek:number[];
   sleepTimeWeek:number[]; aveDataLoading:boolean; weekDataLoading:boolean;
   distanceData:number[]; distanceDataLoading:boolean;
+  caloriesData:number[]; caloriesDataLoading:boolean;
   heartData:number[]; heartDataLoading:boolean;
   distanceChartHandle:any; heartChartHandle:any;
 
   constructor(ionicApp: IonicApp, navController: NavController, navParams: NavParams,
-   viewController: ViewController, zone: NgZone) {
+   viewController: ViewController, zone: NgZone, platform: Platform) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = navController;
     this.viewController = viewController;
     this.zone = zone;
+    this.platform = platform;
     this.user = navParams.data;
     this.currentUser = Parse.User.current();
     this.aveDataLoading = true;
     this.weekDataLoading = true;
     this.distanceDataLoading = true;
+    this.caloriesDataLoading = true;
     this.heartDataLoading = true;
   }
 
@@ -40,7 +43,30 @@ export class ProfilePage {
   initialize() {
     //this.initAveData();
     //this.initWeekData();
-    this.initDistanceData();
+    if (localStorage['healthApiAccessGranted']) {
+      this.initDistanceData();
+      this.initCaloriesData();
+    } else if (navigator.health) {
+      navigator.health.isAvailable(() => {
+        navigator.health.requestAuthorization(['steps', 'distance', 'activity'],
+          () => {
+            localStorage['healthApiAccessGranted'] = true;
+            this.initDistanceData();
+            this.initCaloriesData();
+          }, (err) => {
+            localStorage['healthApiAccessGranted'] = false;
+            console.log('Health auth error', err);
+            this.distanceDataLoading = false;
+            this.caloriesDataLoading = false;
+          }
+        )
+      }, () => {
+        console.log('Health not available');
+        this.distanceDataLoading = false;
+        this.caloriesDataLoading = false;
+      });
+    }
+    
     this.initHeartData();
   }
 
@@ -134,27 +160,34 @@ export class ProfilePage {
 
   initDistanceData() {
     this.distanceData = [];
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 8; i++) {
       this.distanceData.push(0);
     }
     let start:Date = new Date();
     start.setHours(0);
     start.setMinutes(0);
     start.setSeconds(0);
-    start = new Date(start.getTime() - 7 * 86400 * 1000);
-    let callbacksRemaining:number = 7;
-    for (let i = 0; i < 7; i++) {
+    start = new Date(start.getTime() - 8 * 86400 * 1000);
+    let callbacksRemaining:number = 8;
+    for (let i = 0; i < 8; i++) {
       ((i) => {
+        let endDate:Date = new Date(start.getTime() + (i + 1) * 86400 * 1000);
+        if (i == 7) {
+          endDate = new Date();
+        }
         navigator.health.queryAggregated({
           startDate: new Date(start.getTime() + i * 86400 * 1000),
-          endDate: new Date(start.getTime() + (i + 1) * 86400 * 1000),
+          endDate: endDate,
           dataType: 'distance'
         }, (data) => {
           callbacksRemaining--;
           //console.log('distance', i, data);
           if (data.value) {
-            this.distanceData[i]
-             = Math.round(data.value / 10) / 100;
+            let val:number = Math.round(data.value / 10) / 100;
+            if (this.platform && this.platform.is('ios')) {
+              val *= 0.5;
+            }
+            this.distanceData[i] = val;
           }  
           if (callbacksRemaining == 0 ) {
             this.initDistanceChart();
@@ -164,6 +197,47 @@ export class ProfilePage {
           console.log('Error:', error);
           if (callbacksRemaining == 0 ) {
             this.initDistanceChart();
+          }
+        });
+      })(i);
+    }
+  }
+
+  initCaloriesData() {
+    this.caloriesData = [];
+    for (let i = 0; i < 8; i++) {
+      this.caloriesData.push(0);
+    }
+    let start:Date = new Date();
+    start.setHours(0);
+    start.setMinutes(0);
+    start.setSeconds(0);
+    start = new Date(start.getTime() - 8 * 86400 * 1000);
+    let callbacksRemaining:number = 8;
+    for (let i = 0; i < 8; i++) {
+      ((i) => {
+        navigator.health.queryAggregated({
+          startDate: new Date(start.getTime() + i * 86400 * 1000),
+          endDate: new Date(start.getTime() + (i + 1) * 86400 * 1000),
+          dataType: 'calories'
+        }, (data) => {
+          callbacksRemaining--;
+          //console.log('calories', i, data);
+          if (data.value) {
+            let val:number = Math.round(data.value / 10) * 10;
+            /*if (this.platform && this.platform.is('ios')) {
+              val *= 0.5;
+            }*/
+            this.caloriesData[i] = val;
+          }  
+          if (callbacksRemaining == 0 ) {
+            this.initCaloriesChart();
+          }
+        }, (error) => {
+          callbacksRemaining--;
+          console.log('Error:', error);
+          if (callbacksRemaining == 0 ) {
+            this.initCaloriesChart();
           }
         });
       })(i);
@@ -238,7 +312,7 @@ export class ProfilePage {
     let labels:string[] = [];
     let day = new Date().getDay() - 1;
     day = (day == -1) ? 6 : day;
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 8; i++) {
       labels.push(days[(i+day) % 7]);
     }
     let distanceData:any = {
@@ -258,6 +332,35 @@ export class ProfilePage {
     this.distanceChartHandle = new Chart(ctx).Bar(distanceData, options);
   }
 
+  initCaloriesChart() {
+    this.zone.run(() => {
+      this.caloriesDataLoading = false;
+    });
+    let ctx:any = (<HTMLCanvasElement> document.getElementById("caloriesChart")).getContext("2d");
+    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+    let labels:string[] = [];
+    let day = new Date().getDay() - 1;
+    day = (day == -1) ? 6 : day;
+    for (let i = 0; i < 8; i++) {
+      labels.push(days[(i+day) % 7]);
+    }
+    let caloriesData:any = {
+      labels: labels,
+      datasets: [{
+        label: "km",
+        fillColor: "rgba(40,40,245,0.5)",
+        strokeColor: "rgba(40,40,245,0.8)",
+        highlightFill: "rgba(40,40,245,0.75)",
+        highlightStroke: "rgba(40,40,245,1)",
+        data: this.caloriesData
+      }]
+    };
+    let options:any = {
+      scaleShowGridLines: false
+    }
+    this.distanceChartHandle = new Chart(ctx).Bar(caloriesData, options);
+  }
+
   initHeartChart() {
     this.zone.run(() => {
       this.heartDataLoading = false;
@@ -267,7 +370,7 @@ export class ProfilePage {
     let labels:string[] = [];
     let day = new Date().getDay() - 1;
     day = (day == -1) ? 6 : day;
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < this.heartData.length; i++) {
       labels.push(days[(i+day) % 7]);
     }
     let heartData:any = {
@@ -285,21 +388,6 @@ export class ProfilePage {
       scaleShowGridLines: false
     }
     this.heartChartHandle = new Chart(ctx).Bar(heartData, options);
-  }
-
-  formatTimeDuration(timeSec) {
-    if (!timeSec || timeSec == NaN) {
-      return "-";  
-    }
-    let outputString:string;
-    if (timeSec < 60) {
-      outputString = Math.round(timeSec) + " s";
-    } else if (timeSec < 3600) {
-      outputString = Math.round(timeSec/60) + " min";
-    } else {
-      outputString = Math.round(timeSec * 10/(60 * 60)) / 10 + " hrs";
-    }
-    return outputString;
   }
 
 }

@@ -185,8 +185,8 @@ export class Health {
   //Called by showData
   processData(steps:any, distance:any, activity:any) {
     if (steps != null && distance != null && activity != null) {
-      let summaryString:string = 'You walked ' + steps.value + ' steps yesterday '
-        + 'which covered ' + distance.value + distance.unit;
+      let summaryString:string = 'You walked ' + Math.round(steps.value)
+       + ' steps yesterday ' + 'which covered ' + Math.round(distance.value) + distance.unit;
       console.log(summaryString);
       this.loading = false;
       this.summaryString = summaryString;

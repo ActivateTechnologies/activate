@@ -33,13 +33,12 @@ Parse.Cloud.define("getWeekHeartData", function(request, response) {
     success: function(parseObjects) {
       console.log({log:'Found heartData', 'obj':parseObjects.length});
       var heartBeats = [];
-      for (var i = 0; i < 7; i++) {
+      for (var i = 0; i < 8; i++) {
         heartBeats.push([]);
       }
       for (var i = 0; i < parseObjects.length; i++) {
         var time = parseObjects[i].get('tempWhen').getTime() - start.getTime();
         var day = Math.floor(time/(86400*1000))
-        console.log({log:"1Going to work on day" + day});
         heartBeats[day].push(parseObjects[i].get('heartRate'));
       }
       var averageHeartBeats = [];
