@@ -44,6 +44,10 @@
 		<span [hidden]="!distanceDataLoading">Counting all those steps ...</span>
 		<canvas id="distanceChart" [hidden]="distanceDataLoading"></canvas>
 
+		<p class="sectionHeader">Calories burned (kcal):</p>
+		<span [hidden]="!caloriesDataLoading">Collecting those calories ...</span>
+		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
+
 		<p class="sectionHeader">Average heart rate:</p>
 		<span [hidden]="!heartDataLoading">Counting all those steps ...</span>
 		<canvas id="heartChart" [hidden]="heartDataLoading"></canvas>
