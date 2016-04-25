@@ -12,7 +12,6 @@
 	  </div>
 
 	  <p class="nameProfile">{{currentUser.get('name')}}</p>
-	  <br>
 	</div>
 
 	<div class="containerProfilePageContent">
@@ -48,31 +47,10 @@
 		<span [hidden]="!caloriesDataLoading">Collecting those calories ...</span>
 		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
 
-		<p class="sectionHeader">Average heart rate:</p>
+		<p class="sectionHeader">Average heart rate (bpm):</p>
 		<span [hidden]="!heartDataLoading">Counting all those steps ...</span>
 		<canvas id="heartChart" [hidden]="heartDataLoading"></canvas>
 
-		<!-- <div class="sectionBody">
-			<div class="emojiContainer">
-				<i class="em em-walking emojiProfileContainer"></i> 
-				<p class="textProfileBelowEmoji">2 hrs</p>
-			</div>
-
-			<div class="emojiContainer">
-				<i class="em em-runner"></i> 
-				<p class="textProfileBelowEmoji">20 mins</p>
-			</div>
-
-			<div class="emojiContainer">
-				<i class="em em-bicyclist"></i> 
-				<p class="textProfileBelowEmoji">10 mins</p>
-			</div>
-
-			<div class="emojiContainer">
-				<i class="em em-sleeping"></i>
-				<p class="textProfileBelowEmoji">10 mins<p>
-			</div> 
-		</div> -->
 	</div>
 
 </ion-content>

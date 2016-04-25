@@ -319,8 +319,8 @@ export class ProfilePage {
       labels: labels,
       datasets: [{
         label: "km",
-        fillColor: "rgba(40,40,245,0.5)",
-        strokeColor: "rgba(40,40,245,0.8)",
+        fillColor: "rgb(54, 162, 235)",
+        strokeColor: "rgb(54, 162, 235)",
         highlightFill: "rgba(40,40,245,0.75)",
         highlightStroke: "rgba(40,40,245,1)",
         data: this.distanceData
@@ -377,8 +377,8 @@ export class ProfilePage {
       labels: labels,
       datasets: [{
         label: "bpm",
-        fillColor: "rgba(40,40,245,0.5)",
-        strokeColor: "rgba(40,40,245,0.8)",
+        fillColor: "rgb(255, 99, 132)",
+        strokeColor: "rgb(255, 99, 132)",
         highlightFill: "rgba(40,40,245,0.75)",
         highlightStroke: "rgba(40,40,245,1)",
         data: this.heartData

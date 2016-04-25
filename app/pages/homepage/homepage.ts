@@ -33,7 +33,7 @@ export class HomePage {
 
   initialize() {
     if (Parse.User.current()) {
-      this.navigateTreeTo('healthApi', false); //healthApi
+      this.navigateTreeTo('start', false); //healthApi
       return;
     }
     this.typing = true;
