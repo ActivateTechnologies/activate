@@ -112,6 +112,8 @@
 		border-radius: 5px;
 		padding: 6px;
 
+		margin-top: 15px;
+
 		margin-right: auto;
 		margin-left: auto;
 		display: block;
@@ -140,5 +142,9 @@
 
 	.textProfileBelowEmoji {
 		margin: 0;
+	}
+
+	.em-profileContainer {
+		font-size: 10px;
 	}
 }
