@@ -107,7 +107,7 @@
 	}
 
   .em {
-    font-size: 8px;
+    font-size: 10px;
   }
 
   .emojiBottom {
@@ -183,6 +183,27 @@
     color: #FFFFFF;
   }
 
+  .gamePic {
+    margin-top: 5px;
+  }
+
+  .chatContainerContent {
+  
+  }
+
+  .leftChatContainerContent {
+    width: 7%;
+    min-width: 18px;
+    display: inline-block;
+
+  }
+
+  .rightChatContainerContent {
+    width: 93%;
+    float: right;
+    display: inline-block;
+    
+  }
 
 
 }
