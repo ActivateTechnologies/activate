@@ -150,7 +150,7 @@ export class HomePage {
     });
   }
 
-  //Adds user choice to conversation and calls to fetch next treeObject
+//Adds user choice to conversation and calls to fetch next treeObject
   replyWithMessage(option:any) {
     //console.log('replyWithMessage', message);
     if (!option.isWidget) {

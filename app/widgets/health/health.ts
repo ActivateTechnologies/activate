@@ -202,7 +202,7 @@ export class Health {
   measureHeart() {
     this.loading = true;
     let props:any = {
-      seconds: 5,
+      seconds: 10,
       fps: 30
     };
     if (window.heartbeat) {

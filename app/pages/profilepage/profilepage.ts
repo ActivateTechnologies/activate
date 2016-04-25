@@ -15,7 +15,7 @@ export class ProfilePage {
   cyclingTimeAve:number; sleepTimeAve:number;
   walkingTimeWeek:number[]; runningTimeWeek:number[]; cyclingTimeWeek:number[];
   sleepTimeWeek:number[]; aveDataLoading:boolean; weekDataLoading:boolean;
-  distanceData:number[]; distanceDataLoading:boolean; distanceDataUnit:string;
+  distanceData:number[]; distanceDataLoading:boolean;
   heartData:number[]; heartDataLoading:boolean;
   distanceChartHandle:any; heartChartHandle:any;
 
@@ -108,7 +108,6 @@ export class ProfilePage {
           endDate: new Date(start.getTime() + (i + 1) * 86400 * 1000),
           dataType: 'activity'
         }, (data) => {
-          this.activityDataOut = data;
           callbacksRemaining--;
           //console.log('Activity', i, data);
           if (data.value.sleep) {
@@ -156,7 +155,6 @@ export class ProfilePage {
           if (data.value) {
             this.distanceData[i]
              = Math.round(data.value / 10) / 100;
-            this.distanceDataUnit = data.unit
           }  
           if (callbacksRemaining == 0 ) {
             this.initDistanceChart();
