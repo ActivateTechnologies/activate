@@ -223,7 +223,6 @@ export class ProfilePage {
         }, (data) => {
           callbacksRemaining--;
           //console.log('calories', i, data);
-          this.caloriesTempData = data;
           if (data.value) {
             let val:number = Math.round(data.value / 10) * 10;
             /*if (this.platform && this.platform.is('ios')) {

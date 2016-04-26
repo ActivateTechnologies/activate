@@ -26,7 +26,7 @@ export class HomePage {
     this.chatMessages = [];
     this.initialize();
     this.THINKING_DELAY = (this.dev) ? 0 : 1000;
-    this.TYPING_DELAY = (this.dev) ? 0 : 1500;
+    this.TYPING_DELAY = (this.dev) ? 500 : 1500;
     this.SCROLL_DELAY = (this.dev) ? 0 : 3000;
     this.widgetBoundCallback = this.widgetCallback.bind(this);
   }
