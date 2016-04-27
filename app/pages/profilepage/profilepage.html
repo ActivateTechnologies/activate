@@ -40,18 +40,18 @@
 			</div>
 		</div> -->
 
-		<p class="sectionHeader"><i class="em em-walking"></i> + <i class="em em-running"></i> (km):</p>
+		<p class="sectionHeader">Distance travelled (km):</p>
 		<span [hidden]="!distanceDataLoading">Counting all those steps ...</span>
 		<canvas id="distanceChart" [hidden]="distanceDataLoading"></canvas>
-	</div>
-		<!--
+
+	
 		<p class="sectionHeader">Calories burned (kcal):</p>
 		<span [hidden]="!caloriesDataLoading">Collecting those calories ...</span>
 		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
-		-->
-	<div class="containerProfilePageContent">
-		<p class="sectionHeader"><i class="em em-heart"></i> (bpm):</p>
-		<span [hidden]="!heartDataLoading">Getting data ...</span>
+		
+
+		<p class="sectionHeader">Average heart rate (bpm):</p>
+		<span [hidden]="!heartDataLoading">Counting all those steps ...</span>
 		<canvas id="heartChart" [hidden]="heartDataLoading"></canvas>
 	</div>
 
