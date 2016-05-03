@@ -393,14 +393,14 @@ export class ProfilePage {
 
   //STRAVA
   connectStrava() {
-    alert("I am an alert box!");  
+    window.open('https://www.strava.com/oauth/authorize?client_id=11012&response_type=code&redirect_uri=http://localhost:8100&approval_prompt=force', '_system');  
   }
 
   //MEETUP
   connectMeetup() {
     this.cordovaOauth = new CordovaOauth(new Meetup({clientId: "5mmt4kfgh5mc469f43hj8t5rh6", appScope: ["email"]}));
     this.cordovaOauth.login().then((success) => {
-      console.log(JSON.stringify(success));
+      alert(JSON.stringify(success));
         }, (error) => {
       alert(JSON.stringify(error));
     });
