@@ -80,44 +80,59 @@ export class HomePage {
       messageObject.isWidget = false;
       messageObject.message = this.processMessage(treeObjectMessages[randIndexMessages]);
     }
+    this.saveMessageToParse(messageObject, treeObject, false);
     this.zone.run(() => {
       this.chatMessages.push(messageObject);
     });
     this.scrollToBottom();
-    //if (!messageObject.isWidget) {
-      if (treeObjectChildConnectors[randIndexChildren].length > 0) {
-        this.zone.run(() => {
-          this.replyOptions = [];
-        });
-        for (let i = 0; i < treeObjectChildConnectors[0].length; i++) {
-          let replyOption:any = {
-            pointer: treeObject.get(Consts.TREEOBJECTS_CHILDREN)[i]
-          }
-          if (treeObjectChildConnectors[randIndexChildren][i].widgetName) {
-            replyOption.isWidget = true;
-            replyOption.widget = treeObjectChildConnectors[randIndexChildren][i];
-          } else {
-            replyOption.isWidget = false;
-            replyOption.message = treeObjectChildConnectors[randIndexChildren][i];
-          }
-          //console.log('Reply Option', treeObject, replyOption);
-          this.zone.run(() => {
-            this.replyOptions.push(replyOption);
-          });
+    if (treeObjectChildConnectors[randIndexChildren].length > 0) {
+      this.zone.run(() => {
+        this.replyOptions = [];
+      });
+      for (let i = 0; i < treeObjectChildConnectors[0].length; i++) {
+        let replyOption:any = {
+          pointer: treeObject.get(Consts.TREEOBJECTS_CHILDREN)[i]
         }
-      } else {
-        this.setTyping(true);
-        setTimeout(() => {
-          this.fetchAndProcessPointer(treeObject.get(Consts.TREEOBJECTS_CHILDREN)[0]);
-        }, this.TYPING_DELAY);
+        if (treeObjectChildConnectors[randIndexChildren][i].widgetName) {
+          replyOption.isWidget = true;
+          replyOption.widget = treeObjectChildConnectors[randIndexChildren][i];
+        } else {
+          replyOption.isWidget = false;
+          replyOption.message = treeObjectChildConnectors[randIndexChildren][i];
+        }
+        //console.log('Reply Option', treeObject, replyOption);
+        this.zone.run(() => {
+          this.replyOptions.push(replyOption);
+        });
       }
-    //}
+    } else {
+      this.setTyping(true);
+      setTimeout(() => {
+        this.fetchAndProcessPointer(treeObject.get(Consts.TREEOBJECTS_CHILDREN)[0]);
+      }, this.TYPING_DELAY);
+    }
+  }
+
+  //Save message to parse Message class for archiving
+  saveMessageToParse(messageObject:any, treeObject:any, usersMessage:boolean) {
+    let Message = Parse.Object.extend(Consts.MESSAGES_CLASS);
+    let message = new Message();
+    message.set(Consts.MESSAGES_USERSMESSAGE, usersMessage);
+    message.set(Consts.MESSAGES_USER, Parse.User.current());
+    if (treeObject) {
+      message.set(Consts.MESSAGES_TREEOBJECT, treeObject);
+    }
+    if (messageObject.message) {
+      message.set(Consts.MESSAGES_MESSAGE, messageObject.message);
+    } else if (messageObject.widget) {
+      message.set(Consts.MESSAGES_MESSAGE, treeObject.get(Consts.TREEOBJECTS_MESSAGES)[0]);
+    }
+    message.save();
   }
 
   //Replaces hot keywords with dynamic data
   processMessage(message:string) {
     let editedString:string = message;
-
     editedString = editedString.replace("#~user_firstname~#", 
       (Parse.User.current()) ? Parse.User.current().get(Consts.USER_FIRSTNAME) : "Stranger");
     editedString = editedString.replace("#~nativeHealthApi~#", 
@@ -150,7 +165,7 @@ export class HomePage {
     });
   }
 
-//Adds user choice to conversation and calls to fetch next treeObject
+  //Adds user choice to conversation and calls to fetch next treeObject
   replyWithMessage(option:any) {
     //console.log('replyWithMessage', message);
     if (!option.isWidget) {
@@ -159,6 +174,7 @@ export class HomePage {
         usersMessage: true,
         isWidget: false
       }
+      this.saveMessageToParse(messageObject, null, true);
       this.zone.run(() => {
         this.chatMessages.push(messageObject);
       });
@@ -186,6 +202,7 @@ export class HomePage {
     if (data) {
       messageObject.data = data;
     }
+    this.saveMessageToParse(messageObject, null, true);
     this.zone.run(() => {
       this.chatMessages.push(messageObject);
       this.scrollToBottom();

@@ -2,7 +2,7 @@ import {Page, IonicApp, NavController, ViewController, NavParams, Platform} from
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {NgZone} from 'angular2/core';
-import {CordovaOauth, Meetup} from 'ng2-cordova-oauth/core';
+//import {CordovaOauth, Meetup} from 'ng2-cordova-oauth/core';
 
 @Page({
   templateUrl: 'build/pages/profilepage/profilepage.html'
@@ -398,12 +398,12 @@ export class ProfilePage {
 
   //MEETUP
   connectMeetup() {
-    this.cordovaOauth = new CordovaOauth(new Meetup({clientId: "5mmt4kfgh5mc469f43hj8t5rh6", appScope: ["email"]}));
+    /*this.cordovaOauth = new CordovaOauth(new Meetup({clientId: "5mmt4kfgh5mc469f43hj8t5rh6", appScope: ["email"]}));
     this.cordovaOauth.login().then((success) => {
       alert(JSON.stringify(success));
         }, (error) => {
       alert(JSON.stringify(error));
-    });
+    });*/
   }
 
 }

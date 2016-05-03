@@ -8,7 +8,10 @@ interface Window {
 	heartbeat: any;
 	facebookConnectPlugin: any;
 	FB: any;
-	Chart: any;
+}
+
+interface Chart {
+
 }
 
 interface Navigator {

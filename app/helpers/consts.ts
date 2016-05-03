@@ -9,6 +9,8 @@ export class Consts {
   
   //Messages Class
   public static MESSAGES_CLASS = "Messages";
+  //Pointer <User> pointer to user
+  public static MESSAGES_USER = "user";
   //String - message text
   public static MESSAGES_MESSAGE = "message";
   //Boolean - is this message sent by the uesr
