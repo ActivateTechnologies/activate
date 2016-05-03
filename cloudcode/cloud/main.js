@@ -27,8 +27,8 @@ Parse.Cloud.define("getWeekHeartData", function(request, response) {
   start.setSeconds(0);
   var end = start;
   start = new Date(start.getTime() - 7 * 86400 * 1000);
-  query.greaterThan('tempWhen', start);
-  query.lessThan('tempWhen', end);
+  query.greaterThan('createdAt', start);
+  query.lessThan('createdAt', end);
   query.find({
     success: function(parseObjects) {
       console.log({log:'Found heartData', 'obj':parseObjects.length});
@@ -37,7 +37,7 @@ Parse.Cloud.define("getWeekHeartData", function(request, response) {
         heartBeats.push([]);
       }
       for (var i = 0; i < parseObjects.length; i++) {
-        var time = parseObjects[i].get('tempWhen').getTime() - start.getTime();
+        var time = parseObjects[i].get('createdAt').getTime() - start.getTime();
         var day = Math.floor(time/(86400*1000))
         heartBeats[day].push(parseObjects[i].get('heartRate'));
       }
