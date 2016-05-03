@@ -15,6 +15,10 @@
 
 	</div>
 
+	<img (click)="connectStrava()" class="connectStravaButton" src="images/stravaConnect.png">
+
+	<img (click)="connectMeetup()" class="connectMeetupButton" src="images/meetup.png">
+	
 	<div class="containerProfilePageContent">
 		<!-- <p class="sectionHeader">Daily Average:</p>
 		<span [hidden]="!aveDataLoading">Analysing how active you've been ...</span>
@@ -49,6 +53,9 @@
 		<span [hidden]="!caloriesDataLoading">Collecting those calories ...</span>
 		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
 		
+		<p class="sectionHeader">Sleep (hours):</p>
+		<span [hidden]="!caloriesDataLoading">Working out those ZZZZZs ...</span>
+		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
 
 		<p class="sectionHeader">Average heart rate (bpm):</p>
 		<span [hidden]="!heartDataLoading">Counting all those steps ...</span>
