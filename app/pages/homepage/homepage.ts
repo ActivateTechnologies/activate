@@ -13,7 +13,7 @@ export class HomePage {
 
   nav:any; app:any; zone:any; platform:any; chatMessages:any[]; replyOptions:any[];
   typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number; SCROLL_DELAY:number;
-  dev:boolean = true;
+  dev:boolean = true; loadingMessages:boolean = true;
 
   public widgetBoundCallback: Function;
 
@@ -33,7 +33,8 @@ export class HomePage {
 
   initialize() {
     if (Parse.User.current()) {
-      this.navigateTreeTo('start', false); //healthApi
+      this.retrieveArchieveMessages();
+      //this.navigateTreeTo('start', false); //healthApi
       return;
     }
     this.typing = true;
@@ -57,6 +58,40 @@ export class HomePage {
       this.typing = typing;
     });
     this.scrollToBottom();
+  }
+
+  //Retrieve past user messages
+  retrieveArchieveMessages() {
+    this.loadingMessages = true;
+    let Messages = Parse.Object.extend("Messages");
+    let query = new Parse.Query(Messages);
+    query.equalTo(Consts.MESSAGES_USER, Parse.User.current());
+    query.descending("createdAt");
+    query.limit(10);
+    query.find({
+      success: (parseObjects) => {
+        for (let i = 0; i < parseObjects.length; i++) {
+          let messageObject:any = {};
+          if (parseObjects[i].get(Consts.MESSAGES_MESSAGE).widgetName) {
+            messageObject.isWidget = true;
+            messageObject.widget = parseObjects[i].get(Consts.MESSAGES_MESSAGE);
+          } else {
+            messageObject.isWidget = false;
+            messageObject.message = parseObjects[i].get(Consts.MESSAGES_MESSAGE);
+          }
+          messageObject.usersMessage = parseObjects[i].get(Consts.MESSAGES_USERSMESSAGE);
+          //this.chatMessages.push(messageObject);
+          this.chatMessages.splice(0, 0, messageObject);
+        }
+        this.scrollToBottom();
+        this.loadingMessages = false;
+        this.navigateTreeTo('start', true);
+      },
+      error: (error) => {
+        console.log('Error retrieving past messages:', error);
+      }
+    })
+
   }
 
   //Called when a treeObject is received

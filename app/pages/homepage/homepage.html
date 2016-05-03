@@ -14,6 +14,7 @@
 
 <ion-content class="homepage" id="homepage-content">
   <ion-list padding>
+    <span *ngIf="loadingMessages">Loading ...</span>
     <div *ngFor="#chatMessage of chatMessages" class="fade-in"
         [class.align-right]="chatMessage.usersMessage">
       <div *ngIf="chatMessage.type != 'line'" [class.message-user]="chatMessage.usersMessage"
