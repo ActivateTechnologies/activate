@@ -43,6 +43,7 @@
     "cordova-plugin-facebook4@~1.7.0"
   ],
   "cordovaPlatforms": [
-    "ios"
+    "ios",
+    "android"
   ]
 }

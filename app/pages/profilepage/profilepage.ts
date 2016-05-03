@@ -390,4 +390,10 @@ export class ProfilePage {
     this.heartChartHandle = new Chart(ctx).Bar(heartData, options);
   }
 
+  //STRAVA
+  connectStrava() {
+    alert("I am an alert box!");  
+  }
+
+
 }
