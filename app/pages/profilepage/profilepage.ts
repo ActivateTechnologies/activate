@@ -392,9 +392,58 @@ export class ProfilePage {
   }
 
   //STRAVA
-  connectStrava() {
+  connectStravaButton() {
+    this.platform.ready().then(() => {
+        this.connectStravaFunction().then((success) => {
+            alert(success.access_token);
+        }, (error) => {
+            alert(error);
+        });
+    });
+  }
+
+  connectStravaFunction() {
+    return new Promise(function(resolve, reject) {
+        var browserRef = window.cordova.InAppBrowser.open("https://www.strava.com/oauth/authorize?client_id=11012&response_type=code" + "&response_type=code&redirect_uri=http://localhost&approval_prompt=force", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
+        browserRef.addEventListener("loadstart", (event) => {
+            //alert(1);
+            if ((event.url).indexOf("http://localhost") === 0) {
+                browserRef.removeEventListener("exit", (event) => {});
+                alert(2);
+                alert(event.url);
+                browserRef.close();
+                var url = event.url
+                var accessCode = url.substring(30,url.length);
+                alert(accessCode);
+                console.log(accessCode);
+                alert(3);
+
+                /*
+                var responseParameters = ((event.url).split("#")[1]).split("&");
+                alert(4);
+                var parsedResponse = {};
+                for (var i = 0; i < responseParameters.length; i++) {
+                    parsedResponse[responseParameters[i].split("=")[0]] = responseParameters[i].split("=")[1];
+                }
+                if (parsedResponse["access_token"] !== undefined && parsedResponse["access_token"] !== null) {
+                    resolve(parsedResponse);
+                } else {
+                    reject("Problem authenticating with Strava");
+                }
+                */
+            }
+        });
+        browserRef.addEventListener("exit", function(event) {
+            reject("The Strava sign in flow was canceled");
+        });
+    });
+  }
+
+  /*
+  connectStravaFunction() {
     window.open('https://www.strava.com/oauth/authorize?client_id=11012&response_type=code&redirect_uri=http://localhost:8100&approval_prompt=force', '_system');  
   }
+  */
 
   //MEETUP
   connectMeetup() {
