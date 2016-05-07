@@ -418,6 +418,7 @@ export class ProfilePage {
                 console.log(accessCode);
                 alert(3);
 
+                //This is the raw javascript version I was talking about. I found other versions, but atm this is the only one that seems to work:
                 /*
                 var responseParameters = ((event.url).split("#")[1]).split("&");
                 alert(4);
@@ -439,11 +440,27 @@ export class ProfilePage {
     });
   }
 
-  /*
-  connectStravaFunction() {
-    window.open('https://www.strava.com/oauth/authorize?client_id=11012&response_type=code&redirect_uri=http://localhost:8100&approval_prompt=force', '_system');  
+  stravaAPIPOST() {
+    alert('stravaAPIPOST');
+    var c_id = "11012";
+    var c_secret = "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc";
+    var access_code = "c420583602c1eb00dd60707dd48c58d46e5c8a83";
+    var params = "client_id=" + c_id + "&client_secret=" + c_secret + "&code=" + access_code;
+​    
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function () {
+      alert('2');
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        alert(xmlhttp.responseText);
+      }
+    }
+​    
+    xmlhttp.open("POST", "https://www.strava.com/oauth/token", true);
+    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.setRequestHeader("Content-length", "3");
+    xmlhttp.setRequestHeader("Connection", "close");
+    xmlhttp.send(params);
   }
-  */
 
   //MEETUP
   connectMeetup() {
