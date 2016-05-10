@@ -85,7 +85,7 @@ export class HomePage {
         }
         this.scrollToBottom();
         this.loadingMessages = false;
-        this.navigateTreeTo('start', true);
+        this.navigateTreeTo('mood', true);
       },
       error: (error) => {
         console.log('Error retrieving past messages:', error);

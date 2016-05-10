@@ -42,7 +42,8 @@
     "cordova-plugin-statusbar@~2.1.2",
     "ionic-plugin-keyboard@~2.0.1",
     "cordova-plugin-facebook4@~1.7.0",
-    "cordova-plugin-inappbrowser"
+    "cordova-plugin-inappbrowser",
+    "cordova-plugin-camera"
   ],
   "cordovaPlatforms": [
     "ios",

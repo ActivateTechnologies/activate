@@ -15,11 +15,7 @@
 
 	</div>
 
-	<img (click)="connectStravaButton()" class="connectStravaButton" src="images/stravaConnect.png">
-
-	<button (click)="stravaAPIPOST()" class="stravaAPIPOST">Strava API POST</button>
-
-	<img (click)="connectMeetup()" class="connectMeetupButton" src="images/meetup.png">
+	
 	
 	<div class="containerProfilePageContent">
 		<!-- <p class="sectionHeader">Daily Average:</p>
@@ -46,22 +42,66 @@
 			</div>
 		</div> -->
 
-		<p class="sectionHeader">Distance travelled (km):</p>
-		<span [hidden]="!distanceDataLoading">Counting all those steps ...</span>
+		<p class="sectionHeader">Overview:</p>
+		<span [hidden]="!distanceDataLoading">Churning all your data ...</span>
 		<canvas id="distanceChart" [hidden]="distanceDataLoading"></canvas>
+	</div>
 
-	
-		<p class="sectionHeader">Calories burned (kcal):</p>
-		<span [hidden]="!caloriesDataLoading">Collecting those calories ...</span>
+	<div class="containerProfilePageContent">
+
+		<p class="sectionHeader"><i class="em em-walking"></i> (km):</p>
+		<span [hidden]="!caloriesDataLoading">Working out steps ...</span>
 		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
-		
-		<p class="sectionHeader">Sleep (hours):</p>
+
+
+		<p class="sectionHeader"><i class="em em-running"></i> (km):</p>
+		<span [hidden]="!caloriesDataLoading">Working out strides ...</span>
+		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
+
+
+		<p class="sectionHeader"><i class="em em-bicyclist"></i> (km)</p>
+		<span [hidden]="!caloriesDataLoading">Working out cycles ...</span>
+		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
+
+		<p class="sectionHeader"><i class="em em-sleeping"></i> (hours):</p>
 		<span [hidden]="!caloriesDataLoading">Working out those ZZZZZs ...</span>
 		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
 
-		<p class="sectionHeader">Average heart rate (bpm):</p>
-		<span [hidden]="!heartDataLoading">Counting all those steps ...</span>
+		<p class="sectionHeader"><i class="em em-heart"></i> (bpm):</p>
+		<span [hidden]="!heartDataLoading">Getting those beats ...</span>
 		<canvas id="heartChart" [hidden]="heartDataLoading"></canvas>
+	
+		<p class="sectionHeader"><i class="em em-fire"></i> (kcal):</p>
+		<span [hidden]="!caloriesDataLoading">Collecting those calories ...</span>
+		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
 	</div>
 
+	<div class="containerProfilePageContent">
+		<p class="sectionHeader"><i class="em em-apple"></i> (g):</p>
+		<span [hidden]="!caloriesDataLoading">Working out your food ...</span>
+		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
+	</div>
+
+	<div class="containerProfilePageContent">
+		<p class="sectionHeader"><i class="em em-smiley"></i>:</p>
+		<span [hidden]="!caloriesDataLoading">Getting your mood data ...</span>
+		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
+	</div>
+
+	<div class="containerProfilePageContent">
+		<p class="sectionHeader"><i class="em em-trophy"></i>:</p>
+		<span [hidden]="!caloriesDataLoading">Ranking you to facebook friends ...</span>
+		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
+	</div>
+
+	<img (click)="connectStravaButton()" class="connectStravaButton" src="images/stravaConnect.png">
+
+	
+	<button (click)="stravaAPIPOST()" class="stravaAPIPOST">Strava API POST</button>
+
+	<button class="stravaAPIPOST">Connect with MOVES</button>
+
+	<!--
+	<img (click)="connectMeetup()" class="connectMeetupButton" src="images/meetup.png">
+	-->
 </ion-content>
