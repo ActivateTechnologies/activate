@@ -4,6 +4,7 @@ import {Widget} from '../../widgets/widget';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {NgZone} from 'angular2/core';
 import {ProfilePage} from '../profilepage/profilepage';
+import {Camera} from 'ionic-native';
 
 @Page({
   templateUrl: 'build/pages/homepage/homepage.html',
@@ -85,7 +86,7 @@ export class HomePage {
         }
         this.scrollToBottom();
         this.loadingMessages = false;
-        this.navigateTreeTo('mood', true);
+        this.navigateTreeTo('loggedIn', true);
       },
       error: (error) => {
         console.log('Error retrieving past messages:', error);
@@ -296,4 +297,15 @@ export class HomePage {
       this.nav.push(ProfilePage);
     }
   }
+
+  openCamera() {
+      //FROM: http://ionicframework.com/docs/v2/native/Camera/
+     Camera.getPicture(options).then((imageData) => {
+     // imageData is either a base64 encoded string or a file URI
+     // If it's base64:
+     let base64Image = "data:image/jpeg;base64," + imageData;
+    }, (err) => {
+    });
+  }
+
 }
