@@ -448,18 +448,20 @@ export class ProfilePage {
     var params = "client_id=" + c_id + "&client_secret=" + c_secret + "&code=" + access_code;
 ​    
     var xmlhttp = new XMLHttpRequest();
+    alert(1);
     xmlhttp.onreadystatechange = function () {
       alert('2');
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
         alert(xmlhttp.responseText);
       }
     }
-​    
+​    alert(3);
     xmlhttp.open("POST", "https://www.strava.com/oauth/token", true);
     xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xmlhttp.setRequestHeader("Content-length", "3");
     xmlhttp.setRequestHeader("Connection", "close");
     xmlhttp.send(params);
+    alert(4);
   }
 
   //MEETUP
