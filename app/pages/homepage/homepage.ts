@@ -3,6 +3,8 @@ import {Consts} from '../../helpers/consts';
 import {Widget} from '../../widgets/widget';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {NgZone} from 'angular2/core';
+import {Http, HTTP_PROVIDERS} from 'angular2/http';
+import 'rxjs/Rx';
 import {ProfilePage} from '../profilepage/profilepage';
 
 @Page({
@@ -17,7 +19,7 @@ export class HomePage {
 
   public widgetBoundCallback: Function;
 
-	constructor(ionicApp: IonicApp, nav: NavController, zone: NgZone, platform: Platform) {
+	constructor(ionicApp: IonicApp, nav: NavController, zone: NgZone, platform: Platform, http:Http) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = nav;
     this.app = ionicApp;
@@ -29,6 +31,41 @@ export class HomePage {
     this.TYPING_DELAY = (this.dev) ? 500 : 1500;
     this.SCROLL_DELAY = (this.dev) ? 0 : 3000;
     this.widgetBoundCallback = this.widgetCallback.bind(this);
+
+    /*http.get('https://www.strava.com/oauth/token')
+      // Call map on the response observable to get the parsed people object
+      .map(res => res.json())
+      // Subscribe to the observable to get the parsed people object and attach it to the
+      // component
+      .subscribe(people => console.log(people));*/
+    /*http.post("https://www.strava.com/oauth/token", "client_id=11012&client_secret=1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc&code=c420583602c1eb00dd60707dd48c58d46e5c8a83")
+    //http.get("https://httpbin.org/ip")
+      .subscribe(data => {
+        alert(data);
+        console.log('Returned data:', data.json());
+      }, error => {
+        alert('error');
+        console.log('Error with ajax call:', JSON.stringify(error.json()));
+      });*/
+
+    var c_id = "11012";
+    var c_secret = "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc";
+    var access_code = "c420583602c1eb00dd60707dd48c58d46e5c8a83";
+    var params = "client_id=" + c_id + "&client_secret=" + c_secret + "&code=" + access_code;
+
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function () {
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        alert(xmlhttp.responseText);
+      }
+    }
+
+    xmlhttp.open("POST", "https://www.strava.com/oauth/token", true);
+    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.setRequestHeader("Content-length", "3");
+    xmlhttp.setRequestHeader("Connection", "close");
+    xmlhttp.send(params);
+
   }
 
   initialize() {
