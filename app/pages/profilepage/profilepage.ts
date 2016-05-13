@@ -468,7 +468,7 @@ export class ProfilePage {
   connectMoves() {
     alert(1);
     return new Promise(function(resolve, reject) {
-        var browserRef = window.cordova.InAppBrowser.open("moves://app/authorize?client_id=95C57N4Gt5t9l5uir45i0P6RcNd1DN6v&redirect_uri=com.ionicframework.activate804698&scope=activity", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
+        var browserRef = window.cordova.InAppBrowser.open("moves://app/authorize?client_id=95C57N4Gt5t9l5uir45i0P6RcNd1DN6v&redirect_uri=activate://&scope=activity", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
         browserRef.addEventListener("loadstart", (event) => {
             //alert(1);
             if ((event.url).indexOf("http://localhost") === 0) {
