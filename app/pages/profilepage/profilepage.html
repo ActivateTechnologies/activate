@@ -99,7 +99,14 @@
 	
 	<button (click)="stravaAPIPOST()" class="stravaAPIPOST">Strava API POST</button>
 
+	<!--
 	<button (click)="connectMoves()" class="stravaAPIPOST">Connect with MOVES</button>
+	-->
+
+	<a href="moves://app/authorize?client_id=95C57N4Gt5t9l5uir45i0P6RcNd1DN6v&redirect_uri=activate://&scope=activity">
+		<button class="stravaAPIPOST">Connect with MOVES</button>
+	</a>
+
 
 	<!--
 	<img (click)="connectMeetup()" class="connectMeetupButton" src="images/meetup.png">
