@@ -468,7 +468,7 @@ export class ProfilePage {
   connectMoves() {
     alert(1);
     return new Promise(function(resolve, reject) {
-        var browserRef = window.cordova.InAppBrowser.open("moves://app/authorize?client_id=95C57N4Gt5t9l5uir45i0P6RcNd1DN6v&redirect_uri=activate://&scope=activity", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
+        var browserRef = window.cordova.InAppBrowser.open("https://api.moves-app.com/oauth/v1/authorize?response_type=code&client_id=95C57N4Gt5t9l5uir45i0P6RcNd1DN6v&scope=activity", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
         browserRef.addEventListener("loadstart", (event) => {
             //alert(1);
             if ((event.url).indexOf("http://localhost") === 0) {
@@ -477,7 +477,9 @@ export class ProfilePage {
                 alert(event.url);
                 browserRef.close();
                 var url = event.url
-                var accessCode = url.substring(30,url.length);
+                var urlMinus = url.length - 7
+                alert(urlMinus);
+                var accessCode = url.substring(23,urlMinus);
                 alert(accessCode);
                 console.log(accessCode);
                 alert(3);
