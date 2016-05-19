@@ -128,6 +128,7 @@ export class Health {
     let activity:any;
 
     if (localStorage['healthApiAccessGranted']) {
+      Parse.User.current()
       this.loading = true;
       navigator.health.queryAggregated({
         startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // one day ago
