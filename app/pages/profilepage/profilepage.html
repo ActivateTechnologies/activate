@@ -49,25 +49,56 @@
 
 	<div class="containerProfilePageContent">
 
-		<p class="sectionHeader"><i class="em em-walking"></i> (km):</p>
+		<p class="sectionHeader">
+			<i class="em em-walking"></i> (km):
+			<a href="moves://app">
+				<img src="images/MovesLogo.png" class="movesLogoHeaders">
+			</a>
+		</p>
 		<span [hidden]="!caloriesDataLoading">Working out steps ...</span>
 		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
 
 
-		<p class="sectionHeader"><i class="em em-running"></i> (km):</p>
+		<p class="sectionHeader">
+			<i class="em em-running"></i> (km):
+			<a href="moves://app">
+				<img src="images/MovesLogo.png" class="movesLogoHeaders">
+			</a>
+			<a href="strava://app">
+				<img src="images/stravaLogo.png" class="stravaLogoHeaders">
+			</a>
+		</p>
 		<span [hidden]="!caloriesDataLoading">Working out strides ...</span>
 		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
 
 
-		<p class="sectionHeader"><i class="em em-bicyclist"></i> (km)</p>
+		<p class="sectionHeader">
+			<i class="em em-bicyclist"></i> (km)
+			<a href="moves://app">
+				<img src="images/MovesLogo.png" class="movesLogoHeaders">
+			</a>
+			<a href="strava://app">
+				<img src="images/stravaLogo.png" class="stravaLogoHeaders">
+			</a>
+		</p>
 		<span [hidden]="!caloriesDataLoading">Working out cycles ...</span>
 		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
 
-		<p class="sectionHeader"><i class="em em-sleeping"></i> (hours):</p>
+		<p class="sectionHeader">
+			<i class="em em-sleeping"></i> (hours):
+			<a href="sleepcycle://app">
+				<img src="images/sleepCycle.png" class="movesLogoHeaders">
+			</a>
+		</p>
 		<span [hidden]="!caloriesDataLoading">Working out those ZZZZZs ...</span>
 		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
 
-		<p class="sectionHeader"><i class="em em-heart"></i> (bpm):</p>
+		<p class="sectionHeader">
+			<i class="em em-heart"></i> (bpm):
+			<a href="sleepcycle://app">
+				<img src="images/sleepCycle.png" class="movesLogoHeaders">
+			</a>
+		</p>
 		<span [hidden]="!heartDataLoading">Getting those beats ...</span>
 		<canvas id="heartChart" [hidden]="heartDataLoading"></canvas>
 	
@@ -89,7 +120,12 @@
 	</div>
 
 	<div class="containerProfilePageContent">
-		<p class="sectionHeader"><i class="em em-trophy"></i>:</p>
+		<p class="sectionHeader">
+			<i class="em em-trophy"></i>:
+			<a href="facebook://app">
+				<img src="images/facebook.jpg" class="movesLogoHeaders">
+			</a>
+		</p>
 		<span [hidden]="!caloriesDataLoading">Ranking you to facebook friends ...</span>
 		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
 	</div>
@@ -99,7 +135,11 @@
 	
 	<button (click)="stravaAPIPOST()" class="stravaAPIPOST">Strava API POST</button>
 
-	<button class="stravaAPIPOST">Connect with MOVES</button>
+	<!--
+	<button (click)="connectMoves()" class="stravaAPIPOST">Connect with MOVES</button>
+	-->
+
+	<img (click)="connectMoves()" src="images/MovesLogowithName.png" class="movesLogoConnectButton">
 
 	<!--
 	<img (click)="connectMeetup()" class="connectMeetupButton" src="images/meetup.png">

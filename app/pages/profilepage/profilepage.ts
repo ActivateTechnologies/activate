@@ -435,7 +435,7 @@ export class ProfilePage {
             }
         });
         browserRef.addEventListener("exit", function(event) {
-            reject("The Strava sign in flow was canceled");
+            reject("The Strava sign in flow was cancelled");
         });
     });
   }
@@ -448,19 +448,80 @@ export class ProfilePage {
     var params = "client_id=" + c_id + "&client_secret=" + c_secret + "&code=" + access_code;
 ​    
     var xmlhttp = new XMLHttpRequest();
+    alert(1);
     xmlhttp.onreadystatechange = function () {
       alert('2');
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
         alert(xmlhttp.responseText);
       }
     }
-​    
+​    alert(3);
     xmlhttp.open("POST", "https://www.strava.com/oauth/token", true);
     xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xmlhttp.setRequestHeader("Content-length", "3");
     xmlhttp.setRequestHeader("Connection", "close");
     xmlhttp.send(params);
+    alert(4);
   }
+
+  //MOVES
+  connectMoves() {
+    alert(1);
+    return new Promise(function(resolve, reject) {
+        var browserRef = window.cordova.InAppBrowser.open("https://api.moves-app.com/oauth/v1/authorize?response_type=code&client_id=95C57N4Gt5t9l5uir45i0P6RcNd1DN6v&scope=activity", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
+        browserRef.addEventListener("loadstart", (event) => {
+            //alert(1);
+            if ((event.url).indexOf("http://localhost") === 0) {
+                browserRef.removeEventListener("exit", (event) => {});
+                alert(2);
+                alert(event.url);
+                browserRef.close();
+                var url = event.url
+                var urlMinus = url.length - 7
+                alert(urlMinus);
+                var accessCode = url.substring(23,urlMinus);
+                alert(accessCode);
+                console.log(accessCode);
+                alert(3);
+            }
+        });
+        browserRef.addEventListener("exit", function(event) {
+            reject("The Moves sign in flow was cancelled");
+        });
+    });
+  }
+
+  MovesAPIPOST() {
+    alert('stravaAPIPOST');
+    var c_id = "11012";
+    var c_secret = "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc";
+    var access_code = "c420583602c1eb00dd60707dd48c58d46e5c8a83";
+    var params = "client_id=" + c_id + "&client_secret=" + c_secret + "&code=" + access_code;
+​    
+    var xmlhttp = new XMLHttpRequest();
+    alert(1);
+    xmlhttp.onreadystatechange = function () {
+      alert('2');
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        alert(xmlhttp.responseText);
+      }
+    }
+​    alert(3);
+    xmlhttp.open("POST", "https://www.strava.com/oauth/token", true);
+    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.setRequestHeader("Content-length", "3");
+    xmlhttp.setRequestHeader("Connection", "close");
+    xmlhttp.send(params);
+    alert(4);
+  }
+
+
+
+
+
+
+
+
 
   //MEETUP
   connectMeetup() {
