@@ -56,6 +56,12 @@ export class Consts {
   public static USER_NOOFGAMES = "numGames";
   //GeoPoint - User's last known location
   public static USER_LASTLOCATION = "lastLocation";
+  //Object - stravaData
+  public static USER_STRAVADATA = "stravaData";
+  //String - stravaAuthorizationCode
+  public static USER_STRAVAAUTHORIZATIONCODE = "stravaAuthorizationCode";
+  //String - stravaAccessToken
+  public static USER_STRAVAACCESSTOKEN = "stravaAccessToken";
 
   //HeartData Class
   public static HEARTDATA_CLASS = "HeartData";

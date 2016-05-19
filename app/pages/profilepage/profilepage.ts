@@ -411,7 +411,6 @@ export class ProfilePage {
                 browserRef.close();
                 var url = event.url
                 var accessCode = url.substring(30,url.length);
-                alert(accessCode);
                 this.stravaAPIPOST(accessCode);
             }
         });
@@ -433,6 +432,11 @@ export class ProfilePage {
     xmlhttp.onreadystatechange = function () {
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
         alert(xmlhttp.responseText); //TODO: REMOVE FOR PROD
+        //Saving to Parse
+        Parse.User.current().set(Consts.USER_STRAVADATA, JSON.parse(xmlhttp.responseText));
+        Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, access_code);
+        Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN, JSON.parse(xmlhttp.responseText).access_token);
+        (<Parse.Object> Parse.User.current()).save();
       }
     }
     
