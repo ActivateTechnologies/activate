@@ -2,6 +2,7 @@ import {Page, IonicApp, NavController, ViewController, NavParams, Platform} from
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {NgZone} from 'angular2/core';
+import {Http, Headers} from 'angular2/http';
 //import {CordovaOauth, Meetup} from 'ng2-cordova-oauth/core';
 
 @Page({
@@ -9,7 +10,7 @@ import {NgZone} from 'angular2/core';
 })
 export class ProfilePage {
 
-  nav:any;viewController:any; user:any; currentUser:any; zone:any; platform:any;
+  nav:any;viewController:any; user:any; currentUser:any; zone:any; platform:any; http: any;
   message:string; friendStatus:any; respondToRequest:boolean;
   userRelationshipNumber:number; friends:any[]; relationship:any;
   walkingTimeAve:number; runningTimeAve:number;
@@ -22,12 +23,13 @@ export class ProfilePage {
   distanceChartHandle:any; heartChartHandle:any;
 
   constructor(ionicApp: IonicApp, navController: NavController, navParams: NavParams,
-   viewController: ViewController, zone: NgZone, platform: Platform) {
+   viewController: ViewController, zone: NgZone, platform: Platform, http: Http) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = navController;
     this.viewController = viewController;
     this.zone = zone;
     this.platform = platform;
+    this.http = http;
     this.user = navParams.data;
     this.currentUser = Parse.User.current();
     this.aveDataLoading = true;
@@ -393,75 +395,50 @@ export class ProfilePage {
 
   //STRAVA
   connectStravaButton() {
-    this.platform.ready().then(() => {
+    /*this.platform.ready().then(() => {
         this.connectStravaFunction().then((success) => {
             alert(success.access_token);
         }, (error) => {
             alert(error);
         });
-    });
-  }
+    });*/
 
-  connectStravaFunction() {
-    return new Promise(function(resolve, reject) {
-        var browserRef = window.cordova.InAppBrowser.open("https://www.strava.com/oauth/authorize?client_id=11012&response_type=code" + "&response_type=code&redirect_uri=http://localhost&approval_prompt=force", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
+    var browserRef = window.cordova.InAppBrowser.open("https://www.strava.com/oauth/authorize?client_id=11012&response_type=code" + "&response_type=code&redirect_uri=http://localhost&approval_prompt=force", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
         browserRef.addEventListener("loadstart", (event) => {
             //alert(1);
             if ((event.url).indexOf("http://localhost") === 0) {
                 browserRef.removeEventListener("exit", (event) => {});
-                alert(2);
-                alert(event.url);
                 browserRef.close();
                 var url = event.url
                 var accessCode = url.substring(30,url.length);
                 alert(accessCode);
-                console.log(accessCode);
-                alert(3);
-
-                //This is the raw javascript version I was talking about. I found other versions, but atm this is the only one that seems to work:
-                /*
-                var responseParameters = ((event.url).split("#")[1]).split("&");
-                alert(4);
-                var parsedResponse = {};
-                for (var i = 0; i < responseParameters.length; i++) {
-                    parsedResponse[responseParameters[i].split("=")[0]] = responseParameters[i].split("=")[1];
-                }
-                if (parsedResponse["access_token"] !== undefined && parsedResponse["access_token"] !== null) {
-                    resolve(parsedResponse);
-                } else {
-                    reject("Problem authenticating with Strava");
-                }
-                */
+                this.stravaAPIPOST(accessCode);
             }
         });
         browserRef.addEventListener("exit", function(event) {
-            reject("The Strava sign in flow was cancelled");
+          alert("Congratulations your Strava account is connected!"); //TODO: WHAT IF IT ISN'T??
         });
-    });
   }
 
-  stravaAPIPOST() {
-    alert('stravaAPIPOST');
+  stravaAPIPOST(access_code) {
+
     var c_id = "11012";
     var c_secret = "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc";
-    var access_code = "c420583602c1eb00dd60707dd48c58d46e5c8a83";
-    var params = "client_id=" + c_id + "&client_secret=" + c_secret + "&code=" + access_code;
-​    
+​    var objParam = {
+      client_id: c_id,
+      client_secret: c_secret,
+      code: access_code
+    };
     var xmlhttp = new XMLHttpRequest();
-    alert(1);
     xmlhttp.onreadystatechange = function () {
-      alert('2');
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        alert(xmlhttp.responseText);
+        alert(xmlhttp.responseText); //TODO: REMOVE FOR PROD
       }
     }
-​    alert(3);
+    
     xmlhttp.open("POST", "https://www.strava.com/oauth/token", true);
-    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xmlhttp.setRequestHeader("Content-length", "3");
-    xmlhttp.setRequestHeader("Connection", "close");
-    xmlhttp.send(params);
-    alert(4);
+    xmlhttp.setRequestHeader("Content-type", "application/json;"); 
+    xmlhttp.send(JSON.stringify(objParam));
   }
 
   //MOVES
@@ -491,13 +468,19 @@ export class ProfilePage {
     });
   }
 
-  MovesAPIPOST() {
+  movesAPIPOST() {
     alert('stravaAPIPOST');
     var c_id = "11012";
     var c_secret = "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc";
     var access_code = "c420583602c1eb00dd60707dd48c58d46e5c8a83";
     var params = "client_id=" + c_id + "&client_secret=" + c_secret + "&code=" + access_code;
-​    
+​    var params2 = {
+      grant_type: "authorization_code",
+      code: "M10RYI5rv31556r439QV_Xd06h4lg68GjjvIb2zYSAZJcZo5GtJzxXjhLNu9k1Cu",
+      client_id: "95C57N4Gt5t9l5uir45i0P6RcNd1DN6v",
+      redirect_uri: "http://localhost"
+
+    }
     var xmlhttp = new XMLHttpRequest();
     alert(1);
     xmlhttp.onreadystatechange = function () {
@@ -507,11 +490,11 @@ export class ProfilePage {
       }
     }
 ​    alert(3);
-    xmlhttp.open("POST", "https://www.strava.com/oauth/token", true);
+    xmlhttp.open("POST", "https://api.moves-app.com/oauth/v1/access_token", true);
     xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xmlhttp.setRequestHeader("Content-length", "3");
     xmlhttp.setRequestHeader("Connection", "close");
-    xmlhttp.send(params);
+    xmlhttp.send(params2);
     alert(4);
   }
 
