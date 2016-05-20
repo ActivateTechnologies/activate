@@ -423,9 +423,11 @@ export class ProfilePage {
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
         alert(xmlhttp.responseText); //TODO: REMOVE FOR PROD
         //Saving to Parse
+        //TODO: get user id
         Parse.User.current().set(Consts.USER_STRAVADATA, JSON.parse(xmlhttp.responseText));
         Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, access_code);
         Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN, JSON.parse(xmlhttp.responseText).access_token);
+        Parse.User.current().set(Consts.USER_STRAVAID, JSON.parse(xmlhttp.responseText).athlete.id);
         (<Parse.Object> Parse.User.current()).save();
       }
     }
@@ -456,6 +458,7 @@ export class ProfilePage {
 
   movesAPIPOST(movesAuthorizationCode) {
     alert('movesApIPOST');
+    /*
     var c_id = "95C57N4Gt5t9l5uir45i0P6RcNd1DN6v";
     var c_secret = "I_47yeKyJqqdgVJYcv5vka3vtqDSTGN6nHx7510TX3QN6w7gw3Rj62fRJ6UXVqrj"
     var redirect_uri = "http://localhost";
@@ -465,6 +468,7 @@ export class ProfilePage {
       client_secret: c_secret,
       reidrect_uri: redirect_uri
     };
+    */
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -483,7 +487,7 @@ export class ProfilePage {
     alert(2);
     xmlhttp.setRequestHeader("Content-type", "application/json;"); 
     alert(3);
-    xmlhttp.send(JSON.stringify(objParam));
+    //xmlhttp.send(JSON.stringify(objParam));
     alert(4);
   }
 
