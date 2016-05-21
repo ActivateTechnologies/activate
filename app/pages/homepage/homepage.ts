@@ -16,17 +16,22 @@ export class HomePage {
 
   nav:any; app:any; zone:any; platform:any; chatMessages:any[]; replyOptions:any[];
   typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number; SCROLL_DELAY:number;
-  dev:boolean = true; loadingMessages:boolean = true;
+  dev:boolean = true; loadingMessages:boolean = true; recentMessagesTemp:any[];
+  // recentMessagesTemp holds all the messages recently shown to user before he has replied,
+  // these will only be saved once the user has made a selection. Also used to hold messages
+  // before user has signed in.
 
   public widgetBoundCallback: Function;
 
-	constructor(ionicApp: IonicApp, nav: NavController, zone: NgZone, platform: Platform, http:Http) {
+	constructor(ionicApp: IonicApp, nav: NavController, zone: NgZone, platform: Platform,
+   http:Http) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = nav;
     this.app = ionicApp;
     this.zone = zone;
     this.platform = platform;
     this.chatMessages = [];
+    this.recentMessagesTemp = [];
     this.initialize();
     this.THINKING_DELAY = (this.dev) ? 0 : 1000;
     this.TYPING_DELAY = (this.dev) ? 500 : 1500;
@@ -39,7 +44,8 @@ export class HomePage {
       // Subscribe to the observable to get the parsed people object and attach it to the
       // component
       .subscribe(people => console.log(people));*/
-    /*http.post("https://www.strava.com/oauth/token", "client_id=11012&client_secret=1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc&code=c420583602c1eb00dd60707dd48c58d46e5c8a83")
+    /*http.post("https://www.strava.com/oauth/token", 
+      "client_id=11012&client_secret=1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc&code=c420583602c1eb00dd60707dd48c58d46e5c8a83")
     //http.get("https://httpbin.org/ip")
       .subscribe(data => {
         alert(data);
@@ -200,7 +206,27 @@ export class HomePage {
     } else if (messageObject.widget) {
       message.set(Consts.MESSAGES_MESSAGE, treeObject.get(Consts.TREEOBJECTS_MESSAGES)[0]);
     }
-    message.save();
+    if (!Parse.User.current()) {
+      this.recentMessagesTemp.push(message);
+      return;
+    }
+    if (!usersMessage) {
+      this.recentMessagesTemp.push(message);
+    } else if (this.recentMessagesTemp.length == 0) {
+      message.save();
+    } else {
+      Parse.Object.saveAll(this.recentMessagesTemp, {
+        success: (objects) => {
+          this.recentMessagesTemp = [];
+          message.save();
+        },
+        error: (error) => {
+          this.recentMessagesTemp.push(message);
+        }
+      });
+      
+    }
+    
   }
 
   //Replaces hot keywords with dynamic data
@@ -266,6 +292,19 @@ export class HomePage {
 
   //Passed as a callback function to widgets that were in replies
   widgetCallback(option:any, data?:any) {
+    /*if (option.widget.widgetName == 'facebookLogin') {
+      for (let i = 0; i < this.recentMessagesTemp.length; i++) {
+        this.recentMessagesTemp[i].set(Consts.MESSAGES_USER, Parse.User.current());
+      }
+      Parse.Object.saveAll(this.recentMessagesTemp, {
+        success: (objects) => {
+          this.recentMessagesTemp = [];
+        },
+        error: (error) => {
+          console.log('Error saving messages from before user was signed in');
+        }
+      });
+    }*/
     console.log('data', data);
     let messageObject:any = {
       usersMessage: true,

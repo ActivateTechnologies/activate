@@ -2,6 +2,7 @@ import {Page, IonicApp, NavController, ViewController, NavParams, Platform} from
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {NgZone} from 'angular2/core';
+import {Http, Headers} from 'angular2/http';
 //import {CordovaOauth, Meetup} from 'ng2-cordova-oauth/core';
 
 @Page({
@@ -9,7 +10,7 @@ import {NgZone} from 'angular2/core';
 })
 export class ProfilePage {
 
-  nav:any;viewController:any; user:any; currentUser:any; zone:any; platform:any;
+  nav:any;viewController:any; user:any; currentUser:any; zone:any; platform:any; http:any
   message:string; friendStatus:any; respondToRequest:boolean;
   userRelationshipNumber:number; friends:any[]; relationship:any;
   walkingTimeAve:number; runningTimeAve:number;
@@ -22,12 +23,13 @@ export class ProfilePage {
   distanceChartHandle:any; heartChartHandle:any;
 
   constructor(ionicApp: IonicApp, navController: NavController, navParams: NavParams,
-   viewController: ViewController, zone: NgZone, platform: Platform) {
+   viewController: ViewController, zone: NgZone, platform: Platform, http: Http) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = navController;
     this.viewController = viewController;
     this.zone = zone;
     this.platform = platform;
+    this.http = http; 
     this.user = navParams.data;
     this.currentUser = Parse.User.current();
     this.aveDataLoading = true;
@@ -441,7 +443,7 @@ export class ProfilePage {
   }
 
   stravaAPIPOST() {
-    alert('stravaAPIPOST');
+    /*alert('stravaAPIPOST');
     var c_id = "11012";
     var c_secret = "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc";
     var access_code = "c420583602c1eb00dd60707dd48c58d46e5c8a83";
@@ -461,7 +463,31 @@ export class ProfilePage {
     xmlhttp.setRequestHeader("Content-length", "3");
     xmlhttp.setRequestHeader("Connection", "close");
     xmlhttp.send(params);
-    alert(4);
+    alert(4);*/
+    alert(11);
+    let postData = JSON.stringify({
+      client_id: "11012",
+      client_secret: "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc",
+      code: "c420583602c1eb00dd60707dd48c58d46e5c8a83"
+    });
+    alert(22);
+​
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    alert(33)
+    this.http.post('https://www.strava.com/oauth/token', postData, {
+        headers: headers
+      }).subscribe(
+        (data) => {
+          alert(data);
+        },
+        (err) => {
+          alert("err")
+        },
+        () => {
+          console.log('Authentication Complete')
+        }
+      );
   }
 
   //MOVES
