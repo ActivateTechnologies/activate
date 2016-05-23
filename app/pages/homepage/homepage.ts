@@ -7,6 +7,7 @@ import {Http, HTTP_PROVIDERS} from 'angular2/http';
 import 'rxjs/Rx';
 import {ProfilePage} from '../profilepage/profilepage';
 import {Camera} from 'ionic-native';
+//import {File} from 'ionic-native';
 
 @Page({
   templateUrl: 'build/pages/homepage/homepage.html',
@@ -379,27 +380,98 @@ export class HomePage {
     }
   }
 
-  openCamera() {
-      //FROM: http://ionicframework.com/docs/v2/native/Camera/
-      
-       /**
-   * Warning: Using DATA_URL is not recommended! The DATA_URL destination
-   * type is very memory intensive, even with a low quality setting. Using it
-   * can result in out of memory errors and application crashes. Use FILE_URI
-   * or NATIVE_URI instead.
-   */
-    navigator.camera.getPicture(onSuccess, onFail, { quality: 25,
-        destinationType: Camera.DestinationType.DATA_URL
-    });
+  //DOCUMENTATION FOR CAMERA: https://github.com/apache/cordova-plugin-camera
 
-    function onSuccess(imageData) {
+  /* THIS CODE OPENS CAMERA, TAKES A PICTURE, BUT THEN DOES LITTLE ELSE.
+  //USE console.log instead of alerts (apparently causes 'issues' on iOS)
+  openCamera() {
+    console.log(1);
+    navigator.camera.getPicture(onSuccess, onFail, { quality: 50,
+      destinationType: Camera.DestinationType.FILE_URI });
+    console.log(2);
+    function onSuccess(imageURI) {
+        console.log(3);
         var image = document.getElementById('myImage');
-        image.src = "data:image/jpeg;base64," + imageData;
+        image.src = imageURI;
+        console.log(imageURI);
     }
 
     function onFail(message) {
-        alert('Failed because: ' + message);
+        console.log('Failed because: ' + message);
     }
   }
+  */
+
+  //SETS OPTIONS FOR CAMERA
+  setOptions(srcType) {
+    var options = {
+        // Some common settings are 20, 50, and 100
+        quality: 50,
+        destinationType: Camera.DestinationType.FILE_URI,
+        // In this app, dynamically set the picture source, Camera or photo gallery
+        sourceType: srcType,
+        encodingType: Camera.EncodingType.PNG,
+        mediaType: Camera.MediaType.PICTURE,
+        allowEdit: true,
+        correctOrientation: true  //Corrects Android orientation quirks
+    }
+    return options;
+  }
+
+  //EXTRA PLUGIN NEEDED TO WRITE FILES: https://github.com/apache/cordova-plugin-file
+  //DOES IT NEED IMPORTING? ionic-native documentation does not stipulate so: http://ionicframework.com/docs/v2/native/file/
+  createNewFileEntry(imgUri) {
+    window.resolveLocalFileSystemURL(cordova.file.cacheDirectory, function success(dirEntry) {
+
+        // JPEG file
+        dirEntry.getFile("tempFile.jpeg", { create: true, exclusive: false }, function (fileEntry) {
+
+            // Do something with it, like write to it, upload it, etc.
+            // writeFile(fileEntry, imgUri);
+            console.log("got file: " + fileEntry.fullPath);
+            // displayFileData(fileEntry.fullPath, "File copied to");
+
+        }, onErrorCreateFile);
+
+    }, onErrorResolveUrl);
+  }
+
+  //Honestly don't understand what this does.... But is in documentation.
+  displayImage(imgUri) {
+
+    var elem = document.getElementById('imageFile');
+    elem.src = imgUri;
+  }
+
+  //MAIN CAMERA FUNCTION THAT'S CALLED
+  //ADDED this.setOptions & this.createNewFileEntry
+  //Couple of issues highlighted here like timeout: https://github.com/EddyVerbruggen/cordova-plugin-actionsheet/issues/11
+  //Could be a permissions error?
+  //?? https://github.com/marcshilling/react-native-image-picker/issues/80
+  //https://forums.developer.apple.com/thread/8629
+  //http://codesanswer.com/question/17962-ios-8-snapshotting-a-view-that-has-not-been-rendered-results-in-an-empty-snapshot
+  //https://issues.apache.org/jira/browse/CB-8234
+  openCamera(selection) {
+    var srcType = Camera.PictureSourceType.CAMERA;
+    var options = this.setOptions(srcType);
+    var func = this.createNewFileEntry;
+
+    setTimeout(function() { navigator.camera.getPicture(function cameraSuccess(imageUri) {
+
+        this.displayImage(imageUri);
+        // You may choose to copy the picture, save it somewhere, or upload.
+        func(imageUri);
+        console.log(imageUri);
+
+    }, function cameraError(error) {
+        console.debug("Unable to obtain picture: " + error, "app");
+
+    }, options);
+
+  },
+  3000);
+  }
+
+
 
 }
