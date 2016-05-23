@@ -53,26 +53,26 @@ export class HomePage {
       }, error => {
         alert('error');
         console.log('Error with ajax call:', JSON.stringify(error.json()));
-      });*/
+    });*/
+    if (this.platform.is("android") || this.platform.is("ios")) {
+      var c_id = "11012";
+      var c_secret = "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc";
+      var access_code = "c420583602c1eb00dd60707dd48c58d46e5c8a83";
+      var params = "client_id=" + c_id + "&client_secret=" + c_secret + "&code=" + access_code;
 
-    var c_id = "11012";
-    var c_secret = "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc";
-    var access_code = "c420583602c1eb00dd60707dd48c58d46e5c8a83";
-    var params = "client_id=" + c_id + "&client_secret=" + c_secret + "&code=" + access_code;
-
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        alert(xmlhttp.responseText);
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+          alert(xmlhttp.responseText);
+        }
       }
+
+      xmlhttp.open("POST", "https://www.strava.com/oauth/token", true);
+      xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xmlhttp.setRequestHeader("Content-length", "3");
+      xmlhttp.setRequestHeader("Connection", "close");
+      xmlhttp.send(params);
     }
-
-    xmlhttp.open("POST", "https://www.strava.com/oauth/token", true);
-    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xmlhttp.setRequestHeader("Content-length", "3");
-    xmlhttp.setRequestHeader("Connection", "close");
-    xmlhttp.send(params);
-
   }
 
   initialize() {
@@ -197,31 +197,36 @@ export class HomePage {
     let Message = Parse.Object.extend(Consts.MESSAGES_CLASS);
     let message = new Message();
     message.set(Consts.MESSAGES_USERSMESSAGE, usersMessage);
-    message.set(Consts.MESSAGES_USER, Parse.User.current());
     if (treeObject) {
       message.set(Consts.MESSAGES_TREEOBJECT, treeObject);
     }
     if (messageObject.message) {
       message.set(Consts.MESSAGES_MESSAGE, messageObject.message);
     } else if (messageObject.widget) {
-      message.set(Consts.MESSAGES_MESSAGE, treeObject.get(Consts.TREEOBJECTS_MESSAGES)[0]);
+      message.set(Consts.MESSAGES_MESSAGE, messageObject.widget);
     }
-    if (!Parse.User.current()) {
+    if (Parse.User.current() == null) {
       this.recentMessagesTemp.push(message);
       return;
     }
     if (!usersMessage) {
       this.recentMessagesTemp.push(message);
     } else if (this.recentMessagesTemp.length == 0) {
+      message.set(Consts.MESSAGES_USER, Parse.User.current());
       message.save();
     } else {
+      this.recentMessagesTemp.push(message);
+      for (let i = 0; i < this.recentMessagesTemp.length; i++) {
+        this.recentMessagesTemp[i].set(Consts.MESSAGES_USER, Parse.User.current());
+      }
       Parse.Object.saveAll(this.recentMessagesTemp, {
         success: (objects) => {
           this.recentMessagesTemp = [];
           message.save();
         },
         error: (error) => {
-          this.recentMessagesTemp.push(message);
+          console.log('Error saving recent messages', error.message);
+          //this.recentMessagesTemp.push(message);
         }
       });
       
@@ -244,7 +249,7 @@ export class HomePage {
   //Fetches a parse object from server when given one, and calls processReceivedTreeObject
   fetchAndProcessPointer(pointer:any) {
     //console.log('Going to fetch:', pointer);
-    if (pointer == null) {
+    if (pointer == null || typeof pointer.fetch !== "function") {
       console.log('Pointer is null, likely end of tree.');
       this.chatMessages.push({
         message: "- End of tree -",
@@ -376,12 +381,25 @@ export class HomePage {
 
   openCamera() {
       //FROM: http://ionicframework.com/docs/v2/native/Camera/
-     Camera.getPicture(options).then((imageData) => {
-     // imageData is either a base64 encoded string or a file URI
-     // If it's base64:
-     let base64Image = "data:image/jpeg;base64," + imageData;
-    }, (err) => {
+      
+       /**
+   * Warning: Using DATA_URL is not recommended! The DATA_URL destination
+   * type is very memory intensive, even with a low quality setting. Using it
+   * can result in out of memory errors and application crashes. Use FILE_URI
+   * or NATIVE_URI instead.
+   */
+    navigator.camera.getPicture(onSuccess, onFail, { quality: 25,
+        destinationType: Camera.DestinationType.DATA_URL
     });
+
+    function onSuccess(imageData) {
+        var image = document.getElementById('myImage');
+        image.src = "data:image/jpeg;base64," + imageData;
+    }
+
+    function onFail(message) {
+        alert('Failed because: ' + message);
+    }
   }
 
 }

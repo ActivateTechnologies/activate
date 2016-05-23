@@ -1,6 +1,7 @@
 import {Page, IonicApp, NavController, ViewController, NavParams, Platform} from 'ionic-angular';
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
+import {UIMessages} from '../../helpers/uimessages';
 import {NgZone} from 'angular2/core';
 import {Http, Headers} from 'angular2/http';
 //import {CordovaOauth, Meetup} from 'ng2-cordova-oauth/core';
@@ -10,11 +11,7 @@ import {Http, Headers} from 'angular2/http';
 })
 export class ProfilePage {
 
-<<<<<<< HEAD
   nav:any;viewController:any; user:any; currentUser:any; zone:any; platform:any; http:any
-=======
-  nav:any;viewController:any; user:any; currentUser:any; zone:any; platform:any; http: any;
->>>>>>> a323a82768be81642a4e5d68985e71da7e7e147b
   message:string; friendStatus:any; respondToRequest:boolean;
   userRelationshipNumber:number; friends:any[]; relationship:any;
   walkingTimeAve:number; runningTimeAve:number;
@@ -33,11 +30,7 @@ export class ProfilePage {
     this.viewController = viewController;
     this.zone = zone;
     this.platform = platform;
-<<<<<<< HEAD
     this.http = http; 
-=======
-    this.http = http;
->>>>>>> a323a82768be81642a4e5d68985e71da7e7e147b
     this.user = navParams.data;
     this.currentUser = Parse.User.current();
     this.aveDataLoading = true;
@@ -418,12 +411,7 @@ export class ProfilePage {
         });
   }
 
-<<<<<<< HEAD
-  stravaAPIPOST() {
-    /*alert('stravaAPIPOST');
-=======
   stravaAPIPOST(access_code) {
->>>>>>> a323a82768be81642a4e5d68985e71da7e7e147b
     var c_id = "11012";
     var c_secret = "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc";
 ​    var objParam = {
@@ -435,51 +423,19 @@ export class ProfilePage {
     xmlhttp.onreadystatechange = function () {
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
         alert(xmlhttp.responseText); //TODO: REMOVE FOR PROD
+        alert(xmlhttp.responseText); 
         //Saving to Parse
         //TODO: get user id
         Parse.User.current().set(Consts.USER_STRAVADATA, JSON.parse(xmlhttp.responseText));
         Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, access_code);
         Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN, JSON.parse(xmlhttp.responseText).access_token);
-        Parse.User.current().set(Consts.USER_STRAVAID, JSON.parse(xmlhttp.responseText).athlete.id);
+        //Parse.User.current().set(Consts.USER_STRAVAID, JSON.parse(xmlhttp.responseText).athlete.id);
         (<Parse.Object> Parse.User.current()).save();
       }
     }
-    
     xmlhttp.open("POST", "https://www.strava.com/oauth/token", true);
-<<<<<<< HEAD
-    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xmlhttp.setRequestHeader("Content-length", "3");
-    xmlhttp.setRequestHeader("Connection", "close");
-    xmlhttp.send(params);
-    alert(4);*/
-    alert(11);
-    let postData = JSON.stringify({
-      client_id: "11012",
-      client_secret: "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc",
-      code: "c420583602c1eb00dd60707dd48c58d46e5c8a83"
-    });
-    alert(22);
-​
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    alert(33)
-    this.http.post('https://www.strava.com/oauth/token', postData, {
-        headers: headers
-      }).subscribe(
-        (data) => {
-          alert(data);
-        },
-        (err) => {
-          alert("err")
-        },
-        () => {
-          console.log('Authentication Complete')
-        }
-      );
-=======
     xmlhttp.setRequestHeader("Content-type", "application/json;"); 
     xmlhttp.send(JSON.stringify(objParam));
->>>>>>> a323a82768be81642a4e5d68985e71da7e7e147b
   }
 
   //MOVES
@@ -534,6 +490,18 @@ export class ProfilePage {
     alert(3);
     //xmlhttp.send(JSON.stringify(objParam));
     alert(4);
+  }
+
+  showSettings() {
+    UIMessages.showConfirmation({
+      title: "Logout",
+      message: "The only setting option currently is to logout. Are you sure?"
+    }, this.nav, () => {
+      Parse.User.logOut().then(() => {
+        alert('The user has logged out');
+        location.reload();
+      });
+    });
   }
 
 

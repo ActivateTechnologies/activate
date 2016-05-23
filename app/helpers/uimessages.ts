@@ -35,7 +35,7 @@ export class UIMessages {
   }
 
   //Shows a confirmation to the user (TODO: cordova confirmation)
-  public static showConfirmation(strings, nav, okCallback, cancelCallback, okString, cancelString) {
+  public static showConfirmation(strings, nav, okCallback, cancelCallback?, okString?, cancelString?) {
     /*if(!buttonStrings) {
       console.log('dont have buttonStrings');
       buttonStrings = {
