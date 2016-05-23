@@ -10,7 +10,11 @@ import {Http, Headers} from 'angular2/http';
 })
 export class ProfilePage {
 
+<<<<<<< HEAD
   nav:any;viewController:any; user:any; currentUser:any; zone:any; platform:any; http:any
+=======
+  nav:any;viewController:any; user:any; currentUser:any; zone:any; platform:any; http: any;
+>>>>>>> a323a82768be81642a4e5d68985e71da7e7e147b
   message:string; friendStatus:any; respondToRequest:boolean;
   userRelationshipNumber:number; friends:any[]; relationship:any;
   walkingTimeAve:number; runningTimeAve:number;
@@ -29,7 +33,11 @@ export class ProfilePage {
     this.viewController = viewController;
     this.zone = zone;
     this.platform = platform;
+<<<<<<< HEAD
     this.http = http; 
+=======
+    this.http = http;
+>>>>>>> a323a82768be81642a4e5d68985e71da7e7e147b
     this.user = navParams.data;
     this.currentUser = Parse.User.current();
     this.aveDataLoading = true;
@@ -395,70 +403,50 @@ export class ProfilePage {
 
   //STRAVA
   connectStravaButton() {
-    this.platform.ready().then(() => {
-        this.connectStravaFunction().then((success) => {
-            alert(success.access_token);
-        }, (error) => {
-            alert(error);
-        });
-    });
-  }
-
-  connectStravaFunction() {
-    return new Promise(function(resolve, reject) {
-        var browserRef = window.cordova.InAppBrowser.open("https://www.strava.com/oauth/authorize?client_id=11012&response_type=code" + "&response_type=code&redirect_uri=http://localhost&approval_prompt=force", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
+    var browserRef = window.cordova.InAppBrowser.open("https://www.strava.com/oauth/authorize?client_id=11012&response_type=code" + "&response_type=code&redirect_uri=http://localhost&approval_prompt=force", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
         browserRef.addEventListener("loadstart", (event) => {
-            //alert(1);
             if ((event.url).indexOf("http://localhost") === 0) {
                 browserRef.removeEventListener("exit", (event) => {});
-                alert(2);
-                alert(event.url);
                 browserRef.close();
                 var url = event.url
                 var accessCode = url.substring(30,url.length);
-                alert(accessCode);
-                console.log(accessCode);
-                alert(3);
-
-                //This is the raw javascript version I was talking about. I found other versions, but atm this is the only one that seems to work:
-                /*
-                var responseParameters = ((event.url).split("#")[1]).split("&");
-                alert(4);
-                var parsedResponse = {};
-                for (var i = 0; i < responseParameters.length; i++) {
-                    parsedResponse[responseParameters[i].split("=")[0]] = responseParameters[i].split("=")[1];
-                }
-                if (parsedResponse["access_token"] !== undefined && parsedResponse["access_token"] !== null) {
-                    resolve(parsedResponse);
-                } else {
-                    reject("Problem authenticating with Strava");
-                }
-                */
+                this.stravaAPIPOST(accessCode);
             }
         });
         browserRef.addEventListener("exit", function(event) {
-            reject("The Strava sign in flow was cancelled");
+          alert("Congratulations your Strava account is connected!"); //TODO: WHAT IF IT ISN'T??
         });
-    });
   }
 
+<<<<<<< HEAD
   stravaAPIPOST() {
     /*alert('stravaAPIPOST');
+=======
+  stravaAPIPOST(access_code) {
+>>>>>>> a323a82768be81642a4e5d68985e71da7e7e147b
     var c_id = "11012";
     var c_secret = "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc";
-    var access_code = "c420583602c1eb00dd60707dd48c58d46e5c8a83";
-    var params = "client_id=" + c_id + "&client_secret=" + c_secret + "&code=" + access_code;
-​    
+​    var objParam = {
+      client_id: c_id,
+      client_secret: c_secret,
+      code: access_code
+    };
     var xmlhttp = new XMLHttpRequest();
-    alert(1);
     xmlhttp.onreadystatechange = function () {
-      alert('2');
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        alert(xmlhttp.responseText);
+        alert(xmlhttp.responseText); //TODO: REMOVE FOR PROD
+        //Saving to Parse
+        //TODO: get user id
+        Parse.User.current().set(Consts.USER_STRAVADATA, JSON.parse(xmlhttp.responseText));
+        Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, access_code);
+        Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN, JSON.parse(xmlhttp.responseText).access_token);
+        Parse.User.current().set(Consts.USER_STRAVAID, JSON.parse(xmlhttp.responseText).athlete.id);
+        (<Parse.Object> Parse.User.current()).save();
       }
     }
-​    alert(3);
+    
     xmlhttp.open("POST", "https://www.strava.com/oauth/token", true);
+<<<<<<< HEAD
     xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xmlhttp.setRequestHeader("Content-length", "3");
     xmlhttp.setRequestHeader("Connection", "close");
@@ -488,56 +476,63 @@ export class ProfilePage {
           console.log('Authentication Complete')
         }
       );
+=======
+    xmlhttp.setRequestHeader("Content-type", "application/json;"); 
+    xmlhttp.send(JSON.stringify(objParam));
+>>>>>>> a323a82768be81642a4e5d68985e71da7e7e147b
   }
 
   //MOVES
   connectMoves() {
-    alert(1);
-    return new Promise(function(resolve, reject) {
-        var browserRef = window.cordova.InAppBrowser.open("https://api.moves-app.com/oauth/v1/authorize?response_type=code&client_id=95C57N4Gt5t9l5uir45i0P6RcNd1DN6v&scope=activity", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
+    var browserRef = window.cordova.InAppBrowser.open("https://api.moves-app.com/oauth/v1/authorize?response_type=code&client_id=95C57N4Gt5t9l5uir45i0P6RcNd1DN6v&scope=activity%20location", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
         browserRef.addEventListener("loadstart", (event) => {
-            //alert(1);
             if ((event.url).indexOf("http://localhost") === 0) {
                 browserRef.removeEventListener("exit", (event) => {});
-                alert(2);
-                alert(event.url);
                 browserRef.close();
                 var url = event.url
                 var urlMinus = url.length - 7
-                alert(urlMinus);
-                var accessCode = url.substring(23,urlMinus);
-                alert(accessCode);
-                console.log(accessCode);
-                alert(3);
+                var movesAuthorizationCode = url.substring(23,urlMinus);
+                console.log(movesAuthorizationCode);
+                this.movesAPIPOST(movesAuthorizationCode);
             }
         });
         browserRef.addEventListener("exit", function(event) {
-            reject("The Moves sign in flow was cancelled");
+            alert("Congratulations your Moves account is connected!"); //TODO: WHAT IF IT ISN'T??
         });
-    });
   }
 
-  MovesAPIPOST() {
-    alert('stravaAPIPOST');
-    var c_id = "11012";
-    var c_secret = "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc";
-    var access_code = "c420583602c1eb00dd60707dd48c58d46e5c8a83";
-    var params = "client_id=" + c_id + "&client_secret=" + c_secret + "&code=" + access_code;
-​    
+  movesAPIPOST(movesAuthorizationCode) {
+    alert('movesApIPOST');
+    /*
+    var c_id = "95C57N4Gt5t9l5uir45i0P6RcNd1DN6v";
+    var c_secret = "I_47yeKyJqqdgVJYcv5vka3vtqDSTGN6nHx7510TX3QN6w7gw3Rj62fRJ6UXVqrj"
+    var redirect_uri = "http://localhost";
+​    var objParam = {
+      code: movesAuthorizationCode,
+      client_id: c_id,
+      client_secret: c_secret,
+      reidrect_uri: redirect_uri
+    };
+    */
     var xmlhttp = new XMLHttpRequest();
-    alert(1);
     xmlhttp.onreadystatechange = function () {
-      alert('2');
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        alert(xmlhttp.responseText);
+        alert(3);
+        alert(xmlhttp.responseText); //TODO: REMOVE FOR PROD
+        //Saving to Parse
+        /*
+        Parse.User.current().set(Consts.USER_STRAVADATA, JSON.parse(xmlhttp.responseText));
+        Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, access_code);
+        Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN, JSON.parse(xmlhttp.responseText).access_token);
+        (<Parse.Object> Parse.User.current()).save();*/
       }
     }
-​    alert(3);
-    xmlhttp.open("POST", "https://www.strava.com/oauth/token", true);
-    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xmlhttp.setRequestHeader("Content-length", "3");
-    xmlhttp.setRequestHeader("Connection", "close");
-    xmlhttp.send(params);
+    
+    xmlhttp.open("POST", "https://api.moves-app.com/oauth/v1", true);
+    alert(2);
+    xmlhttp.setRequestHeader("Content-type", "application/json;"); 
+    alert(3);
+    //xmlhttp.send(JSON.stringify(objParam));
     alert(4);
   }
 
