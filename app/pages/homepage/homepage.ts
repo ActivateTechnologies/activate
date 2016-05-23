@@ -300,12 +300,25 @@ export class HomePage {
 
   openCamera() {
       //FROM: http://ionicframework.com/docs/v2/native/Camera/
-     Camera.getPicture(options).then((imageData) => {
-     // imageData is either a base64 encoded string or a file URI
-     // If it's base64:
-     let base64Image = "data:image/jpeg;base64," + imageData;
-    }, (err) => {
+      
+       /**
+   * Warning: Using DATA_URL is not recommended! The DATA_URL destination
+   * type is very memory intensive, even with a low quality setting. Using it
+   * can result in out of memory errors and application crashes. Use FILE_URI
+   * or NATIVE_URI instead.
+   */
+    navigator.camera.getPicture(onSuccess, onFail, { quality: 25,
+        destinationType: Camera.DestinationType.DATA_URL
     });
+
+    function onSuccess(imageData) {
+        var image = document.getElementById('myImage');
+        image.src = "data:image/jpeg;base64," + imageData;
+    }
+
+    function onFail(message) {
+        alert('Failed because: ' + message);
+    }
   }
 
 }
