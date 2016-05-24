@@ -15,7 +15,10 @@ export class HomePage {
 
   nav:any; app:any; zone:any; platform:any; chatMessages:any[]; replyOptions:any[];
   typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number; SCROLL_DELAY:number;
-  dev:boolean = true; loadingMessages:boolean = true;
+  dev:boolean = true; loadingMessages:boolean = true; recentMessagesTemp:any[];
+  // recentMessagesTemp holds all the messages recently shown to user before he has replied,
+  // these will only be saved once the user has made a selection. Also used to hold messages
+  // before user has signed in.
 
   public widgetBoundCallback: Function;
 
@@ -26,6 +29,7 @@ export class HomePage {
     this.zone = zone;
     this.platform = platform;
     this.chatMessages = [];
+    this.recentMessagesTemp = [];
     this.initialize();
     this.THINKING_DELAY = (this.dev) ? 0 : 1000;
     this.TYPING_DELAY = (this.dev) ? 500 : 1500;
@@ -150,21 +154,42 @@ export class HomePage {
     }
   }
 
-  //Save message to parse Message class for archiving
   saveMessageToParse(messageObject:any, treeObject:any, usersMessage:boolean) {
     let Message = Parse.Object.extend(Consts.MESSAGES_CLASS);
     let message = new Message();
     message.set(Consts.MESSAGES_USERSMESSAGE, usersMessage);
-    message.set(Consts.MESSAGES_USER, Parse.User.current());
     if (treeObject) {
       message.set(Consts.MESSAGES_TREEOBJECT, treeObject);
     }
     if (messageObject.message) {
       message.set(Consts.MESSAGES_MESSAGE, messageObject.message);
     } else if (messageObject.widget) {
-      message.set(Consts.MESSAGES_MESSAGE, treeObject.get(Consts.TREEOBJECTS_MESSAGES)[0]);
+      message.set(Consts.MESSAGES_MESSAGE, messageObject.widget);
     }
-    message.save();
+    if (Parse.User.current() == null) {
+      this.recentMessagesTemp.push(message);
+      return;
+    }
+    if (!usersMessage) {
+      this.recentMessagesTemp.push(message);
+    } else if (this.recentMessagesTemp.length == 0) {
+      message.set(Consts.MESSAGES_USER, Parse.User.current());
+      message.save();
+    } else {
+      this.recentMessagesTemp.push(message);
+      for (let i = 0; i < this.recentMessagesTemp.length; i++) {
+        this.recentMessagesTemp[i].set(Consts.MESSAGES_USER, Parse.User.current());
+      }
+      Parse.Object.saveAll(this.recentMessagesTemp, {
+        success: (objects) => {
+          this.recentMessagesTemp = [];
+          message.save();
+        },
+        error: (error) => {
+          console.log('Error saving recent messages', error.message);
+        }
+      });
+    }
   }
 
   //Replaces hot keywords with dynamic data
@@ -182,7 +207,7 @@ export class HomePage {
   //Fetches a parse object from server when given one, and calls processReceivedTreeObject
   fetchAndProcessPointer(pointer:any) {
     //console.log('Going to fetch:', pointer);
-    if (pointer == null) {
+    if (pointer == null || typeof pointer.fetch !== "function") {
       console.log('Pointer is null, likely end of tree.');
       this.chatMessages.push({
         message: "- End of tree -",

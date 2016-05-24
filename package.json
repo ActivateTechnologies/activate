@@ -43,7 +43,8 @@
     "ionic-plugin-keyboard@~2.0.1",
     "cordova-plugin-facebook4@~1.7.0",
     "cordova-plugin-inappbrowser",
-    "cordova-plugin-file"
+    "cordova-plugin-file",
+    "cordova-plugin-camera"
   ],
   "cordovaPlatforms": [
     "ios",
