@@ -422,14 +422,24 @@ export class ProfilePage {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        alert(xmlhttp.responseText); //TODO: REMOVE FOR PROD
-        alert(xmlhttp.responseText); 
+
+        //alert(1);
+        //alert(xmlhttp.responseText); //TODO: REMOVE FOR PROD
+
+        //alert(2);
+        //var tokenTest = JSON.parse(xmlhttp.responseText).access_token);
+        //alert(tokenTest); 
+
+        //alert(3);
+        var idTest = JSON.parse(xmlhttp.responseText).athlete.id);
+        //alert(idTest); 
         //Saving to Parse
         //TODO: get user id
         Parse.User.current().set(Consts.USER_STRAVADATA, JSON.parse(xmlhttp.responseText));
         Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, access_code);
+        //Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, JSON.parse(xmlhttp.responseText).athlete.id);
         Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN, JSON.parse(xmlhttp.responseText).access_token);
-        //Parse.User.current().set(Consts.USER_STRAVAID, JSON.parse(xmlhttp.responseText).athlete.id);
+        Parse.User.current().set(Consts.USER_STRAVAID, idTest);
         (<Parse.Object> Parse.User.current()).save();
       }
     }
@@ -437,6 +447,39 @@ export class ProfilePage {
     xmlhttp.setRequestHeader("Content-type", "application/json;"); 
     xmlhttp.send(JSON.stringify(objParam));
   }
+
+  stravaData() {
+    alert(0.5);
+    var stravaId = Consts.USER_STRAVAID;
+    var stravaAccessToken = Consts.USER_STRAVAACCESSTOKEN;
+    alert(0.6);
+   
+    var xmlhttp = new XMLHttpRequest();
+    alert(1);
+    
+    xmlhttp.onreadystatechange = function () {
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        alert(1.1);
+        alert(xmlhttp.responseText);
+        /*
+        Parse.User.current().set(Consts.USER_STRAVADATA, JSON.parse(xmlhttp.responseText));
+        Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, access_code);
+        Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN, JSON.parse(xmlhttp.responseText).access_token);
+        Parse.User.current().set(Consts.USER_STRAVAID, idTest);
+        (<Parse.Object> Parse.User.current()).save();
+        */
+      }
+    }
+    
+
+    xmlhttp.open("GET", "https://www.strava.com/api/v3/athletes/"+stravaId+"/koms", true);
+    alert(2);
+    xmlhttp.setRequestHeader("Content-type", "application/json;"); 
+    alert(3);
+    //xmlhttp.send(JSON.stringify(objParam));
+
+  }
+
 
   //MOVES
   connectMoves() {
@@ -491,6 +534,11 @@ export class ProfilePage {
     //xmlhttp.send(JSON.stringify(objParam));
     alert(4);
   }
+
+
+
+
+
 
   showSettings() {
     UIMessages.showConfirmation({

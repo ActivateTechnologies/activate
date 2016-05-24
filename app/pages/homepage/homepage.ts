@@ -3,8 +3,6 @@ import {Consts} from '../../helpers/consts';
 import {Widget} from '../../widgets/widget';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {NgZone} from 'angular2/core';
-import {Http, HTTP_PROVIDERS} from 'angular2/http';
-import 'rxjs/Rx';
 import {ProfilePage} from '../profilepage/profilepage';
 import {Camera} from 'ionic-native';
 //import {File} from 'ionic-native';
@@ -17,63 +15,22 @@ export class HomePage {
 
   nav:any; app:any; zone:any; platform:any; chatMessages:any[]; replyOptions:any[];
   typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number; SCROLL_DELAY:number;
-  dev:boolean = true; loadingMessages:boolean = true; recentMessagesTemp:any[];
-  // recentMessagesTemp holds all the messages recently shown to user before he has replied,
-  // these will only be saved once the user has made a selection. Also used to hold messages
-  // before user has signed in.
+  dev:boolean = true; loadingMessages:boolean = true;
 
   public widgetBoundCallback: Function;
 
-	constructor(ionicApp: IonicApp, nav: NavController, zone: NgZone, platform: Platform,
-   http:Http) {
+	constructor(ionicApp: IonicApp, nav: NavController, zone: NgZone, platform: Platform) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = nav;
     this.app = ionicApp;
     this.zone = zone;
     this.platform = platform;
     this.chatMessages = [];
-    this.recentMessagesTemp = [];
     this.initialize();
     this.THINKING_DELAY = (this.dev) ? 0 : 1000;
     this.TYPING_DELAY = (this.dev) ? 500 : 1500;
     this.SCROLL_DELAY = (this.dev) ? 0 : 3000;
     this.widgetBoundCallback = this.widgetCallback.bind(this);
-
-    /*http.get('https://www.strava.com/oauth/token')
-      // Call map on the response observable to get the parsed people object
-      .map(res => res.json())
-      // Subscribe to the observable to get the parsed people object and attach it to the
-      // component
-      .subscribe(people => console.log(people));*/
-    /*http.post("https://www.strava.com/oauth/token", 
-      "client_id=11012&client_secret=1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc&code=c420583602c1eb00dd60707dd48c58d46e5c8a83")
-    //http.get("https://httpbin.org/ip")
-      .subscribe(data => {
-        alert(data);
-        console.log('Returned data:', data.json());
-      }, error => {
-        alert('error');
-        console.log('Error with ajax call:', JSON.stringify(error.json()));
-    });*/
-    if (this.platform.is("android") || this.platform.is("ios")) {
-      var c_id = "11012";
-      var c_secret = "1d5dc79c5adbaaefcc6eeb2b2c9ddb584085ecfc";
-      var access_code = "c420583602c1eb00dd60707dd48c58d46e5c8a83";
-      var params = "client_id=" + c_id + "&client_secret=" + c_secret + "&code=" + access_code;
-
-      var xmlhttp = new XMLHttpRequest();
-      xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-          alert(xmlhttp.responseText);
-        }
-      }
-
-      xmlhttp.open("POST", "https://www.strava.com/oauth/token", true);
-      xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      xmlhttp.setRequestHeader("Content-length", "3");
-      xmlhttp.setRequestHeader("Connection", "close");
-      xmlhttp.send(params);
-    }
   }
 
   initialize() {
@@ -198,41 +155,16 @@ export class HomePage {
     let Message = Parse.Object.extend(Consts.MESSAGES_CLASS);
     let message = new Message();
     message.set(Consts.MESSAGES_USERSMESSAGE, usersMessage);
+    message.set(Consts.MESSAGES_USER, Parse.User.current());
     if (treeObject) {
       message.set(Consts.MESSAGES_TREEOBJECT, treeObject);
     }
     if (messageObject.message) {
       message.set(Consts.MESSAGES_MESSAGE, messageObject.message);
     } else if (messageObject.widget) {
-      message.set(Consts.MESSAGES_MESSAGE, messageObject.widget);
+      message.set(Consts.MESSAGES_MESSAGE, treeObject.get(Consts.TREEOBJECTS_MESSAGES)[0]);
     }
-    if (Parse.User.current() == null) {
-      this.recentMessagesTemp.push(message);
-      return;
-    }
-    if (!usersMessage) {
-      this.recentMessagesTemp.push(message);
-    } else if (this.recentMessagesTemp.length == 0) {
-      message.set(Consts.MESSAGES_USER, Parse.User.current());
-      message.save();
-    } else {
-      this.recentMessagesTemp.push(message);
-      for (let i = 0; i < this.recentMessagesTemp.length; i++) {
-        this.recentMessagesTemp[i].set(Consts.MESSAGES_USER, Parse.User.current());
-      }
-      Parse.Object.saveAll(this.recentMessagesTemp, {
-        success: (objects) => {
-          this.recentMessagesTemp = [];
-          message.save();
-        },
-        error: (error) => {
-          console.log('Error saving recent messages', error.message);
-          //this.recentMessagesTemp.push(message);
-        }
-      });
-      
-    }
-    
+    message.save();
   }
 
   //Replaces hot keywords with dynamic data
@@ -250,7 +182,7 @@ export class HomePage {
   //Fetches a parse object from server when given one, and calls processReceivedTreeObject
   fetchAndProcessPointer(pointer:any) {
     //console.log('Going to fetch:', pointer);
-    if (pointer == null || typeof pointer.fetch !== "function") {
+    if (pointer == null) {
       console.log('Pointer is null, likely end of tree.');
       this.chatMessages.push({
         message: "- End of tree -",
@@ -298,19 +230,6 @@ export class HomePage {
 
   //Passed as a callback function to widgets that were in replies
   widgetCallback(option:any, data?:any) {
-    /*if (option.widget.widgetName == 'facebookLogin') {
-      for (let i = 0; i < this.recentMessagesTemp.length; i++) {
-        this.recentMessagesTemp[i].set(Consts.MESSAGES_USER, Parse.User.current());
-      }
-      Parse.Object.saveAll(this.recentMessagesTemp, {
-        success: (objects) => {
-          this.recentMessagesTemp = [];
-        },
-        error: (error) => {
-          console.log('Error saving messages from before user was signed in');
-        }
-      });
-    }*/
     console.log('data', data);
     let messageObject:any = {
       usersMessage: true,
@@ -456,8 +375,8 @@ export class HomePage {
     var options = this.setOptions(srcType);
     var func = this.createNewFileEntry;
 
-    setTimeout(function() { navigator.camera.getPicture(function cameraSuccess(imageUri) {
-
+    navigator.camera.getPicture(function cameraSuccess(imageUri) {
+        
         this.displayImage(imageUri);
         // You may choose to copy the picture, save it somewhere, or upload.
         func(imageUri);
@@ -468,8 +387,7 @@ export class HomePage {
 
     }, options);
 
-  },
-  3000);
+
   }
 
 
