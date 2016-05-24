@@ -19,8 +19,8 @@ export class ProfilePage {
   walkingTimeWeek:number[]; runningTimeWeek:number[]; cyclingTimeWeek:number[];
   sleepTimeWeek:number[]; aveDataLoading:boolean; weekDataLoading:boolean;
   distanceData:number[]; distanceDataLoading:boolean;
-  caloriesData:number[]; cyclingData:any;
-  caloriesDataLoading:boolean; cyclingDataLoading:boolean;
+  caloriesData:number[]; cyclingData:any; runningData:any;
+  caloriesDataLoading:boolean; cyclingDataLoading:boolean; runningDataLoading:boolean;
   heartData:number[]; heartDataLoading:boolean;
   distanceChartHandle:any; heartChartHandle:any; cyclingChartHandle:any;
 
@@ -39,6 +39,7 @@ export class ProfilePage {
     this.distanceDataLoading = true;
     this.caloriesDataLoading = true;
     this.cyclingDataLoading = true;
+    this.runningDataLoading = true;
     this.heartDataLoading = true;
   }
 
@@ -398,6 +399,42 @@ export class ProfilePage {
     this.heartChartHandle = new Chart(ctx).Bar(heartData, options);
   }
 
+  initRunningChart() {
+    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+    let labels:string[] = [];
+    let day = new Date().getDay() - 1;
+    day = (day == -1) ? 6 : day;
+    for (let i = 0; i < this.runningData.distance.length; i++) {
+      labels.push(days[(i+day) % 7]);
+    }
+    let dataInKm:any[];
+    dataInKm = [];
+    for (let i = 0; i < this.runningData.distance.length; i++) {
+      dataInKm.push(Math.round(this.runningData.distance[i]/1000));
+    }
+    console.log(dataInKm, labels);
+    let runningDataObject:any = {
+      labels: labels,
+      datasets: [{
+        label: "km",
+        fillColor: "rgb(34, 206, 206)",
+        strokeColor: "rgb(34, 206, 206)",
+        highlightFill: "rgba(34,206,206,0.75)",
+        highlightStroke: "rgba(34,206,206,1)",
+        data: dataInKm
+      }]
+    };
+    let options:any = {
+      scaleShowGridLines: false
+    }
+    this.zone.run(() => {
+      this.runningDataLoading = false;
+      let ctx:any = (<HTMLCanvasElement> document.getElementById("runningChart")).getContext("2d");
+      this.cyclingChartHandle = new Chart(ctx).Bar(runningDataObject, options);
+    })
+    
+  }
+
   initCyclingChart() {
     let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
     let labels:string[] = [];
@@ -416,10 +453,10 @@ export class ProfilePage {
       labels: labels,
       datasets: [{
         label: "km",
-        fillColor: "rgb(255, 99, 132)",
-        strokeColor: "rgb(255, 99, 132)",
-        highlightFill: "rgba(40,40,245,0.75)",
-        highlightStroke: "rgba(40,40,245,1)",
+        fillColor: "rgb(255, 197, 51)",
+        strokeColor: "rgb(255, 197, 51)",
+        highlightFill: "rgba(255,197,51,0.75)",
+        highlightStroke: "rgba(255,197,51,1)",
         data: dataInKm
       }]
     };
@@ -534,6 +571,8 @@ export class ProfilePage {
         console.log(JSON.stringify(data));
         this.cyclingData = data.data.cycling;
         this.initCyclingChart();
+        this.runningData = data.data.running;
+        this.initRunningChart();
       } else {
         alert('stravaActivitiesLastWeek error');
         console.log(error)
