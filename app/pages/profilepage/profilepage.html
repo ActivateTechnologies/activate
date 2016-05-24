@@ -81,8 +81,8 @@
 				<img src="images/stravaLogo.png" class="stravaLogoHeaders">
 			</a>
 		</p>
-		<span [hidden]="!caloriesDataLoading">Working out cycles ...</span>
-		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
+		<span [hidden]="!cyclingDataLoading">Working out cycles ...</span>
+		<canvas id="cyclingChart"></canvas>
 
 		<p class="sectionHeader">
 			<i class="em em-sleeping"></i> (hours):
@@ -140,7 +140,11 @@
 	<button (click)="connectMoves()" class="stravaAPIPOST">Connect with MOVES</button>
 	-->
 
-	<button (click)="stravaData()" class="stravaAPIPOST">Strava Data</button>
+	<button (click)="stravaStats()" class="stravaAPIPOST">Strava Stats</button>
+
+	<button (click)="stravaActivities()" class="stravaAPIPOST">Strava Activities</button>
+
+	<button (click)="stravaActivitiesLastWeek()" class="stravaAPIPOST">Strava Activities Last Week</button>
 
 	<img (click)="connectMoves()" src="images/MovesLogowithName.png" class="movesLogoConnectButton">
 

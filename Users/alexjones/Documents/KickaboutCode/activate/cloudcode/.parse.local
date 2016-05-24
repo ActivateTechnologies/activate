@@ -1,0 +1,10 @@
+{
+  "applications": {
+    "_default": {
+      "link": "activate-dev"
+    },
+    "activate-dev": {
+      "applicationId": "v3NS4xBCONYmIqqtwASz1e3TuX9p1WDZod6dUxA7"
+    }
+  }
+}

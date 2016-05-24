@@ -19,9 +19,10 @@ export class ProfilePage {
   walkingTimeWeek:number[]; runningTimeWeek:number[]; cyclingTimeWeek:number[];
   sleepTimeWeek:number[]; aveDataLoading:boolean; weekDataLoading:boolean;
   distanceData:number[]; distanceDataLoading:boolean;
-  caloriesData:number[]; caloriesDataLoading:boolean;
+  caloriesData:number[]; cyclingData:any;
+  caloriesDataLoading:boolean; cyclingDataLoading:boolean;
   heartData:number[]; heartDataLoading:boolean;
-  distanceChartHandle:any; heartChartHandle:any;
+  distanceChartHandle:any; heartChartHandle:any; cyclingChartHandle:any;
 
   constructor(ionicApp: IonicApp, navController: NavController, navParams: NavParams,
    viewController: ViewController, zone: NgZone, platform: Platform, http: Http) {
@@ -37,6 +38,7 @@ export class ProfilePage {
     this.weekDataLoading = true;
     this.distanceDataLoading = true;
     this.caloriesDataLoading = true;
+    this.cyclingDataLoading = true;
     this.heartDataLoading = true;
   }
 
@@ -72,6 +74,7 @@ export class ProfilePage {
     }
     
     this.initHeartData();
+    this.stravaActivitiesLastWeek();
   }
 
   initAveData() {
@@ -356,7 +359,7 @@ export class ProfilePage {
         strokeColor: "rgba(40,40,245,0.8)",
         highlightFill: "rgba(40,40,245,0.75)",
         highlightStroke: "rgba(40,40,245,1)",
-        data: this.caloriesData
+        data: this.cyclingData
       }]
     };
     let options:any = {
@@ -369,6 +372,7 @@ export class ProfilePage {
     this.zone.run(() => {
       this.heartDataLoading = false;
     })
+    console.log(this.heartData);
     let ctx:any = (<HTMLCanvasElement> document.getElementById("heartChart")).getContext("2d");
     let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
     let labels:string[] = [];
@@ -392,6 +396,42 @@ export class ProfilePage {
       scaleShowGridLines: false
     }
     this.heartChartHandle = new Chart(ctx).Bar(heartData, options);
+  }
+
+  initCyclingChart() {
+    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+    let labels:string[] = [];
+    let day = new Date().getDay() - 1;
+    day = (day == -1) ? 6 : day;
+    for (let i = 0; i < this.cyclingData.distance.length; i++) {
+      labels.push(days[(i+day) % 7]);
+    }
+    let dataInKm:any[];
+    dataInKm = [];
+    for (let i = 0; i < this.cyclingData.distance.length; i++) {
+      dataInKm.push(Math.round(this.cyclingData.distance[i]/1000));
+    }
+    console.log(dataInKm, labels);
+    let cyclingDataObject:any = {
+      labels: labels,
+      datasets: [{
+        label: "km",
+        fillColor: "rgb(255, 99, 132)",
+        strokeColor: "rgb(255, 99, 132)",
+        highlightFill: "rgba(40,40,245,0.75)",
+        highlightStroke: "rgba(40,40,245,1)",
+        data: dataInKm
+      }]
+    };
+    let options:any = {
+      scaleShowGridLines: false
+    }
+    this.zone.run(() => {
+      this.cyclingDataLoading = false;
+      let ctx:any = (<HTMLCanvasElement> document.getElementById("cyclingChart")).getContext("2d");
+      this.cyclingChartHandle = new Chart(ctx).Bar(cyclingDataObject, options);
+    })
+    
   }
 
   //STRAVA
@@ -422,22 +462,10 @@ export class ProfilePage {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-
-        //alert(1);
-        //alert(xmlhttp.responseText); //TODO: REMOVE FOR PROD
-
-        //alert(2);
-        //var tokenTest = JSON.parse(xmlhttp.responseText).access_token);
-        //alert(tokenTest); 
-
-        //alert(3);
         var idTest = JSON.parse(xmlhttp.responseText).athlete.id);
-        //alert(idTest); 
-        //Saving to Parse
-        //TODO: get user id
+
         Parse.User.current().set(Consts.USER_STRAVADATA, JSON.parse(xmlhttp.responseText));
         Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, access_code);
-        //Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, JSON.parse(xmlhttp.responseText).athlete.id);
         Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN, JSON.parse(xmlhttp.responseText).access_token);
         Parse.User.current().set(Consts.USER_STRAVAID, idTest);
         (<Parse.Object> Parse.User.current()).save();
@@ -448,39 +476,95 @@ export class ProfilePage {
     xmlhttp.send(JSON.stringify(objParam));
   }
 
-  stravaData() {
-    alert(0.5);
-    var stravaId = Consts.USER_STRAVAID;
-    alert(stravaId);
-    var stravaAccessToken = Consts.USER_STRAVAACCESSTOKEN;
-    alert(0.6);
+  //STRAVA: GET OVERALL STATS
+  stravaStats() {
+    var stravaId = Parse.User.current().get(Consts.USER_STRAVAID);
+    var stravaAccessToken = Parse.User.current().get(Consts.USER_STRAVAACCESSTOKEN);
    
     var xmlhttp = new XMLHttpRequest();
-    alert(1);
-    
+
     xmlhttp.onreadystatechange = function () {
+
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        alert(1.1);
         alert(xmlhttp.responseText);
-        /*
-        Parse.User.current().set(Consts.USER_STRAVADATA, JSON.parse(xmlhttp.responseText));
-        Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, access_code);
-        Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN, JSON.parse(xmlhttp.responseText).access_token);
-        Parse.User.current().set(Consts.USER_STRAVAID, idTest);
+
+        Parse.User.current().set(Consts.USER_STRAVASTATS, xmlhttp.responseText);
         (<Parse.Object> Parse.User.current()).save();
-        */
       }
     }
     
 
-    xmlhttp.open("GET", "https://www.strava.com/api/v3/athletes/"+stravaId+"/koms", true);
-    alert(2);
+    xmlhttp.open("GET", "https://www.strava.com/api/v3/athletes/"+stravaId+"/stats", true);
     xmlhttp.setRequestHeader("Content-type", "application/json;"); 
-    alert(3);
-    //xmlhttp.send(JSON.stringify(objParam));
+     xmlhttp.setRequestHeader("Authorization", "Bearer "+stravaAccessToken); 
+    xmlhttp.send();
 
   }
 
+  //STRAVA: LIST ATHLETE ACTIVITIES
+  stravaActivities() {
+    //var stravaId = Parse.User.current().get(Consts.USER_STRAVAID);
+    var stravaAccessToken = Parse.User.current().get(Consts.USER_STRAVAACCESSTOKEN);
+   
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.onreadystatechange = function () {
+
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        alert(xmlhttp.responseText);
+
+        Parse.User.current().set(Consts.USER_STRAVACTIVITIES, xmlhttp.responseText);
+        (<Parse.Object> Parse.User.current()).save();
+      }
+    }
+    
+
+    xmlhttp.open("GET", "https://www.strava.com/api/v3/athlete/activities", true);
+    xmlhttp.setRequestHeader("Content-type", "application/json;"); 
+     xmlhttp.setRequestHeader("Authorization", "Bearer "+stravaAccessToken); 
+    xmlhttp.send();
+
+  }
+
+  stravaActivitiesLastWeek() {
+    CloudFunctions.stravaActivitiesLastWeek((data, error) => {
+      if (error == null) {
+        //alert('stravaActivitiesLastWeek done!');
+        //alert(JSON.stringify(data));
+        console.log(JSON.stringify(data));
+        this.cyclingData = data.data.cycling;
+        this.initCyclingChart();
+      } else {
+        alert('stravaActivitiesLastWeek error');
+        console.log(error)
+      }
+    })
+    /*
+    var stravaAccessToken = Parse.User.current().get(Consts.USER_STRAVAACCESSTOKEN);
+
+    let past = new Date(new Date().getTime() - 7 * 86400 * 1000)
+    past.setHours(0);
+    past.setMinutes(0);
+    past.setSeconds(0);
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.onreadystatechange = function () {
+
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        alert(xmlhttp.responseText);
+
+        Parse.User.current().set(Consts.USER_STRAVACTIVITIESLASTWEEK, xmlhttp.responseText);
+        (<Parse.Object> Parse.User.current()).save();
+      }
+    }
+    
+
+    xmlhttp.open("GET", "https://www.strava.com/api/v3/athlete/activities?after="+Math.round(past.getTime()/1000), true);
+    xmlhttp.setRequestHeader("Content-type", "application/json;"); 
+     xmlhttp.setRequestHeader("Authorization", "Bearer "+stravaAccessToken); 
+    xmlhttp.send();
+  */
+  }
 
   //MOVES
   connectMoves() {
