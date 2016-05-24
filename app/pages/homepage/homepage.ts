@@ -382,9 +382,11 @@ export class HomePage {
 
   //Honestly don't understand what this does.... But is in documentation.
   displayImage(imgUri) {
-
+    alert('A');
     var elem = document.getElementById('imageFile');
+    alert('B');
     elem.src = imgUri;
+    alert('C');
   }
 
   //MAIN CAMERA FUNCTION THAT'S CALLED
@@ -399,15 +401,17 @@ export class HomePage {
     var srcType = Camera.PictureSourceType.CAMERA;
     var options = this.setOptions(srcType);
     var func = this.createNewFileEntry;
-
-    navigator.camera.getPicture(function cameraSuccess(imageUri) {
-        
+    alert(1);
+    navigator.camera.getPicture((imageUri) => {
+        alert(2);
         this.displayImage(imageUri);
+        alert(2.5);
         // You may choose to copy the picture, save it somewhere, or upload.
-        func(imageUri);
+        //func(imageUri);
+        alert(3);
         console.log(imageUri);
 
-    }, function cameraError(error) {
+    }, (error) => {
         console.debug("Unable to obtain picture: " + error, "app");
 
     }, options);

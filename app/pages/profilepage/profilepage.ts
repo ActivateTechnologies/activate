@@ -451,6 +451,7 @@ export class ProfilePage {
   stravaData() {
     alert(0.5);
     var stravaId = Consts.USER_STRAVAID;
+    alert(stravaId);
     var stravaAccessToken = Consts.USER_STRAVAACCESSTOKEN;
     alert(0.6);
    
