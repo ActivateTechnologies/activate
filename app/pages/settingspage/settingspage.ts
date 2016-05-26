@@ -6,6 +6,35 @@ import {Page, NavController, NavParams} from 'ionic-angular';
 })
 export class SettingsPage {
 
+  openCamera(selection) {
+    var srcType = Camera.PictureSourceType.CAMERA;
+    var options = this.setOptions(srcType);
+    var func = this.createNewFileEntry;
+    alert(1);
+    navigator.camera.getPicture((imageUri) => {
+        alert(2);
+        this.displayImage(imageUri);
+        alert(2.5);
+        // You may choose to copy the picture, save it somewhere, or upload.
+        //func(imageUri);
+        alert(3);
+        console.log(imageUri);
+
+    }, (error) => {
+        console.debug("Unable to obtain picture: " + error, "app");
+
+    }, options);
+
+
+  }
+
+
+
+
+
+
+
+  /*
   public nav; app; selectedItem; icons; items;
 
   constructor(nav: NavController, navParams: NavParams) {
@@ -32,4 +61,5 @@ export class SettingsPage {
       item: item
     })
   }
+  */
 }

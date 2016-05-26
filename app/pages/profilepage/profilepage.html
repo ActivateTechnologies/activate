@@ -16,7 +16,7 @@
 	</div>
 
 	
-	
+	<!-- OVERVIEW GRAPH -->
 	<div class="containerProfilePageContent">
 
 		<p class="sectionHeader">Overview:</p>
@@ -24,24 +24,23 @@
 		<canvas id="distanceChart" [hidden]="distanceDataLoading"></canvas>
 	</div>
 
-	<div class="containerProfilePageContent">
 
+
+	<div class="containerProfilePageContent">
+	<!--  [hidden]="walkingDataLoading || caloriesDataLoading
+	 || cyclingDataLoading || runningDataLoading || heartDataLoading || sleepDataLoading" -->
+
+		<!-- WALKING GRAPH -->
 		<p class="sectionHeader">
 			<i class="em em-walking"></i> (km):
-			<a href="moves://app">
-				<img src="images/MovesLogo.png" class="movesLogoHeaders">
-			</a>
 		</p>
-		<span [hidden]="!caloriesDataLoading">Working out steps ...</span>
-		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
+		<span [hidden]="!walkingDataLoading">Working out steps ...</span>
+		<canvas id="walkingChart" [hidden]="walkingDataLoading"></canvas>
 
 
-		<!-- RUNNING GRAPH -->
+		<!-- RUNNING GRAPH: WORKING -->
 		<p class="sectionHeader">
 			<i class="em em-running"></i> (km):
-			<a href="moves://app">
-				<img src="images/MovesLogo.png" class="movesLogoHeaders">
-			</a>
 			<a href="strava://app">
 				<img src="images/stravaLogo.png" class="stravaLogoHeaders">
 			</a>
@@ -53,40 +52,35 @@
 		<!-- CYCLE GRAPH: WORKING -->
 		<p class="sectionHeader">
 			<i class="em em-bicyclist"></i> (km)
-			<a href="moves://app">
-				<img src="images/MovesLogo.png" class="movesLogoHeaders">
-			</a>
 			<a href="strava://app">
 				<img src="images/stravaLogo.png" class="stravaLogoHeaders">
 			</a>
 		</p>
 		<span [hidden]="!cyclingDataLoading">Working out cycles ...</span>
 		<canvas id="cyclingChart"></canvas>
-		<!-- -->
+	
 
-
+		<!-- SLEEP GRAPH -->
 		<p class="sectionHeader">
 			<i class="em em-sleeping"></i> (hours):
-			<a href="sleepcycle://app">
-				<img src="images/sleepCycle.png" class="movesLogoHeaders">
-			</a>
 		</p>
-		<span [hidden]="!caloriesDataLoading">Working out those ZZZZZs ...</span>
-		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
+		<span [hidden]="!sleepDataLoading">Working out those ZZZZZs ...</span>
+		<canvas id="sleepChart" [hidden]="sleepDataLoading"></canvas>
+		
+		<!-- KILOJOULES -->
+		<p class="sectionHeader"><i class="em em-fire"></i> (kJ):</p>
+		<span [hidden]="!kJDataLoading">Collecting those calories ...</span>
+		<canvas id="kJChart"></canvas>
 
+		<!-- HEART RATE -->
 		<p class="sectionHeader">
 			<i class="em em-heart"></i> (bpm):
-			<a href="sleepcycle://app">
-				<img src="images/sleepCycle.png" class="movesLogoHeaders">
-			</a>
 		</p>
 		<span [hidden]="!heartDataLoading">Getting those beats ...</span>
 		<canvas id="heartChart" [hidden]="heartDataLoading"></canvas>
-	
-		<p class="sectionHeader"><i class="em em-fire"></i> (kcal):</p>
-		<span [hidden]="!caloriesDataLoading">Collecting those calories ...</span>
-		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
 	</div>
+
+
 
 	<div class="containerProfilePageContent">
 		<p class="sectionHeader"><i class="em em-apple"></i> (g):</p>
@@ -114,13 +108,6 @@
 	<img (click)="connectStravaButton()" class="connectStravaButton" src="images/stravaConnect.png">
 
 	<!--
-	<button (click)="stravaAPIPOST()" class="stravaAPIPOST">Strava API POST</button>
-	-->
-	
-	<!--
-	<button (click)="connectMoves()" class="stravaAPIPOST">Connect with MOVES</button>
-	-->
-
 	<button (click)="stravaStats()" class="stravaAPIPOST">Strava Stats</button>
 
 	<button (click)="stravaActivities()" class="stravaAPIPOST">Strava Activities</button>
@@ -130,6 +117,7 @@
 	<img (click)="connectMoves()" src="images/MovesLogowithName.png" class="movesLogoConnectButton">
 
 	<button (click)="movesAPIPOST()" class="stravaAPIPOST">Moves API POST</button>
+	-->
 	<!--
 	<img (click)="connectMeetup()" class="connectMeetupButton" src="images/meetup.png">
 	-->
