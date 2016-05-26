@@ -1,5 +1,5 @@
 import {NavController, IonicApp} from 'ionic-angular';
-import {Component, Input} from 'angular2/core'
+import {Component, Input} from '@angular/core'
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {UserFunctions} from '../../helpers/userfunctions';
@@ -26,6 +26,7 @@ export class FacebookLogin {
   ngOnInit() {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.currentUser = Parse.User.current();
+    console.log('facebooklogin widget ngOnInit');
   }
 
 	login() {

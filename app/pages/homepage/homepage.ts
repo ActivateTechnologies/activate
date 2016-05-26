@@ -2,7 +2,7 @@ import {Page, NavController, IonicApp, Platform, Modal, ViewController} from 'io
 import {Consts} from '../../helpers/consts';
 import {Widget} from '../../widgets/widget';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
-import {NgZone} from 'angular2/core';
+import {NgZone} from '@angular/core';
 import {ProfilePage} from '../profilepage/profilepage';
 import {Camera} from 'ionic-native';
 //import {File} from 'ionic-native';
@@ -42,6 +42,8 @@ export class HomePage {
       this.retrieveArchieveMessages();
       //this.navigateTreeTo('start', false); //healthApi
       return;
+    } else {
+      this.loadingMessages = false;
     }
     this.typing = true;
     CloudFunctions.initConversation((data, error?) => {
@@ -74,8 +76,10 @@ export class HomePage {
     query.equalTo(Consts.MESSAGES_USER, Parse.User.current());
     query.descending("createdAt");
     query.limit(10);
+    alert(0)
     query.find({
       success: (parseObjects) => {
+        alert(1)
         for (let i = 0; i < parseObjects.length; i++) {
           let messageObject:any = {};
           if (parseObjects[i].get(Consts.MESSAGES_MESSAGE).widgetName) {
@@ -94,6 +98,7 @@ export class HomePage {
         this.navigateTreeTo('loggedIn', true);
       },
       error: (error) => {
+        alert(2)
         console.log('Error retrieving past messages:', error);
       }
     })
@@ -137,6 +142,7 @@ export class HomePage {
         if (treeObjectChildConnectors[randIndexChildren][i].widgetName) {
           replyOption.isWidget = true;
           replyOption.widget = treeObjectChildConnectors[randIndexChildren][i];
+          console.log(replyOption.widget);
         } else {
           replyOption.isWidget = false;
           replyOption.message = treeObjectChildConnectors[randIndexChildren][i];
@@ -286,7 +292,7 @@ export class HomePage {
     if (contentHandle && contentHandle.scrollElement) {
       contentHandle.scrollTo(0, contentHandle.scrollElement.scrollHeight, this.SCROLL_DELAY);
     } else {
-      console.log('Today elememt not found');
+      //console.log('Scroll elememt not found');
     }
   }
 

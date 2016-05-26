@@ -1,5 +1,5 @@
 import {NavController, IonicApp, Platform} from 'ionic-angular';
-import {Component, Input} from 'angular2/core'
+import {Component, Input} from '@angular/core'
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 

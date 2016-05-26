@@ -2,8 +2,8 @@ import {Page, IonicApp, NavController, ViewController, NavParams, Platform} from
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {UIMessages} from '../../helpers/uimessages';
-import {NgZone} from 'angular2/core';
-import {Http, Headers} from 'angular2/http';
+import {NgZone} from '@angular/core';
+import {Http, Headers} from '@angular/http';
 //import {CordovaOauth, Meetup} from 'ng2-cordova-oauth/core';
 
 @Page({

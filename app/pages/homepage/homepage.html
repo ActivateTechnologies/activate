@@ -15,7 +15,7 @@
 <ion-content class="homepage" id="homepage-content">
   <ion-list padding>
     <span *ngIf="loadingMessages">Loading ...</span>
-    <div *ngFor="#chatMessage of chatMessages" class="fade-in"
+    <div *ngFor="let chatMessage of chatMessages" class="fade-in"
         [class.align-right]="chatMessage.usersMessage">
       <div *ngIf="chatMessage.type != 'line'" [class.message-user]="chatMessage.usersMessage"
           [class.message-bot]="!chatMessage.usersMessage">
@@ -64,7 +64,7 @@
 
     <img id="imageFile">
     <div class="replyOptionsTopContainer">
-      <div *ngFor="#option of replyOptions" class="replyOption"
+      <div *ngFor="let option of replyOptions" class="replyOption"
        (click)="replyWithMessage(option)">
         <span *ngIf="!option.isWidget" [innerHTML]="option.message"></span>
         <Widget *ngIf="option.isWidget" [callbackFunction]="widgetBoundCallback"
@@ -105,7 +105,7 @@
 </ion-content>
 
 <!-- <ion-toolbar position="bottom" padding class="fixed">
-  <div class="replyOption" *ngFor="#option of replyOptions">
+  <div class="replyOption" *ngFor="let option of replyOptions">
     {{option.message}}
   </div>
 </ion-toolbar> -->
