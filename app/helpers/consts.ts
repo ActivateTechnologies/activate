@@ -62,8 +62,14 @@ export class Consts {
   public static USER_STRAVAAUTHORIZATIONCODE = "stravaAuthorizationCode";
   //String - stravaAccessToken
   public static USER_STRAVAACCESSTOKEN = "stravaAccessToken";
-  //String - stravaId
+  //Number - stravaId
   public static USER_STRAVAID = "stravaId";
+  //String - stravaStats
+  public static USER_STRAVASTATS = "stravaStats";
+  //String - stravaActivitites
+  public static USER_STRAVACTIVITIES = "stravaActivities";
+  //String - stravaActivititesLastWeek
+  public static USER_STRAVACTIVITIESLASTWEEK = "stravaActivitiesLastWeek";
 
   //HeartData Class
   public static HEARTDATA_CLASS = "HeartData";

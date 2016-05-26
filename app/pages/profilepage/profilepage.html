@@ -18,29 +18,6 @@
 	
 	
 	<div class="containerProfilePageContent">
-		<!-- <p class="sectionHeader">Daily Average:</p>
-		<span [hidden]="!aveDataLoading">Analysing how active you've been ...</span>
-		<div [hidden]="aveDataLoading" class="sectionBody sectionBeneath">
-			<div class="emojiContainer">
-				<i class="em em-walking emojiProfileContainer"></i> 
-				<p class="textProfileBelowEmoji">{{formatTimeDuration(walkingTimeAve)}}</p>
-			</div>
-
-			<div class="emojiContainer">
-				<i class="em em-runner"></i> 
-				<p class="textProfileBelowEmoji">{{formatTimeDuration(runningTimeAve)}}</p>
-			</div>
-
-			<div class="emojiContainer">
-				<i class="em em-bicyclist"></i> 
-				<p class="textProfileBelowEmoji">{{formatTimeDuration(cyclingTimeAve)}}</p>
-			</div>
-
-			<div class="emojiContainer">
-				<i class="em em-sleeping"></i>
-				<p class="textProfileBelowEmoji">{{formatTimeDuration(sleepTimeAve)}}<p>
-			</div>
-		</div> -->
 
 		<p class="sectionHeader">Overview:</p>
 		<span [hidden]="!distanceDataLoading">Churning all your data ...</span>
@@ -59,6 +36,7 @@
 		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
 
 
+		<!-- RUNNING GRAPH -->
 		<p class="sectionHeader">
 			<i class="em em-running"></i> (km):
 			<a href="moves://app">
@@ -68,10 +46,11 @@
 				<img src="images/stravaLogo.png" class="stravaLogoHeaders">
 			</a>
 		</p>
-		<span [hidden]="!caloriesDataLoading">Working out strides ...</span>
-		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
+		<span [hidden]="!runningDataLoading">Working out cycles ...</span>
+		<canvas id="runningChart"></canvas>
+		<!-- -->
 
-
+		<!-- CYCLE GRAPH: WORKING -->
 		<p class="sectionHeader">
 			<i class="em em-bicyclist"></i> (km)
 			<a href="moves://app">
@@ -81,8 +60,10 @@
 				<img src="images/stravaLogo.png" class="stravaLogoHeaders">
 			</a>
 		</p>
-		<span [hidden]="!caloriesDataLoading">Working out cycles ...</span>
-		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
+		<span [hidden]="!cyclingDataLoading">Working out cycles ...</span>
+		<canvas id="cyclingChart"></canvas>
+		<!-- -->
+
 
 		<p class="sectionHeader">
 			<i class="em em-sleeping"></i> (hours):
@@ -140,7 +121,11 @@
 	<button (click)="connectMoves()" class="stravaAPIPOST">Connect with MOVES</button>
 	-->
 
-	<button (click)="stravaData()" class="stravaAPIPOST">Strava Data</button>
+	<button (click)="stravaStats()" class="stravaAPIPOST">Strava Stats</button>
+
+	<button (click)="stravaActivities()" class="stravaAPIPOST">Strava Activities</button>
+
+	<button (click)="stravaActivitiesLastWeek()" class="stravaAPIPOST">Strava Activities Last Week</button>
 
 	<img (click)="connectMoves()" src="images/MovesLogowithName.png" class="movesLogoConnectButton">
 
