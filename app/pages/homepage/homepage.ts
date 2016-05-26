@@ -1,4 +1,5 @@
-import {Page, NavController, IonicApp, Platform, Modal, ViewController} from 'ionic-angular';
+import {Page, NavController, Content, IonicApp, Platform, Modal, ViewController} from 'ionic-angular';
+import {ViewChild} from '@angular/core';
 import {Consts} from '../../helpers/consts';
 import {Widget} from '../../widgets/widget';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
@@ -12,7 +13,7 @@ import {Camera} from 'ionic-native';
   directives: [Widget]
 })
 export class HomePage {
-
+  @ViewChild(Content) content: Content;
   nav:any; app:any; zone:any; platform:any; chatMessages:any[]; replyOptions:any[];
   typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number; SCROLL_DELAY:number;
   dev:boolean = true; loadingMessages:boolean = true; recentMessagesTemp:any[];
@@ -22,10 +23,10 @@ export class HomePage {
 
   public widgetBoundCallback: Function;
 
-	constructor(ionicApp: IonicApp, nav: NavController, zone: NgZone, platform: Platform) {
+	constructor(nav: NavController, app: IonicApp, zone: NgZone, platform: Platform) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = nav;
-    this.app = ionicApp;
+    this.app = app;
     this.zone = zone;
     this.platform = platform;
     this.chatMessages = [];
@@ -76,10 +77,8 @@ export class HomePage {
     query.equalTo(Consts.MESSAGES_USER, Parse.User.current());
     query.descending("createdAt");
     query.limit(10);
-    alert(0)
     query.find({
       success: (parseObjects) => {
-        alert(1)
         for (let i = 0; i < parseObjects.length; i++) {
           let messageObject:any = {};
           if (parseObjects[i].get(Consts.MESSAGES_MESSAGE).widgetName) {
@@ -98,11 +97,9 @@ export class HomePage {
         this.navigateTreeTo('loggedIn', true);
       },
       error: (error) => {
-        alert(2)
         console.log('Error retrieving past messages:', error);
       }
     })
-
   }
 
   //Called when a treeObject is received
@@ -288,12 +285,9 @@ export class HomePage {
 
   //Scroll to bottom of ion-content with defined scroll time animation
   scrollToBottom() {
-    let contentHandle:any = this.app.getComponent('homepage-content');
-    if (contentHandle && contentHandle.scrollElement) {
-      contentHandle.scrollTo(0, contentHandle.scrollElement.scrollHeight, this.SCROLL_DELAY);
-    } else {
-      //console.log('Scroll elememt not found');
-    }
+    setTimeout(() => {
+      this.content.scrollToBottom();
+    }, 400);
   }
 
   navigateTreeTo(notesString, insertLine) {
@@ -326,6 +320,7 @@ export class HomePage {
 
   openUserProfile() {
     if (Parse.User.current() != null) {
+      console.log(this.nav);
       this.nav.push(ProfilePage);
     }
   }
@@ -407,14 +402,10 @@ export class HomePage {
     var srcType = Camera.PictureSourceType.CAMERA;
     var options = this.setOptions(srcType);
     var func = this.createNewFileEntry;
-    alert(1);
     navigator.camera.getPicture((imageUri) => {
-        alert(2);
         this.displayImage(imageUri);
-        alert(2.5);
         // You may choose to copy the picture, save it somewhere, or upload.
         //func(imageUri);
-        alert(3);
         console.log(imageUri);
 
     }, (error) => {
