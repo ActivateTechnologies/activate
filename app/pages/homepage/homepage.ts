@@ -58,7 +58,7 @@ export class HomePage {
   }
 
   onPageDidEnter() {
-    //this.openUserProfile();
+    this.openUserProfile();
   }
 
   //Set state of typing, controls display of typing indicator
@@ -211,7 +211,7 @@ export class HomePage {
   fetchAndProcessPointer(pointer:any) {
     //console.log('Going to fetch:', pointer);
     if (pointer == null || typeof pointer.fetch !== "function") {
-      console.log('Pointer is null, likely end of tree.');
+      //console.log('Pointer is null, likely end of tree.');
       this.chatMessages.push({
         message: "- End of tree -",
         usersMessage: false,
@@ -296,7 +296,7 @@ export class HomePage {
     query.equalTo(Consts.TREEOBJECTS_NOTES, notesString);
     query.first({
       success: (treeObject) => {
-        console.log('Got treeObject', treeObject)
+        //console.log('Got treeObject', treeObject)
         if (insertLine) {
           this.zone.run(() => {
             this.chatMessages.push({
@@ -320,7 +320,6 @@ export class HomePage {
 
   openUserProfile() {
     if (Parse.User.current() != null) {
-      console.log(this.nav);
       this.nav.push(ProfilePage);
     }
   }
