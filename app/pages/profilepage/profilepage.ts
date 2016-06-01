@@ -767,7 +767,7 @@ export class ProfilePage {
       message: "The only setting option currently is to logout. Are you sure?"
     }, this.nav, () => {
       Parse.User.logOut().then(() => {
-        alert('The user has logged out');
+        //alert('The user has logged out');
         location.reload();
       });
     });

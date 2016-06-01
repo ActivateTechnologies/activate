@@ -46,6 +46,22 @@ export class Health {
         this.measureHeart();
       }*/
     });
+
+    console.log(1);
+    if (!this.isReply) {
+      console.log(2);
+      setTimeout(() => {
+        let arrayOfElements = document.getElementsByClassName("health");
+        let html = arrayOfElements[arrayOfElements.length-1].innerHTML;
+        html.replace('<!--template bindings={}-->', ' ')
+          .replace('<!--template bindings={}-->', ' '); //two occurances
+        html = '<div class="health">' + html + '</div>';
+        console.log(3);
+        console.log(html);
+        this.callbackFunction(this.chatObject, this.isReply, html);
+
+      });
+    }
   }
 
   //Initialize various status variables incluring platformId and health api statuses
@@ -84,15 +100,15 @@ export class Health {
       navigator.health.requestAuthorization(['steps', 'distance', 'activity'],
         () => {
           localStorage['healthApiAccessGranted'] = true;
-          this.callbackFunction(this.chatObject);
+          this.callbackFunction(this.chatObject, this.isReply);
         }, (err) => {
           localStorage['healthApiAccessGranted'] = false;
           console.log('Health auth error', err);
-          this.callbackFunction(this.chatObject);
+          this.callbackFunction(this.chatObject, this.isReply);
         }
       );
     } else {
-      this.callbackFunction(this.chatObject, {});
+      this.callbackFunction(this.chatObject, this.isReply);
     }
       
   }

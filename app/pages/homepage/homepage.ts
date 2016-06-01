@@ -75,7 +75,7 @@ export class HomePage {
     let Messages = Parse.Object.extend("Messages");
     let query = new Parse.Query(Messages);
     query.equalTo(Consts.MESSAGES_USER, Parse.User.current());
-    query.descending("createdAt");
+    query.descending(Consts.MESSAGES_TIMESTAMP);
     query.limit(10);
     query.find({
       success: (parseObjects) => {
@@ -161,13 +161,14 @@ export class HomePage {
     let Message = Parse.Object.extend(Consts.MESSAGES_CLASS);
     let message = new Message();
     message.set(Consts.MESSAGES_USERSMESSAGE, usersMessage);
+    message.set(Consts.MESSAGES_TIMESTAMP, new Date());
     if (treeObject) {
       message.set(Consts.MESSAGES_TREEOBJECT, treeObject);
     }
     if (messageObject.message) {
       message.set(Consts.MESSAGES_MESSAGE, messageObject.message);
     } else if (messageObject.widget) {
-      message.set(Consts.MESSAGES_MESSAGE, messageObject.widget);
+      message.set(Consts.MESSAGES_MESSAGE, JSON.stringify(messageObject.widget));
     }
     if (Parse.User.current() == null) {
       this.recentMessagesTemp.push(message);
@@ -189,7 +190,7 @@ export class HomePage {
           message.save();
         },
         error: (error) => {
-          console.log('Error saving recent messages', error.message);
+          console.log('Error saving recent messages:', error.message);
         }
       });
     }
@@ -239,7 +240,7 @@ export class HomePage {
         usersMessage: true,
         isWidget: false
       }
-      this.saveMessageToParse(messageObject, null, true);
+      this.saveMessageToParse(messageObject, option.pointer, true);
       this.zone.run(() => {
         this.chatMessages.push(messageObject);
       });
@@ -257,30 +258,33 @@ export class HomePage {
   }
 
   //Passed as a callback function to widgets that were in replies
-  widgetCallback(option:any, data?:any) {
-    console.log('data', data);
+  widgetCallback(option:any, isReply:boolean, data?:string) {
+    //console.log('data', data);
     let messageObject:any = {
       usersMessage: true,
       isWidget: true,
       widget: option.widget
     }
-    if (data) {
-      messageObject.data = data;
-    }
-    this.saveMessageToParse(messageObject, null, true);
-    this.zone.run(() => {
-      this.chatMessages.push(messageObject);
-      this.scrollToBottom();
-      this.replyOptions = [];
-    });
-    setTimeout(() => {
-      this.setTyping(true);
+    if (isReply) {
+      this.zone.run(() => {
+        this.chatMessages.push(messageObject);
+        this.scrollToBottom();
+        this.replyOptions = [];
+      });
       setTimeout(() => {
-        this.zone.run(() => {
-          this.fetchAndProcessPointer(option.pointer);
-        });
-      }, this.TYPING_DELAY);
-    }, this.THINKING_DELAY);
+        this.setTyping(true);
+        setTimeout(() => {
+          this.zone.run(() => {
+            this.fetchAndProcessPointer(option.pointer);
+          });
+        }, this.TYPING_DELAY);
+      }, this.THINKING_DELAY);
+    } else {
+      if (data) {
+        messageObject.message = data;
+      }
+      this.saveMessageToParse(messageObject, option.pointer, true);
+    }
   }
 
   //Scroll to bottom of ion-content with defined scroll time animation
@@ -402,32 +406,27 @@ export class HomePage {
     }); //saving file  
   }
 
-  microsoftImageRecog() {
-    alert("calling Microsoft");
+  microsoftImageRecog(file) {
+    console.log("calling Microsoft");
     //alert(imageUri);
     var imageUri = "http://files.parsetfss.com/f248e72a-b4d7-4c8d-8def-7b6436d2b8fb/tfss-c62f162f-6236-4dee-96e6-32e8983ff341-image.txt"
 
     var micrsoftImageKey = "01aa933905644a99b64b1a1449b0e5c5";
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
-      alert(3);
-      alert("ready state: " + xmlhttp.readyState);
-      alert("status: " + xmlhttp.status);
+      console.log('Status: ' + xmlhttp.status);
+      console.log('Response text: ' + xmlhttp.responseText);
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        alert(4);
-        alert(xmlhttp.responseText);
-        
+        console.log('Results! :', xmlhttp.responseText);
       }
     }
 
-    xmlhttp.open("POST", "https://api.projectoxford.ai/vision/v1.0/analyze?visualFeatures=Categories", true);
-    xmlhttp.setRequestHeader("Content-type", "application/json;");
-
+    xmlhttp.open("POST", "https://api.projectoxford.ai/vision/v1.0/analyze", true);
+    xmlhttp.setRequestHeader("Content-type", "application/json");
     xmlhttp.setRequestHeader("Ocp-Apim-Subscription-Key", "01aa933905644a99b64b1a1449b0e5c5"); 
-    xmlhttp.setRequestHeader("Content-length", "125"); 
-
-    xmlhttp.send({
-      "url": "http://www.e-health101.com/wp-content/uploads/2013/01/Glass-of-Water.jpg"
+    //xmlhttp.setRequestHeader("Content-length", "125"); 
+    xmlhttp.send(JSON.stringify({
+      "url":"https://upload.wikimedia.org/wikipedia/commons/e/eb/Ash_Tree_-_geograph.org.uk_-_590710.jpg"
     });
 
   }
@@ -455,7 +454,4 @@ export class HomePage {
         console.debug("Unable to obtain picture: " + error, "app");
     }, options);
   }
-
-
-
 }

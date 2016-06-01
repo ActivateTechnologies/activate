@@ -28,6 +28,17 @@ export class UserLocation {
     if (!this.isReply && this.currentUser) {
       this.lastLocation = this.currentUser.get(Consts.USER_LASTLOCATION);
     }
+
+    if (!this.isReply) {
+      setTimeout(() => {
+        let arrayOfElements = document.getElementsByClassName("userlocation");
+        let html = arrayOfElements[arrayOfElements.length-1].innerHTML;
+        html.replace('<!--template bindings={}-->', ' ')
+          .replace('<!--template bindings={}-->', ' '); //two occurances
+        html = '<div class="userlocation">' + html + '</div>';
+        this.callbackFunction(this.chatObject, this.isReply, html);
+      });
+    }
   }
 
 	getUserLocation() {
@@ -43,7 +54,7 @@ export class UserLocation {
           (<Parse.Object> Parse.User.current()).save();
         }
         this.loading = false;
-        this.callbackFunction(this.chatObject);
+        this.callbackFunction(this.chatObject, this.isReply);
       }, (error) => {
         switch(error.code) {
           case error.PERMISSION_DENIED:
@@ -60,7 +71,7 @@ export class UserLocation {
             break;
         }
         this.loading = false;
-        this.callbackFunction(this.chatObject);
+        this.callbackFunction(this.chatObject, this.isReply);
       });
     }
 	}
