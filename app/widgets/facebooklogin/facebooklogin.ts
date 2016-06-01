@@ -34,7 +34,7 @@ export class FacebookLogin {
         html.replace('<!--template bindings={}-->', ' ')
           .replace('<!--template bindings={}-->', ' '); //two occurances
         html = '<div class="facebookLogin">' + html + '</div>';
-        this.callbackFunction(this.chatObject, this.isReply, html);
+        this.callbackFunction(this.chatObject, this.isReply, null, html, true);
       });
     }
   }
@@ -47,7 +47,7 @@ export class FacebookLogin {
       this.loading = true;
       UserFunctions.facebookLogin(() => {
         this.loading = false;
-        this.callbackFunction(this.chatObject, this.isReply);
+        this.callbackFunction(this.chatObject, this.isReply, null, null, true);
       }, (message, error) => {
         console.log('Error logging through facebook:', message);
         alert('Error' + message);

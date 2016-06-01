@@ -1,4 +1,5 @@
-import {Page, NavController, Content, IonicApp, Platform, Modal, ViewController} from 'ionic-angular';
+import {Page, NavController, Content, IonicApp, Platform, Modal, ViewController}
+ from 'ionic-angular';
 import {ViewChild} from '@angular/core';
 import {Consts} from '../../helpers/consts';
 import {Widget} from '../../widgets/widget';
@@ -76,7 +77,7 @@ export class HomePage {
     let query = new Parse.Query(Messages);
     query.equalTo(Consts.MESSAGES_USER, Parse.User.current());
     query.descending(Consts.MESSAGES_TIMESTAMP);
-    query.limit(10);
+    query.limit(100);
     query.find({
       success: (parseObjects) => {
         for (let i = 0; i < parseObjects.length; i++) {
@@ -123,7 +124,10 @@ export class HomePage {
       messageObject.isWidget = false;
       messageObject.message = this.processMessage(treeObjectMessages[randIndexMessages]);
     }
-    this.saveMessageToParse(messageObject, treeObject, false);
+    //If it is widget, the widget callback will save the message
+    if (!messageObject.isWidget) {
+      this.saveMessageToParse(messageObject, treeObject, false);
+    }
     this.zone.run(() => {
       this.chatMessages.push(messageObject);
     });
@@ -167,8 +171,8 @@ export class HomePage {
     }
     if (messageObject.message) {
       message.set(Consts.MESSAGES_MESSAGE, messageObject.message);
-    } else if (messageObject.widget) {
-      message.set(Consts.MESSAGES_MESSAGE, JSON.stringify(messageObject.widget));
+    } else {
+      console.log('No message found');
     }
     if (Parse.User.current() == null) {
       this.recentMessagesTemp.push(message);
@@ -258,12 +262,23 @@ export class HomePage {
   }
 
   //Passed as a callback function to widgets that were in replies
-  widgetCallback(option:any, isReply:boolean, data?:string) {
+  /*option: option object of selected reply
+    isReply: is this call from reply section
+    data: any data to be saved along with this message in chatMessages
+    html: static html version of widget's current state to be archived on parse
+  */
+  widgetCallback(option:any, isReply:boolean, data:any, html:string, usersMessage:boolean) {
     //console.log('data', data);
     let messageObject:any = {
-      usersMessage: true,
+      usersMessage: usersMessage,
       isWidget: true,
       widget: option.widget
+    }
+    if (data) {
+      messageObject.data = data;
+    }
+    if (html) {
+      messageObject.message = html;
     }
     if (isReply) {
       this.zone.run(() => {
@@ -279,11 +294,11 @@ export class HomePage {
           });
         }, this.TYPING_DELAY);
       }, this.THINKING_DELAY);
-    } else {
-      if (data) {
-        messageObject.message = data;
-      }
-      this.saveMessageToParse(messageObject, option.pointer, true);
+    } 
+    //Not from reply section, only being called to save widget's 
+    //current state for archiving
+    else { 
+      this.saveMessageToParse(messageObject, option.pointer, usersMessage);
     }
   }
 
@@ -367,7 +382,8 @@ export class HomePage {
   }
 
   //EXTRA PLUGIN NEEDED TO WRITE FILES: https://github.com/apache/cordova-plugin-file
-  //DOES IT NEED IMPORTING? ionic-native documentation does not stipulate so: http://ionicframework.com/docs/v2/native/file/
+  //DOES IT NEED IMPORTING? ionic-native documentation does not stipulate so:
+  //  http://ionicframework.com/docs/v2/native/file/
   createNewFileEntry(imgUri) {
     window.resolveLocalFileSystemURL(cordova.file.cacheDirectory, function success(dirEntry) {
 
@@ -433,11 +449,13 @@ export class HomePage {
 
   //MAIN CAMERA FUNCTION THAT'S CALLED
   //ADDED this.setOptions & this.createNewFileEntry
-  //Couple of issues highlighted here like timeout: https://github.com/EddyVerbruggen/cordova-plugin-actionsheet/issues/11
+  //Couple of issues highlighted here like timeout: 
+  //  https://github.com/EddyVerbruggen/cordova-plugin-actionsheet/issues/11
   //Could be a permissions error?
   //?? https://github.com/marcshilling/react-native-image-picker/issues/80
   //https://forums.developer.apple.com/thread/8629
-  //http://codesanswer.com/question/17962-ios-8-snapshotting-a-view-that-has-not-been-rendered-results-in-an-empty-snapshot
+  //"http://codesanswer.com/question/17962-ios-8-snapshotting-a-
+  //  view-that-has-not-been-rendered-results-in-an-empty-snapshot"
   //https://issues.apache.org/jira/browse/CB-8234
   openCamera(selection) {
     console.log('openCamera')

@@ -36,7 +36,7 @@ export class UserLocation {
         html.replace('<!--template bindings={}-->', ' ')
           .replace('<!--template bindings={}-->', ' '); //two occurances
         html = '<div class="userlocation">' + html + '</div>';
-        this.callbackFunction(this.chatObject, this.isReply, html);
+        this.callbackFunction(this.chatObject, this.isReply, null, html, true);
       });
     }
   }
@@ -54,7 +54,7 @@ export class UserLocation {
           (<Parse.Object> Parse.User.current()).save();
         }
         this.loading = false;
-        this.callbackFunction(this.chatObject, this.isReply);
+        this.callbackFunction(this.chatObject, this.isReply, null, null, true);
       }, (error) => {
         switch(error.code) {
           case error.PERMISSION_DENIED:
@@ -71,7 +71,7 @@ export class UserLocation {
             break;
         }
         this.loading = false;
-        this.callbackFunction(this.chatObject, this.isReply);
+        this.callbackFunction(this.chatObject, this.isReply, null, null, true);
       });
     }
 	}
