@@ -351,12 +351,12 @@ export class HomePage {
     var options = {
         // Some common settings are 20, 50, and 100
         quality: 50,
-        destinationType: Camera.DestinationType.FILE_URI,
+        destinationType: Camera.DestinationType.DATA_URL,
         // In this app, dynamically set the picture source, Camera or photo gallery
         sourceType: srcType,
-        encodingType: Camera.EncodingType.PNG,
+        encodingType: Camera.EncodingType.JPEG,
         mediaType: Camera.MediaType.PICTURE,
-        allowEdit: true,
+        allowEdit: false,
         correctOrientation: true  //Corrects Android orientation quirks
     }
     return options;
@@ -381,12 +381,55 @@ export class HomePage {
   }
 
   //Honestly don't understand what this does.... But is in documentation.
-  displayImage(imgUri) {
-    alert('A');
+  displayImage(imageUri) {
     var elem = document.getElementById('imageFile');
-    alert('B');
-    elem.src = imgUri;
-    alert('C');
+    elem.src = "data:image/jpeg;base64," + imageUri;
+
+    var file = new Parse.File("image.txt", { base64: imageUri }); //creating file
+    file.save({
+      success: (object) => {
+        console.log('File saved successfully');
+        var nutrition = new Parse.Object("Nutrition");
+        nutrition.set("user", Parse.User.current());
+        nutrition.set("image", file);
+        nutrition.save();
+
+        this.microsoftImageRecog(file);
+      },
+      error: (object, error) => {
+        console.log('Error saving file: ', error.message);
+      }
+    }); //saving file  
+  }
+
+  microsoftImageRecog() {
+    alert("calling Microsoft");
+    //alert(imageUri);
+    var imageUri = "http://files.parsetfss.com/f248e72a-b4d7-4c8d-8def-7b6436d2b8fb/tfss-c62f162f-6236-4dee-96e6-32e8983ff341-image.txt"
+
+    var micrsoftImageKey = "01aa933905644a99b64b1a1449b0e5c5";
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function () {
+      alert(3);
+      alert("ready state: " + xmlhttp.readyState);
+      alert("status: " + xmlhttp.status);
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        alert(4);
+        alert(xmlhttp.responseText);
+        
+      }
+    }
+
+    xmlhttp.open("POST", "https://api.projectoxford.ai/vision/v1.0/analyze?visualFeatures=Categories", true);
+    xmlhttp.setRequestHeader("Content-type", "application/json;");
+
+    xmlhttp.setRequestHeader("Ocp-Apim-Subscription-Key", "01aa933905644a99b64b1a1449b0e5c5"); 
+    xmlhttp.setRequestHeader("Content-length", "125"); 
+
+    xmlhttp.send({
+      "url": "http://www.e-health101.com/wp-content/uploads/2013/01/Glass-of-Water.jpg"
+    });
+
   }
 
   //MAIN CAMERA FUNCTION THAT'S CALLED
@@ -404,6 +447,7 @@ export class HomePage {
     var func = this.createNewFileEntry;
     navigator.camera.getPicture((imageUri) => {
         this.displayImage(imageUri);
+        this.microsoftImageRecog(imageUri);
         // You may choose to copy the picture, save it somewhere, or upload.
         //func(imageUri);
         console.log(imageUri);
