@@ -58,7 +58,7 @@ export class HomePage {
   }
 
   onPageDidEnter() {
-    this.openUserProfile();
+    //this.openUserProfile();
   }
 
   //Set state of typing, controls display of typing indicator
@@ -398,6 +398,7 @@ export class HomePage {
   //http://codesanswer.com/question/17962-ios-8-snapshotting-a-view-that-has-not-been-rendered-results-in-an-empty-snapshot
   //https://issues.apache.org/jira/browse/CB-8234
   openCamera(selection) {
+    console.log('openCamera')
     var srcType = Camera.PictureSourceType.CAMERA;
     var options = this.setOptions(srcType);
     var func = this.createNewFileEntry;
@@ -406,13 +407,9 @@ export class HomePage {
         // You may choose to copy the picture, save it somewhere, or upload.
         //func(imageUri);
         console.log(imageUri);
-
     }, (error) => {
         console.debug("Unable to obtain picture: " + error, "app");
-
     }, options);
-
-
   }
 
 
