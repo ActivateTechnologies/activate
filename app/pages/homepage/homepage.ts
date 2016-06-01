@@ -395,7 +395,7 @@ export class HomePage {
         nutrition.set("image", file);
         nutrition.save();
 
-        this.microsoftImageRecog(file);
+        //this.microsoftImageRecog(file);
       },
       error: (object, error) => {
         console.log('Error saving file: ', error.message);
@@ -406,31 +406,69 @@ export class HomePage {
   microsoftImageRecog() {
     alert("calling Microsoft");
     //alert(imageUri);
-    var imageUri = "http://files.parsetfss.com/f248e72a-b4d7-4c8d-8def-7b6436d2b8fb/tfss-c62f162f-6236-4dee-96e6-32e8983ff341-image.txt"
+    var imageUri = "https://upload.wikimedia.org/wikipedia/commons/0/07/Honeycrisp-Apple.jpg";
 
     var micrsoftImageKey = "01aa933905644a99b64b1a1449b0e5c5";
     var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
-      alert(3);
-      alert("ready state: " + xmlhttp.readyState);
-      alert("status: " + xmlhttp.status);
+    xmlhttp.onreadystatechange = () => {
       if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        alert(4);
-        alert(xmlhttp.responseText);
-        
+        var microsoftResponse = xmlhttp.responseText;
+        alert(microsoftResponse);
+        //this.nutritionixAPI(xmlhttp.responseText);
+        this.nutritionixAPI(microsoftResponse);
       }
     }
 
-    xmlhttp.open("POST", "https://api.projectoxford.ai/vision/v1.0/analyze?visualFeatures=Categories", true);
-    xmlhttp.setRequestHeader("Content-type", "application/json;");
+    xmlhttp.open("POST", "https://api.projectoxford.ai/vision/v1.0/analyze?visualFeatures=Tags,Description", true);
+    xmlhttp.setRequestHeader("Content-type", "application/json");
 
     xmlhttp.setRequestHeader("Ocp-Apim-Subscription-Key", "01aa933905644a99b64b1a1449b0e5c5"); 
     xmlhttp.setRequestHeader("Content-length", "125"); 
 
-    xmlhttp.send({
-      "url": "http://www.e-health101.com/wp-content/uploads/2013/01/Glass-of-Water.jpg"
-    });
+    xmlhttp.send(JSON.stringify({
+      "url": imageUri
+    }));
 
+  }
+
+  //NUTRITIONIX API KEYS
+  //APPLICATION ID: 6d4f0049
+  //APPLICATION KEY: fb6a273d8b2cd2a7f961668f4c8ce5ce
+  nutritionixAPI(microsoftResponse) {
+    alert("Yes nutritionix!");
+    console.log(microsoftResponse);
+    var microsoftDescription = JSON.parse(microsoftResponse).description.captions[0].text;
+    alert("Microsoft Description: "+microsoftDescription);
+
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.onreadystatechange = () => {
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        var nutritionixResponse = xmlhttp.responseText;
+        alert(nutritionixResponse);
+        this.nutritionixInfo(nutritionixResponse);
+
+      }
+    }
+
+    xmlhttp.open("GET", "https://api.nutritionix.com/v1_1/search/a%20red%20apple?results=0%3A20&cal_min=0&cal_max=50000&fields=item_name%2Cbrand_name%2Citem_id%2Cbrand_id&appId=6d4f0049&appKey=fb6a273d8b2cd2a7f961668f4c8ce5ce", true);
+    xmlhttp.send();
+  }
+
+  nutritionixInfo(nutritionixResponse) {
+    var info = JSON.parse(nutritionixResponse).hits[2]._id;
+    alert(info);
+
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.onreadystatechange = () => {
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        alert("Nutrional Info: "+xmlhttp.responseText);
+      }
+    }
+
+    xmlhttp.open("GET", "https://api.nutritionix.com/v1_1/item?id=51c3d49697c3e6d8d3b52ed9&appId=6d4f0049&appKey=fb6a273d8b2cd2a7f961668f4c8ce5ce", true);
+    xmlhttp.send();
   }
 
   //MAIN CAMERA FUNCTION THAT'S CALLED
@@ -447,10 +485,10 @@ export class HomePage {
     var func = this.createNewFileEntry;
     navigator.camera.getPicture((imageUri) => {
         this.displayImage(imageUri);
-        this.microsoftImageRecog(imageUri);
+        this.microsoftImageRecog();
         // You may choose to copy the picture, save it somewhere, or upload.
         //func(imageUri);
-        console.log(imageUri);
+        //console.log(imageUri);
 
     }, (error) => {
         console.debug("Unable to obtain picture: " + error, "app");
@@ -463,3 +501,6 @@ export class HomePage {
 
 
 }
+
+
+
