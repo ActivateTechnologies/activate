@@ -1,4 +1,5 @@
-import {Page, NavController, Content, IonicApp, Platform, Modal, ViewController} from 'ionic-angular';
+import {Page, NavController, Content, IonicApp, Platform, Modal, ViewController}
+ from 'ionic-angular';
 import {ViewChild} from '@angular/core';
 import {Consts} from '../../helpers/consts';
 import {Widget} from '../../widgets/widget';
@@ -75,8 +76,8 @@ export class HomePage {
     let Messages = Parse.Object.extend("Messages");
     let query = new Parse.Query(Messages);
     query.equalTo(Consts.MESSAGES_USER, Parse.User.current());
-    query.descending("createdAt");
-    query.limit(10);
+    query.descending(Consts.MESSAGES_TIMESTAMP);
+    query.limit(100);
     query.find({
       success: (parseObjects) => {
         for (let i = 0; i < parseObjects.length; i++) {
@@ -123,7 +124,10 @@ export class HomePage {
       messageObject.isWidget = false;
       messageObject.message = this.processMessage(treeObjectMessages[randIndexMessages]);
     }
-    this.saveMessageToParse(messageObject, treeObject, false);
+    //If it is widget, the widget callback will save the message
+    if (!messageObject.isWidget) {
+      this.saveMessageToParse(messageObject, treeObject, false);
+    }
     this.zone.run(() => {
       this.chatMessages.push(messageObject);
     });
@@ -161,13 +165,14 @@ export class HomePage {
     let Message = Parse.Object.extend(Consts.MESSAGES_CLASS);
     let message = new Message();
     message.set(Consts.MESSAGES_USERSMESSAGE, usersMessage);
+    message.set(Consts.MESSAGES_TIMESTAMP, new Date());
     if (treeObject) {
       message.set(Consts.MESSAGES_TREEOBJECT, treeObject);
     }
     if (messageObject.message) {
       message.set(Consts.MESSAGES_MESSAGE, messageObject.message);
-    } else if (messageObject.widget) {
-      message.set(Consts.MESSAGES_MESSAGE, messageObject.widget);
+    } else {
+      console.log('No message found');
     }
     if (Parse.User.current() == null) {
       this.recentMessagesTemp.push(message);
@@ -189,7 +194,7 @@ export class HomePage {
           message.save();
         },
         error: (error) => {
-          console.log('Error saving recent messages', error.message);
+          console.log('Error saving recent messages:', error.message);
         }
       });
     }
@@ -211,7 +216,7 @@ export class HomePage {
   fetchAndProcessPointer(pointer:any) {
     //console.log('Going to fetch:', pointer);
     if (pointer == null || typeof pointer.fetch !== "function") {
-      console.log('Pointer is null, likely end of tree.');
+      //console.log('Pointer is null, likely end of tree.');
       this.chatMessages.push({
         message: "- End of tree -",
         usersMessage: false,
@@ -239,7 +244,7 @@ export class HomePage {
         usersMessage: true,
         isWidget: false
       }
-      this.saveMessageToParse(messageObject, null, true);
+      this.saveMessageToParse(messageObject, option.pointer, true);
       this.zone.run(() => {
         this.chatMessages.push(messageObject);
       });
@@ -257,30 +262,44 @@ export class HomePage {
   }
 
   //Passed as a callback function to widgets that were in replies
-  widgetCallback(option:any, data?:any) {
-    console.log('data', data);
+  /*option: option object of selected reply
+    isReply: is this call from reply section
+    data: any data to be saved along with this message in chatMessages
+    html: static html version of widget's current state to be archived on parse
+  */
+  widgetCallback(option:any, isReply:boolean, data:any, html:string, usersMessage:boolean) {
+    //console.log('data', data);
     let messageObject:any = {
-      usersMessage: true,
+      usersMessage: usersMessage,
       isWidget: true,
       widget: option.widget
     }
     if (data) {
       messageObject.data = data;
     }
-    this.saveMessageToParse(messageObject, null, true);
-    this.zone.run(() => {
-      this.chatMessages.push(messageObject);
-      this.scrollToBottom();
-      this.replyOptions = [];
-    });
-    setTimeout(() => {
-      this.setTyping(true);
+    if (html) {
+      messageObject.message = html;
+    }
+    if (isReply) {
+      this.zone.run(() => {
+        this.chatMessages.push(messageObject);
+        this.scrollToBottom();
+        this.replyOptions = [];
+      });
       setTimeout(() => {
-        this.zone.run(() => {
-          this.fetchAndProcessPointer(option.pointer);
-        });
-      }, this.TYPING_DELAY);
-    }, this.THINKING_DELAY);
+        this.setTyping(true);
+        setTimeout(() => {
+          this.zone.run(() => {
+            this.fetchAndProcessPointer(option.pointer);
+          });
+        }, this.TYPING_DELAY);
+      }, this.THINKING_DELAY);
+    } 
+    //Not from reply section, only being called to save widget's 
+    //current state for archiving
+    else { 
+      this.saveMessageToParse(messageObject, option.pointer, usersMessage);
+    }
   }
 
   //Scroll to bottom of ion-content with defined scroll time animation
@@ -296,7 +315,7 @@ export class HomePage {
     query.equalTo(Consts.TREEOBJECTS_NOTES, notesString);
     query.first({
       success: (treeObject) => {
-        console.log('Got treeObject', treeObject)
+        //console.log('Got treeObject', treeObject)
         if (insertLine) {
           this.zone.run(() => {
             this.chatMessages.push({
@@ -320,7 +339,6 @@ export class HomePage {
 
   openUserProfile() {
     if (Parse.User.current() != null) {
-      console.log(this.nav);
       this.nav.push(ProfilePage);
     }
   }
@@ -364,7 +382,8 @@ export class HomePage {
   }
 
   //EXTRA PLUGIN NEEDED TO WRITE FILES: https://github.com/apache/cordova-plugin-file
-  //DOES IT NEED IMPORTING? ionic-native documentation does not stipulate so: http://ionicframework.com/docs/v2/native/file/
+  //DOES IT NEED IMPORTING? ionic-native documentation does not stipulate so:
+  //  http://ionicframework.com/docs/v2/native/file/
   createNewFileEntry(imgUri) {
     window.resolveLocalFileSystemURL(cordova.file.cacheDirectory, function success(dirEntry) {
 
@@ -403,10 +422,10 @@ export class HomePage {
     }); //saving file  
   }
 
-  microsoftImageRecog() {
-    alert("calling Microsoft");
+  microsoftImageRecog(file) {
+    console.log("calling Microsoft");
     //alert(imageUri);
-    var imageUri = "https://upload.wikimedia.org/wikipedia/commons/0/07/Honeycrisp-Apple.jpg";
+    var imageUri = "http://www.bbcgoodfood.com/sites/default/files/glossary/banana-crop.jpg";
 
     var micrsoftImageKey = "01aa933905644a99b64b1a1449b0e5c5";
     var xmlhttp = new XMLHttpRequest();
@@ -439,6 +458,8 @@ export class HomePage {
     console.log(microsoftResponse);
     var microsoftDescription = JSON.parse(microsoftResponse).description.captions[0].text;
     alert("Microsoft Description: "+microsoftDescription);
+    var microsoftDescriptionSpaces = encodeURIComponent(microsoftDescription.trim());
+    alert(microsoftDescriptionSpaces);
 
     var xmlhttp = new XMLHttpRequest();
 
@@ -451,7 +472,7 @@ export class HomePage {
       }
     }
 
-    xmlhttp.open("GET", "https://api.nutritionix.com/v1_1/search/a%20red%20apple?results=0%3A20&cal_min=0&cal_max=50000&fields=item_name%2Cbrand_name%2Citem_id%2Cbrand_id&appId=6d4f0049&appKey=fb6a273d8b2cd2a7f961668f4c8ce5ce", true);
+    xmlhttp.open("GET", "https://api.nutritionix.com/v1_1/search/"+microsoftDescriptionSpaces+"?results=0%3A20&cal_min=0&cal_max=50000&fields=item_name%2Cbrand_name%2Citem_id%2Cbrand_id&appId=6d4f0049&appKey=fb6a273d8b2cd2a7f961668f4c8ce5ce", true);
     xmlhttp.send();
   }
 
@@ -467,40 +488,39 @@ export class HomePage {
       }
     }
 
-    xmlhttp.open("GET", "https://api.nutritionix.com/v1_1/item?id=51c3d49697c3e6d8d3b52ed9&appId=6d4f0049&appKey=fb6a273d8b2cd2a7f961668f4c8ce5ce", true);
+    xmlhttp.open("GET", "https://api.nutritionix.com/v1_1/item?id="+info+"&appId=6d4f0049&appKey=fb6a273d8b2cd2a7f961668f4c8ce5ce", true);
     xmlhttp.send();
   }
 
   //MAIN CAMERA FUNCTION THAT'S CALLED
   //ADDED this.setOptions & this.createNewFileEntry
-  //Couple of issues highlighted here like timeout: https://github.com/EddyVerbruggen/cordova-plugin-actionsheet/issues/11
+  //Couple of issues highlighted here like timeout: 
+  //  https://github.com/EddyVerbruggen/cordova-plugin-actionsheet/issues/11
   //Could be a permissions error?
   //?? https://github.com/marcshilling/react-native-image-picker/issues/80
   //https://forums.developer.apple.com/thread/8629
-  //http://codesanswer.com/question/17962-ios-8-snapshotting-a-view-that-has-not-been-rendered-results-in-an-empty-snapshot
+  //"http://codesanswer.com/question/17962-ios-8-snapshotting-a-
+  //  view-that-has-not-been-rendered-results-in-an-empty-snapshot"
   //https://issues.apache.org/jira/browse/CB-8234
   openCamera(selection) {
+    console.log('openCamera')
     var srcType = Camera.PictureSourceType.CAMERA;
     var options = this.setOptions(srcType);
     var func = this.createNewFileEntry;
     navigator.camera.getPicture((imageUri) => {
         this.displayImage(imageUri);
-        this.microsoftImageRecog();
+        //this.microsoftImageRecog();
         // You may choose to copy the picture, save it somewhere, or upload.
         //func(imageUri);
         //console.log(imageUri);
 
+        console.log(imageUri);
     }, (error) => {
         console.debug("Unable to obtain picture: " + error, "app");
-
     }, options);
-
-
   }
 
 
 
+
 }
-
-
-

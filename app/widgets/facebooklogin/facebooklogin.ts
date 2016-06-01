@@ -27,6 +27,16 @@ export class FacebookLogin {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.currentUser = Parse.User.current();
     console.log('facebooklogin widget ngOnInit');
+    if (!this.isReply) {
+      setTimeout(() => {
+        let arrayOfElements = document.getElementsByClassName("facebookLogin");
+        let html = arrayOfElements[arrayOfElements.length-1].innerHTML;
+        html.replace('<!--template bindings={}-->', ' ')
+          .replace('<!--template bindings={}-->', ' '); //two occurances
+        html = '<div class="facebookLogin">' + html + '</div>';
+        this.callbackFunction(this.chatObject, this.isReply, null, html, true);
+      });
+    }
   }
 
 	login() {
@@ -37,7 +47,7 @@ export class FacebookLogin {
       this.loading = true;
       UserFunctions.facebookLogin(() => {
         this.loading = false;
-        this.callbackFunction(this.chatObject);
+        this.callbackFunction(this.chatObject, this.isReply, null, null, true);
       }, (message, error) => {
         console.log('Error logging through facebook:', message);
         alert('Error' + message);

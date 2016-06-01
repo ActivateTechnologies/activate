@@ -15,8 +15,11 @@ export class Consts {
   public static MESSAGES_MESSAGE = "message";
   //Boolean - is this message sent by the uesr
   public static MESSAGES_USERSMESSAGE = "usersMessage";
-  //Pointer <TreeObjects> - to the treeObject this message points to
+  //Pointer <TreeObjects> - to the treeObject this message points to 
+  //or the next tree object this option points to
   public static MESSAGES_TREEOBJECT = "treeObject";
+  //Date - Timestamp of when the message was actually created
+  public static MESSAGES_TIMESTAMP = "timestamp";
 
   //TreeObjects Class
   public static TREEOBJECTS_CLASS = "TreeObjects";

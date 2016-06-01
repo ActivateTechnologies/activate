@@ -46,6 +46,23 @@ export class Health {
         this.measureHeart();
       }*/
     });
+
+    if (!this.isReply) {
+      setTimeout(() => {
+        let arrayOfElements = document.getElementsByClassName("health");
+        let html = arrayOfElements[arrayOfElements.length-1].innerHTML;
+        html.replace('<!--template bindings={}-->', ' ')
+          .replace('<!--template bindings={}-->', ' '); //two occurances
+        html = '<div class="health">' + html + '</div>';
+        console.log('Health html: ', html);
+        if (this.widgetType == 'showData') {
+          this.callbackFunction(this.chatObject, this.isReply, null, html, false);
+        } else {
+          this.callbackFunction(this.chatObject, this.isReply, null, html, true);
+        }
+        
+      });
+    }
   }
 
   //Initialize various status variables incluring platformId and health api statuses
@@ -84,17 +101,16 @@ export class Health {
       navigator.health.requestAuthorization(['steps', 'distance', 'activity'],
         () => {
           localStorage['healthApiAccessGranted'] = true;
-          this.callbackFunction(this.chatObject);
+          this.callbackFunction(this.chatObject, this.isReply, null, null, true);
         }, (err) => {
           localStorage['healthApiAccessGranted'] = false;
           console.log('Health auth error', err);
-          this.callbackFunction(this.chatObject);
+          this.callbackFunction(this.chatObject, this.isReply, null, null, true);
         }
       );
     } else {
-      this.callbackFunction(this.chatObject, {});
+      this.callbackFunction(this.chatObject, this.isReply, null, null, true);
     }
-      
   }
 
   //Constructs the appropriate message to display after user has been asked to grant access
@@ -140,7 +156,7 @@ export class Health {
         this.processData(steps, distance, activity);
       }, (error) => {
         console.log('Error:', error);
-        this.callbackFunction(this.chatObject, {error: "Error accessing steps"});
+        this.callbackFunction(this.chatObject, this.isReply, {error: "Error accessing steps"}, null, false);
       });
       navigator.health.queryAggregated({
         startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // one day ago
@@ -152,7 +168,7 @@ export class Health {
         this.processData(steps, distance, activity);
       }, (error) => {
         console.log('Error:', error);
-        this.callbackFunction(this.chatObject, {error: "Error accessing distance"});
+        this.callbackFunction(this.chatObject, this.isReply, {error: "Error accessing distance"}, null, false);
       });
       navigator.health.queryAggregated({
         startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
@@ -164,7 +180,7 @@ export class Health {
         this.processData(steps, distance, activity);
       }, (error) => {
         console.log('Error:', error);
-        this.callbackFunction(this.chatObject, {error: "Error accessing activity"});
+        this.callbackFunction(this.chatObject, this.isReply, {error: "Error accessing activity"}, null, false);
       });
       /*navigator.health.query({
         startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
@@ -188,7 +204,6 @@ export class Health {
     if (steps != null && distance != null && activity != null) {
       let summaryString:string = 'You walked ' + Math.round(steps.value)
        + ' steps yesterday ' + 'which covered ' + Math.round(distance.value) + distance.unit;
-      console.log(summaryString);
       this.loading = false;
       this.summaryString = summaryString;
       /*this.callbackFunction(this.chatObject, {
@@ -212,18 +227,18 @@ export class Health {
           console.log("Your heart beat per minute is: " + bpm);
           this.saveHeartRate(bpm, () => {
             this.loading = false;
-            this.callbackFunction(this.chatObject, {
+            this.callbackFunction(this.chatObject, this.isReply, {
               summaryString: "Your heart beat per minute is: " + bpm,
               bmpCount: bpm
-            });
+            }, null, true);
           })
         }, (error) => {
           this.summaryString = "Error measuring heart rate";
           this.loading = false;
           console.log("Error measuring heart beat", error);
-          this.callbackFunction(this.chatObject, {
+          this.callbackFunction(this.chatObject, this.isReply, {
             summaryString: "Error measuring heart rate"
-          });
+          }, null, true);
         }
       );
     } else {
@@ -232,10 +247,10 @@ export class Health {
         this.loading = false;
         let bpm:number = 60;
         this.saveHeartRate(bpm, () => {
-          this.callbackFunction(this.chatObject, {
+          this.callbackFunction(this.chatObject, this.isReply, {
             summaryString: "Your heart beat per minute is: " + bpm,
             bmpCount: bpm
-          });
+          }, null, true);
         });
       }, 2000);
 

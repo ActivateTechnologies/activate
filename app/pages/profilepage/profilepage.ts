@@ -54,7 +54,7 @@ export class ProfilePage {
     //this.initWeekData();
     if (localStorage['healthApiAccessGranted']) {
       this.initWalkingData(() => {
-        this.intStravaData();
+        this.initStravaData();
       });
       this.initKjData();
       this.initSleepData();
@@ -64,7 +64,7 @@ export class ProfilePage {
           () => {
             localStorage['healthApiAccessGranted'] = true;
             this.initWalkingData(() => {
-              this.intStravaData();
+              this.initStravaData();
             });
             this.initKjData();
             this.initSleepData();
@@ -73,19 +73,19 @@ export class ProfilePage {
             console.log('Health auth error', err);
             this.walkingDataLoading = false;
             this.kJDataLoading = false;
-            this.intStravaData();
+            this.initStravaData();
           }
         )
       }, () => {
         console.log('Health not available');
         this.walkingDataLoading = false;
         this.kJDataLoading = false;
-        this.intStravaData();
+        this.initStravaData();
       });
     }
 
     if(!this.platform.is('ios') && !this.platform.is('android')) {
-      this.intStravaData();
+      this.initStravaData();
     }
     
     this.initHeartData();
@@ -209,10 +209,10 @@ export class ProfilePage {
       scaleShowGridLines: false
     }
     this.walkingChartHandle = new Chart(ctx, {
-        type: 'bar',
-        data: walkingData, 
-        options: options
-      }); 
+      type: 'bar',
+      data: walkingData, 
+      options: options
+    }); 
   }
 
   initRunningChart() {
@@ -228,21 +228,22 @@ export class ProfilePage {
     for (let i = 0; i < this.runningData.distance.length; i++) {
       dataInKm.push(Math.round(this.runningData.distance[i]/1000));
     }
-    console.log(dataInKm, labels);
     let runningDataObject:any = {
       labels: labels,
       datasets: [{
         label: "km",
-        fillColor: "rgb(96, 208, 227)",
-        strokeColor: "rgb(96, 208, 227)",
+        backgroundColor: "rgb(96, 208, 227)",
+        borderColor: "rgb(96, 208, 227)",
         highlightFill: "rgba(96, 208, 227,0.75)",
         highlightStroke: "rgba(96, 208, 227,1)",
         data: dataInKm
       }]
     };
     let options:any = {
-      gridLines: {
-          display: false
+      scales: {
+        gridLines: {
+          lineWidth: 5
+        }
       }
     }
     this.zone.run(() => {
@@ -250,8 +251,16 @@ export class ProfilePage {
       let ctx:any = (<HTMLCanvasElement> document.getElementById("runningChart")).getContext("2d");
       this.cyclingChartHandle = new Chart(ctx, {
         type: 'bar',
-        data: runningDataObject, 
-        options: options
+        data: runningDataObject,
+        options: {
+          scales: {
+            gridLines: {
+              lineWidth: 5,
+              display: false,
+              drawTicks: false
+            }
+          }
+        }
       });
     })
   }
@@ -269,7 +278,6 @@ export class ProfilePage {
     for (let i = 0; i < this.cyclingData.distance.length; i++) {
       dataInKm.push(Math.round(this.cyclingData.distance[i]/1000));
     }
-    console.log(dataInKm, labels);
     let cyclingDataObject:any = {
       labels: labels,
       datasets: [{
@@ -474,7 +482,7 @@ export class ProfilePage {
         data: kJData, 
         options: options
       }); 
-    }
+  }
 
   initHeartData() {
     this.heartData = [[], []];
@@ -607,7 +615,7 @@ export class ProfilePage {
         this.stravaAPIPOST(accessCode);
         this.stravaStats();
         this.stravaActivities();
-        this.intStravaData();
+        this.initStravaData();
       }
     });
     browserRef.addEventListener("exit", function(event) {
@@ -678,20 +686,20 @@ export class ProfilePage {
   }
 
   //Running and cycling data for last week retrieved from Strava
-  intStravaData() {
+  initStravaData() {
     CloudFunctions.stravaActivitiesLastWeek((data, error) => {
       if (error == null) {
-        //alert('stravaActivitiesLastWeek done!');
-        //alert(JSON.stringify(data));
-        console.log(JSON.stringify(data));
+        console.log('stravaActivitiesLastWeek done!');
         this.cyclingData = data.data.cycling;
         this.initCyclingChart();
         this.runningData = data.data.running;
         this.initRunningChart();
-        for (let i = 0; i < this.runningData.distance.length; i++) {
-          this.walkingData[i] -= this.runningData.distance[i]/1000;
+        if (this.walkingData) {
+          for (let i = 0; i < this.runningData.distance.length; i++) {
+            this.walkingData[i] -= this.runningData.distance[i]/1000;
+          }
+          this.initWalkingChart();
         }
-        this.initWalkingChart();
       } else {
         alert('stravaActivitiesLastWeek error');
         console.log(error)
@@ -759,7 +767,7 @@ export class ProfilePage {
       message: "The only setting option currently is to logout. Are you sure?"
     }, this.nav, () => {
       Parse.User.logOut().then(() => {
-        alert('The user has logged out');
+        //alert('The user has logged out');
         location.reload();
       });
     });
