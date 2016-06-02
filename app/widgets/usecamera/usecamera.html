@@ -1,0 +1,23 @@
+<div class="useCamera">
+	<!-- When isReply -->
+	<!--
+	<div *ngIf="isReply" (click)="login()">
+		<img class="button" src="images/widget-facebookLogin-facebook.png" />
+		<span [hidden]="!loading" class="loading">&nbsp;...</span>
+	</div>
+	-->
+	<div *ngIf="isReply" (click)="openCamera()" class="replyOptionWidget">
+		Take a picture
+		<span [hidden]="!loading" class="loading">&nbsp;...</span>
+	</div>
+	<!-- When !isReply -->
+	<div *ngIf="!isReply">
+		<table class="table"><tr>
+			<td class="imageTd">
+				<img src="{{imgsrc}}" class="profileImage">
+				{{msDescription}}<br>
+				{{caloriesString}}
+			</td>
+		</tr></table>
+	</div>
+</div>

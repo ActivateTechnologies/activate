@@ -4,11 +4,12 @@ import {Consts} from '../helpers/consts';
 import {FacebookLogin} from './facebooklogin/facebooklogin';
 import {UserLocation} from './userlocation/userlocation';
 import {Health} from './health/health';
+import {UseCamera} from './usecamera/usecamera';
 
 @Component({
 	selector: 'Widget',
   templateUrl: 'build/widgets/widget.html',
-  directives: [FacebookLogin, UserLocation, Health]
+  directives: [FacebookLogin, UserLocation, Health, UseCamera]
 })
 export class Widget {
 	@Input() chatObject:any;

@@ -83,6 +83,18 @@ export class Consts {
   //Number - 1:Before workout
   public static HEARTDATA_REFERENCE = "reference";
 
+  //Nutrition Class
+  public static NUTRITION_CLASS = "Nutrition";
+  //Pointer <_User>
+  public static NUTRITION_USER = "User";
+  //String - Microsoft API Response
+  public static NUTRITION_MICROSOFT_RESPONSE = "microsoftResponse";
+  //String - Nutritionix API Response
+  public static NUTRITION_NUTRITIONIX_INFO = "nutritionixInformation";
+  //File - Image uploaded by user
+  public static NUTRITION_IMAGE = "image";
+
+
   constructor() {
   }
 }

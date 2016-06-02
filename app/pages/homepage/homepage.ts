@@ -77,7 +77,7 @@ export class HomePage {
     let query = new Parse.Query(Messages);
     query.equalTo(Consts.MESSAGES_USER, Parse.User.current());
     query.descending(Consts.MESSAGES_TIMESTAMP);
-    query.limit(100);
+    query.limit(10);
     query.find({
       success: (parseObjects) => {
         for (let i = 0; i < parseObjects.length; i++) {
@@ -208,7 +208,6 @@ export class HomePage {
     editedString = editedString.replace("#~nativeHealthApi~#", 
       (this.platform.is('android')) ? "Google Fit" : 
         (this.platform.is('ios')) ? "HealthKit" : "Health Api");
-
     return editedString;
   }
 
@@ -261,12 +260,11 @@ export class HomePage {
     }
   }
 
-  //Passed as a callback function to widgets that were in replies
-  /*option: option object of selected reply
+  /*Passed as a callback function to widgets that were in replies
+    option: option object of selected reply
     isReply: is this call from reply section
     data: any data to be saved along with this message in chatMessages
-    html: static html version of widget's current state to be archived on parse
-  */
+    html: static html version of widget's current state to be archived on parse*/
   widgetCallback(option:any, isReply:boolean, data:any, html:string, usersMessage:boolean) {
     //console.log('data', data);
     let messageObject:any = {
@@ -306,7 +304,7 @@ export class HomePage {
   scrollToBottom() {
     setTimeout(() => {
       this.content.scrollToBottom();
-    }, 400);
+    }, 200);
   }
 
   navigateTreeTo(notesString, insertLine) {
@@ -342,194 +340,5 @@ export class HomePage {
       this.nav.push(ProfilePage);
     }
   }
-
-  //DOCUMENTATION FOR CAMERA: https://github.com/apache/cordova-plugin-camera
-
-  /* THIS CODE OPENS CAMERA, TAKES A PICTURE, BUT THEN DOES LITTLE ELSE.
-  //USE console.log instead of alerts (apparently causes 'issues' on iOS)
-  openCamera() {
-    console.log(1);
-    navigator.camera.getPicture(onSuccess, onFail, { quality: 50,
-      destinationType: Camera.DestinationType.FILE_URI });
-    console.log(2);
-    function onSuccess(imageURI) {
-        console.log(3);
-        var image = document.getElementById('myImage');
-        image.src = imageURI;
-        console.log(imageURI);
-    }
-
-    function onFail(message) {
-        console.log('Failed because: ' + message);
-    }
-  }
-  */
-
-  /*microsoftImageRecog(file) {
-    console.log("calling Microsoft");
-    //alert(imageUri);
-    var imageUri = "http://www.medicalnewstoday.com/content/images/articles/266/266765/two-heads-of-broccoli.jpg";
-
-    var micrsoftImageKey = "01aa933905644a99b64b1a1449b0e5c5";
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = () => {
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        var microsoftResponse = xmlhttp.responseText;
-        alert(microsoftResponse);
-        //this.nutritionixAPI(xmlhttp.responseText);
-        this.nutritionixAPI(microsoftResponse);
-      }
-    }
-
-    xmlhttp.open("POST", "https://api.projectoxford.ai/vision/v1.0/analyze?visualFeatures=Tags,Description", true);
-    xmlhttp.setRequestHeader("Content-type", "application/json");
-
-    xmlhttp.setRequestHeader("Ocp-Apim-Subscription-Key", "01aa933905644a99b64b1a1449b0e5c5"); 
-    xmlhttp.setRequestHeader("Content-length", "125"); 
-
-    xmlhttp.send(JSON.stringify({
-      "url": imageUri
-    }));
-
-  }
-
-  //NUTRITIONIX API KEYS
-  //APPLICATION ID: 6d4f0049
-  //APPLICATION KEY: fb6a273d8b2cd2a7f961668f4c8ce5ce
-  nutritionixAPI(microsoftResponse) {
-    alert("Yes nutritionix!");
-    console.log(microsoftResponse);
-    var microsoftDescription = JSON.parse(microsoftResponse).description.captions[0].text;
-    alert("Microsoft Description: "+microsoftDescription);
-    var microsoftDescriptionSpaces = encodeURIComponent(microsoftDescription.trim());
-    alert(microsoftDescriptionSpaces);
-
-    var xmlhttp = new XMLHttpRequest();
-
-    xmlhttp.onreadystatechange = () => {
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        var nutritionixResponse = xmlhttp.responseText;
-        alert(nutritionixResponse);
-        this.nutritionixInfo(nutritionixResponse);
-
-      }
-    }
-
-    xmlhttp.open("GET", "https://api.nutritionix.com/v1_1/search/"+microsoftDescriptionSpaces+"?results=0%3A20&cal_min=0&cal_max=50000&fields=item_name%2Cbrand_name%2Citem_id%2Cbrand_id&appId=6d4f0049&appKey=fb6a273d8b2cd2a7f961668f4c8ce5ce", true);
-    xmlhttp.send();
-  }
-
-  nutritionixInfo(nutritionixResponse) {
-    var info = JSON.parse(nutritionixResponse).hits[2]._id;
-    alert(info);
-
-    var xmlhttp = new XMLHttpRequest();
-
-    xmlhttp.onreadystatechange = () => {
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        alert("Nutrional Info: "+xmlhttp.responseText);
-      }
-    }
-
-    xmlhttp.open("GET", "https://api.nutritionix.com/v1_1/item?id="+info+"&appId=6d4f0049&appKey=fb6a273d8b2cd2a7f961668f4c8ce5ce", true);
-    xmlhttp.send();
-  }*/
-
-  //EXTRA PLUGIN NEEDED TO WRITE FILES: https://github.com/apache/cordova-plugin-file
-  //DOES IT NEED IMPORTING? ionic-native documentation does not stipulate so:
-  //  http://ionicframework.com/docs/v2/native/file/
-  createNewFileEntry(imgUri) {
-    window.resolveLocalFileSystemURL(cordova.file.cacheDirectory, function success(dirEntry) {
-
-        // JPEG file
-        dirEntry.getFile("tempFile.jpeg", { create: true, exclusive: false }, function (fileEntry) {
-
-            // Do something with it, like write to it, upload it, etc.
-            // writeFile(fileEntry, imgUri);
-            console.log("got file: " + fileEntry.fullPath);
-            // displayFileData(fileEntry.fullPath, "File copied to");
-
-        }, onErrorCreateFile);
-
-    }, onErrorResolveUrl);
-  }
-
-  //Honestly don't understand what this does.... But is in documentation.
-  displayImage(imageUri) {
-    var elem = document.getElementById('imageFile');
-    elem.src = "data:image/jpeg;base64," + imageUri;
-
-    var file = new Parse.File("image.jpg", { base64: imageUri }); //creating file
-    file.save({
-      success: (object) => {
-        console.log('File saved successfully');
-        var nutrition = new Parse.Object("Nutrition");
-        nutrition.set("user", Parse.User.current());
-        nutrition.set("image", file);
-        nutrition.save({
-          success: (object) => {
-            alert("MS Response:" + object.get("microsoftResponse"));
-            //let nutritionResponse = JSON.parse(object.get("nutrionixInformation"));
-            alert("Nutritionix:" + object.get("nutritionixInformation"));
-          },
-          error: (object,error) => {
-            alert("Error saving Nutrition file: " + error.message);
-          }
-        });
-
-        //this.microsoftImageRecog(file);
-      },
-      error: (object, error) => {
-        console.log('Error saving file: ', error.message);
-      }
-    }); //saving file  
-  }
-
-  //SETS OPTIONS FOR CAMERA
-  setOptions(srcType) {
-    var options = {
-        // Some common settings are 20, 50, and 100
-        quality: 50,
-        destinationType: Camera.DestinationType.DATA_URL,
-        // In this app, dynamically set the picture source, Camera or photo gallery
-        sourceType: srcType,
-        encodingType: Camera.EncodingType.JPEG,
-        mediaType: Camera.MediaType.PICTURE,
-        allowEdit: false,
-        correctOrientation: true  //Corrects Android orientation quirks
-    }
-    return options;
-  }
-
-  //MAIN CAMERA FUNCTION THAT'S CALLED
-  //ADDED this.setOptions & this.createNewFileEntry
-  //Couple of issues highlighted here like timeout: 
-  //  https://github.com/EddyVerbruggen/cordova-plugin-actionsheet/issues/11
-  //Could be a permissions error?
-  //?? https://github.com/marcshilling/react-native-image-picker/issues/80
-  //https://forums.developer.apple.com/thread/8629
-  //"http://codesanswer.com/question/17962-ios-8-snapshotting-a-
-  //  view-that-has-not-been-rendered-results-in-an-empty-snapshot"
-  //https://issues.apache.org/jira/browse/CB-8234
-  openCamera(selection) {
-    console.log('openCamera')
-    var srcType = Camera.PictureSourceType.CAMERA;
-    var options = this.setOptions(srcType);
-    var func = this.createNewFileEntry;
-    navigator.camera.getPicture((imageUri) => {
-        this.displayImage(imageUri);
-        //this.microsoftImageRecog();
-        // You may choose to copy the picture, save it somewhere, or upload.
-        //func(imageUri);
-        //console.log(imageUri);
-
-        console.log(imageUri);
-    }, (error) => {
-        console.debug("Unable to obtain picture: " + error, "app");
-    }, options);
-  }
-
-
-
 
 }

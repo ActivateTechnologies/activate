@@ -145,11 +145,11 @@ Parse.Cloud.define("stravaActivitiesLastWeek", function(request, response) {
     });
 });
 
-
 Parse.Cloud.beforeSave("Nutrition", function(request, response) {
   var callbackFunction = function (error) {
     if (error) {
-      response.error(error);
+      console.log('Error with api calls: ' + error);
+      response.success();
     } else {
       response.success();
     }

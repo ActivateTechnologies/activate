@@ -8,4 +8,7 @@
 	<Health *ngIf="widget.widgetName == 'health'"
 	 [callbackFunction]="callbackFunction" [chatObject]="chatObject"
 	 [isReply]="isReply" [options]="chatObject.widget.options" [data]="chatObject.data"></Health>
+  <UseCamera *ngIf="widget.widgetName == 'useCamera'"
+	 [callbackFunction]="callbackFunction" [chatObject]="chatObject"
+	 [isReply]="isReply" [options]="chatObject.widget.options" [data]="chatObject.data"></UseCamera>
 </div>
