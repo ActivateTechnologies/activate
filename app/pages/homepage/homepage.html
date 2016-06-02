@@ -62,7 +62,7 @@
     </div>
     -->
 
-    <img id="imageFile">
+    <img [hidden]="true" id="imageFile">
     <div class="replyOptionsTopContainer">
       <div *ngFor="let option of replyOptions" class="replyOption"
        (click)="replyWithMessage(option)">
@@ -75,7 +75,7 @@
     <div class="replyOptionsBottomContainer">
 
     <div class="bottomReplyContainer">
-        <ion-icon name="ios-nutrition" class="bottomReplyIcon" (click)="microsoftImageRecog()"></ion-icon>
+        <ion-icon name="ios-nutrition" class="bottomReplyIcon" (click)="openCamera()"></ion-icon>
       </div>
 
       <!--

@@ -365,67 +365,10 @@ export class HomePage {
   }
   */
 
-  //SETS OPTIONS FOR CAMERA
-  setOptions(srcType) {
-    var options = {
-        // Some common settings are 20, 50, and 100
-        quality: 50,
-        destinationType: Camera.DestinationType.DATA_URL,
-        // In this app, dynamically set the picture source, Camera or photo gallery
-        sourceType: srcType,
-        encodingType: Camera.EncodingType.JPEG,
-        mediaType: Camera.MediaType.PICTURE,
-        allowEdit: false,
-        correctOrientation: true  //Corrects Android orientation quirks
-    }
-    return options;
-  }
-
-  //EXTRA PLUGIN NEEDED TO WRITE FILES: https://github.com/apache/cordova-plugin-file
-  //DOES IT NEED IMPORTING? ionic-native documentation does not stipulate so:
-  //  http://ionicframework.com/docs/v2/native/file/
-  createNewFileEntry(imgUri) {
-    window.resolveLocalFileSystemURL(cordova.file.cacheDirectory, function success(dirEntry) {
-
-        // JPEG file
-        dirEntry.getFile("tempFile.jpeg", { create: true, exclusive: false }, function (fileEntry) {
-
-            // Do something with it, like write to it, upload it, etc.
-            // writeFile(fileEntry, imgUri);
-            console.log("got file: " + fileEntry.fullPath);
-            // displayFileData(fileEntry.fullPath, "File copied to");
-
-        }, onErrorCreateFile);
-
-    }, onErrorResolveUrl);
-  }
-
-  //Honestly don't understand what this does.... But is in documentation.
-  displayImage(imageUri) {
-    var elem = document.getElementById('imageFile');
-    elem.src = "data:image/jpeg;base64," + imageUri;
-
-    var file = new Parse.File("image.txt", { base64: imageUri }); //creating file
-    file.save({
-      success: (object) => {
-        console.log('File saved successfully');
-        var nutrition = new Parse.Object("Nutrition");
-        nutrition.set("user", Parse.User.current());
-        nutrition.set("image", file);
-        nutrition.save();
-
-        //this.microsoftImageRecog(file);
-      },
-      error: (object, error) => {
-        console.log('Error saving file: ', error.message);
-      }
-    }); //saving file  
-  }
-
-  microsoftImageRecog(file) {
+  /*microsoftImageRecog(file) {
     console.log("calling Microsoft");
     //alert(imageUri);
-    var imageUri = "http://www.bbcgoodfood.com/sites/default/files/glossary/banana-crop.jpg";
+    var imageUri = "http://www.medicalnewstoday.com/content/images/articles/266/266765/two-heads-of-broccoli.jpg";
 
     var micrsoftImageKey = "01aa933905644a99b64b1a1449b0e5c5";
     var xmlhttp = new XMLHttpRequest();
@@ -490,6 +433,72 @@ export class HomePage {
 
     xmlhttp.open("GET", "https://api.nutritionix.com/v1_1/item?id="+info+"&appId=6d4f0049&appKey=fb6a273d8b2cd2a7f961668f4c8ce5ce", true);
     xmlhttp.send();
+  }*/
+
+  //EXTRA PLUGIN NEEDED TO WRITE FILES: https://github.com/apache/cordova-plugin-file
+  //DOES IT NEED IMPORTING? ionic-native documentation does not stipulate so:
+  //  http://ionicframework.com/docs/v2/native/file/
+  createNewFileEntry(imgUri) {
+    window.resolveLocalFileSystemURL(cordova.file.cacheDirectory, function success(dirEntry) {
+
+        // JPEG file
+        dirEntry.getFile("tempFile.jpeg", { create: true, exclusive: false }, function (fileEntry) {
+
+            // Do something with it, like write to it, upload it, etc.
+            // writeFile(fileEntry, imgUri);
+            console.log("got file: " + fileEntry.fullPath);
+            // displayFileData(fileEntry.fullPath, "File copied to");
+
+        }, onErrorCreateFile);
+
+    }, onErrorResolveUrl);
+  }
+
+  //Honestly don't understand what this does.... But is in documentation.
+  displayImage(imageUri) {
+    var elem = document.getElementById('imageFile');
+    elem.src = "data:image/jpeg;base64," + imageUri;
+
+    var file = new Parse.File("image.jpg", { base64: imageUri }); //creating file
+    file.save({
+      success: (object) => {
+        console.log('File saved successfully');
+        var nutrition = new Parse.Object("Nutrition");
+        nutrition.set("user", Parse.User.current());
+        nutrition.set("image", file);
+        nutrition.save({
+          success: (object) => {
+            alert("MS Response:" + object.get("microsoftResponse"));
+            //let nutritionResponse = JSON.parse(object.get("nutrionixInformation"));
+            alert("Nutritionix:" + object.get("nutritionixInformation"));
+          },
+          error: (object,error) => {
+            alert("Error saving Nutrition file: " + error.message);
+          }
+        });
+
+        //this.microsoftImageRecog(file);
+      },
+      error: (object, error) => {
+        console.log('Error saving file: ', error.message);
+      }
+    }); //saving file  
+  }
+
+  //SETS OPTIONS FOR CAMERA
+  setOptions(srcType) {
+    var options = {
+        // Some common settings are 20, 50, and 100
+        quality: 50,
+        destinationType: Camera.DestinationType.DATA_URL,
+        // In this app, dynamically set the picture source, Camera or photo gallery
+        sourceType: srcType,
+        encodingType: Camera.EncodingType.JPEG,
+        mediaType: Camera.MediaType.PICTURE,
+        allowEdit: false,
+        correctOrientation: true  //Corrects Android orientation quirks
+    }
+    return options;
   }
 
   //MAIN CAMERA FUNCTION THAT'S CALLED

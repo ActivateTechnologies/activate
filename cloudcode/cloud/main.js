@@ -143,25 +143,94 @@ Parse.Cloud.define("stravaActivitiesLastWeek", function(request, response) {
         message: 'Request failed with response code ' + httpResponse.status
       });
     });
-
-    /*
-    var xmlhttp = new XMLHttpRequest();
-
-    xmlhttp.onreadystatechange = function () {
-
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        alert(xmlhttp.responseText);
-
-        Parse.User.current().set(Consts.USER_STRAVACTIVITIESLASTWEEK, xmlhttp.responseText);
-        (<Parse.Object> Parse.User.current()).save();
-      }
-    }
-
-    
-
-    xmlhttp.open("GET", "https://www.strava.com/api/v3/athlete/activities?after="+Math.round(past.getTime()/1000), true);
-    xmlhttp.setRequestHeader("Content-type", "application/json;"); 
-     xmlhttp.setRequestHeader("Authorization", "Bearer "+stravaAccessToken); 
-    xmlhttp.send();
-    */
 });
+
+
+Parse.Cloud.beforeSave("Nutrition", function(request, response) {
+  var callbackFunction = function (error) {
+    if (error) {
+      response.error(error);
+    } else {
+      response.success();
+    }
+  }
+  microsoftImageRecog(request.object, callbackFunction);
+});
+
+function microsoftImageRecog(nutritionObject, callbackFunction) {
+  var imageUri = nutritionObject.get("image").url();
+  console.log("calling Microsoft");
+  console.log(imageUri);
+  //var imageUri = "http://www.medicalnewstoday.com/content/images/articles/266/266765/two-heads-of-broccoli.jpg";
+  var MICROSOFT_IMAGE_KEY = "01aa933905644a99b64b1a1449b0e5c5";
+
+  Parse.Cloud.httpRequest({
+    method: 'POST',
+    url: 'https://api.projectoxford.ai/vision/v1.0/analyze?visualFeatures=Tags,Description',
+    body: {
+      url: imageUri
+    },
+    headers: {
+      "Content-type": "application/json",
+      "Ocp-Apim-Subscription-Key": MICROSOFT_IMAGE_KEY
+    }
+  }).then(function(httpResponse) {
+    console.log(httpResponse.text);
+    nutritionObject.set("microsoftResponse", JSON.stringify(httpResponse.text));
+    nutritionixSearch(httpResponse.text, nutritionObject, callbackFunction);
+  }, function(httpResponse) {
+    console.error('microsoftImageRec Request failed with response code ' + httpResponse.status
+      + ' and response text: ' + httpResponse.text);
+    callbackFunction('microsoftImageRec request failed with response code ' + httpResponse.status);
+  });
+}
+
+  //NUTRITIONIX API KEYS
+  //APPLICATION ID: 6d4f0049
+  //APPLICATION KEY: fb6a273d8b2cd2a7f961668f4c8ce5ce
+function nutritionixSearch(microsoftResponse, nutritionObject, callbackFunction) {
+  console.log("Yes nutritionix!");
+  var microsoftDescription = JSON.parse(microsoftResponse).description.captions[0].text;
+  console.log("Microsoft Description: "+microsoftDescription);
+  var microsoftDescriptionSpaces = encodeURIComponent(microsoftDescription.trim());
+  console.log(microsoftDescriptionSpaces);
+
+  var urlString = "https://api.nutritionix.com/v1_1/search/" + microsoftDescriptionSpaces
+   + "?results=0%3A20&cal_min=0&cal_max=50000&fields=item_name%2Cbrand_name%2Citem_id" 
+   + "%2Cbrand_id&appId=6d4f0049&appKey=fb6a273d8b2cd2a7f961668f4c8ce5ce";
+
+  Parse.Cloud.httpRequest({
+    method: 'GET',
+    url: urlString
+  }).then(function(httpResponse) {
+    var nutritionixResponse = httpResponse.text;
+    console.log(nutritionixResponse);
+    nutritionixInfo(nutritionixResponse, nutritionObject, callbackFunction);
+  }, function(httpResponse) {
+    console.error('nutritionixSearch Request failed with response code ' + httpResponse.status 
+      + ' and response text' + httpResponse.text);
+    callbackFunction('nutritionixSearch request failed with response code ' + httpResponse.status)
+  });
+}
+
+function nutritionixInfo(nutritionixResponse, nutritionObject, callbackFunction) {
+  var info = JSON.parse(nutritionixResponse).hits[0]._id;
+  console.log(info);
+
+  var urlString = "https://api.nutritionix.com/v1_1/item?id="+info+
+    "&appId=6d4f0049&appKey=fb6a273d8b2cd2a7f961668f4c8ce5ce"
+  
+  Parse.Cloud.httpRequest({
+    method: 'GET',
+    url: urlString
+  }).then(function(httpResponse) {
+    var nutritionixResponse = httpResponse.text;
+    console.log(nutritionixResponse);
+    nutritionObject.set("nutritionixInformation", JSON.stringify(httpResponse.text));
+    callbackFunction();
+  }, function(httpResponse) {
+    console.error('Request failed with response code ' + httpResponse.status);
+    callbackFunction('nutritionixInfo request failed with response code ' + httpResponse.status)
+  });
+
+}
