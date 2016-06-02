@@ -16,20 +16,26 @@
 	</div>
 
 	
-	<!-- OVERVIEW GRAPH -->
-	<div class="containerProfilePageContent">
+	<!-- OVERVIEW GRAPH 
+	<div class="containerProfilePageContent" id="myDiv">
 
-		<p class="sectionHeader">Overview:</p>
-		<span [hidden]="!distanceDataLoading">Churning all your data ...</span>
-		<canvas id="distanceChart" [hidden]="distanceDataLoading"></canvas>
+		
+		
 	</div>
-
+	-->
 
 
 	<div class="containerProfilePageContent">
 	<!--  [hidden]="walkingDataLoading || caloriesDataLoading
 	 || cyclingDataLoading || runningDataLoading || heartDataLoading || sleepDataLoading" -->
 
+	 	<!-- HEART RATE -->
+		<p class="sectionHeader">
+			<i class="em em-heart"></i> (bpm):
+		</p>
+		<span [hidden]="!heartDataLoading">Getting those beats ...</span>
+		<canvas id="heartChart" [hidden]="heartDataLoading"></canvas>
+		
 		<!-- WALKING GRAPH -->
 		<p class="sectionHeader">
 			<i class="em em-walking"></i> (km):
@@ -71,13 +77,6 @@
 		<p class="sectionHeader"><i class="em em-fire"></i> (kJ):</p>
 		<span [hidden]="!kJDataLoading">Collecting those calories ...</span>
 		<canvas id="kJChart"></canvas>
-
-		<!-- HEART RATE -->
-		<p class="sectionHeader">
-			<i class="em em-heart"></i> (bpm):
-		</p>
-		<span [hidden]="!heartDataLoading">Getting those beats ...</span>
-		<canvas id="heartChart" [hidden]="heartDataLoading"></canvas>
 	</div>
 
 

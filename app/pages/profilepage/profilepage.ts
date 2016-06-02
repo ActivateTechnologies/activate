@@ -136,6 +136,122 @@ export class ProfilePage {
     });
   }
 
+  //-------CHARTS--------
+    initHeartData() {
+    this.heartData = [[], []];
+    for (let i = 0; i < 8; i++) {
+      this.heartData[0].push(999);
+      this.heartData[1].push(0);
+    }
+    let start:Date = new Date();
+    start.setHours(0);
+    start.setMinutes(0);
+    start.setSeconds(0);
+    start = new Date(start.getTime() - 7 * 86400 * 1000);
+    let callbacksRemaining:number = 8;
+    for (let i = 0; i < 8; i++) {
+      ((i) => {
+        navigator.health.query({
+          startDate: new Date(start.getTime() + i * 86400 * 1000),
+          endDate: new Date(start.getTime() + (i + 1) * 86400 * 1000),
+          dataType: 'heart_rate'
+        }, (data) => {
+          callbacksRemaining--;
+          for (let j = 0; j < data.length; j++) {
+            if (data[j].value < this.heartData[0][i]) {
+              this.heartData[0][i] = data[j].value;
+            }
+            if (data[j].value > this.heartData[1][i]) {
+              this.heartData[1][i] = data[j].value;
+            }
+          }
+          if (this.heartData[0][i] == 999) {
+            this.heartData[0][i] = 0;
+          }
+          //console.log('Activity', i, data);
+          /*if (data.value.sleep) {
+            this.sleepData[i]
+             = Math.round(data.value.sleep.duration * 10 / 3600) / 10;
+          }
+          */  
+          if (callbacksRemaining == 0 ) {
+            console.log("Heart data:");
+            console.log(this.heartData);
+            this.initHeartChart();
+          }
+        }, (error) => {
+          callbacksRemaining--;
+          console.log('Error:', error);
+          if (callbacksRemaining == 0 ) {
+            this.initHeartChart();
+          }
+        });
+      })(i);
+    }
+  }
+
+   initHeartChart() {
+    this.zone.run(() => {
+      this.heartDataLoading = false;
+    })
+    let ctx:any = (<HTMLCanvasElement> document.getElementById("heartChart")).getContext("2d");
+    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+    let labels:string[] = [];
+    let day = new Date().getDay() - 1;
+    day = (day == -1) ? 6 : day;
+    for (let i = 0; i < this.heartData[0].length; i++) {
+      labels.push(days[(i+day) % 7]);
+    }
+    console.log("Min Heart:");
+    console.log(this.heartData[0]);
+    console.log("Max Heart:");
+    console.log(this.heartData[1]);
+    let heartData:any = {
+      labels: labels,
+      datasets: [{
+        label: "bpm min",
+        backgroundColor: "rgb(224, 224, 224)",
+        borderColor: "rgb(235, 110, 123)",
+        highlightFill: "rgba(224, 224, 224,0.75)",
+        highlightStroke: "rgba(235, 110, 123,1)",
+        data: this.heartData[0]
+      },
+      {
+        label: "bpm max",
+        backgroundColor: "rgb(235, 110, 123)",
+        borderColor: "rgb(235, 110, 123)",
+        highlightFill: "rgba(224, 224, 224,0.75)",
+        highlightStroke: "rgba(235, 110, 123,1)",
+        data: this.heartData[1]
+      }
+      ]
+    },
+    this.heartChartHandle = new Chart(ctx, {
+        type: 'line',
+        data: heartData, 
+        options: {
+          legend: {
+              display: false,
+              labels: {
+                display: true,
+              },
+          },
+          scales : {
+              xAxes : [ {
+                  gridLines : {
+                      display : false
+                  }
+              } ],
+              yAxes : [ {
+                  gridLines : {
+                      display : false
+                  }
+              } ]
+            }
+          }
+      }); 
+  }
+
   //Walking and running data for last week from Health Plugin
   initWalkingData(callback) {
     this.walkingData = [];
@@ -198,8 +314,8 @@ export class ProfilePage {
       labels: labels,
       datasets: [{
         label: "km",
-        fillColor: "rgb(104, 143, 206)",
-        strokeColor: "rgb(104, 143, 206)",
+        backgroundColor: "rgb(104, 143, 206)",
+        borderColor: "rgb(104, 143, 206)",
         highlightFill: "rgba(104,143,206,0.75)",
         highlightStroke: "rgba(104,143,206,1)",
         data: this.walkingData
@@ -211,7 +327,23 @@ export class ProfilePage {
     this.walkingChartHandle = new Chart(ctx, {
       type: 'bar',
       data: walkingData, 
-      options: options
+      options: {
+          legend: {
+              display: false,
+          },
+          scales : {
+              xAxes : [ {
+                  gridLines : {
+                      display : false
+                  }
+              } ],
+              yAxes : [ {
+                  gridLines : {
+                      display : false
+                  }
+              } ]
+            }
+          }
     }); 
   }
 
@@ -238,14 +370,7 @@ export class ProfilePage {
         highlightStroke: "rgba(96, 208, 227,1)",
         data: dataInKm
       }]
-    };
-    let options:any = {
-      scales: {
-        gridLines: {
-          lineWidth: 5
-        }
-      }
-    }
+    },
     this.zone.run(() => {
       this.runningDataLoading = false;
       let ctx:any = (<HTMLCanvasElement> document.getElementById("runningChart")).getContext("2d");
@@ -253,14 +378,22 @@ export class ProfilePage {
         type: 'bar',
         data: runningDataObject,
         options: {
-          scales: {
-            gridLines: {
-              lineWidth: 5,
+          legend: {
               display: false,
-              drawTicks: false
+          },
+          scales : {
+              xAxes : [ {
+                  gridLines : {
+                      display : false
+                  }
+              } ],
+              yAxes : [ {
+                  gridLines : {
+                      display : false
+                  }
+              } ]
             }
           }
-        }
       });
     })
   }
@@ -282,8 +415,8 @@ export class ProfilePage {
       labels: labels,
       datasets: [{
         label: "km",
-        fillColor: "rgb(117, 223, 152)",
-        strokeColor: "rgb(117, 223, 152)",
+        backgroundColor: "rgb(117, 223, 152)",
+        borderColor: "rgb(117, 223, 152)",
         highlightFill: "rgba(117, 223, 152,0.75)",
         highlightStroke: "rgba(117, 223, 152,1)",
         data: dataInKm
@@ -298,7 +431,23 @@ export class ProfilePage {
       this.cyclingChartHandle = new Chart(ctx, {
         type: 'bar',
         data: cyclingDataObject, 
-        options: options
+        options: {
+          legend: {
+              display: false,
+          },
+          scales : {
+              xAxes : [ {
+                  gridLines : {
+                      display : false
+                  }
+              } ],
+              yAxes : [ {
+                  gridLines : {
+                      display : false
+                  }
+              } ]
+            }
+          }
       }); 
     })
   }
@@ -357,8 +506,8 @@ export class ProfilePage {
       labels: labels,
       datasets: [{
         label: "km",
-        fillColor: "rgb(217, 153, 222)",
-        strokeColor: "rgb(217, 153, 222)",
+        backgroundColor: "rgb(217, 153, 222)",
+        borderColor: "rgb(217, 153, 222)",
         highlightFill: "rgba(217, 153, 222,0.75)",
         highlightStroke: "rgba(217, 153, 222,1)",
         data: this.sleepData
@@ -370,7 +519,23 @@ export class ProfilePage {
     this.sleepChartHandle = new Chart(ctx, {
         type: 'bar',
         data: sleepData, 
-        options: options
+        options: {
+          legend: {
+              display: false,
+          },
+          scales : {
+              xAxes : [ {
+                  gridLines : {
+                      display : false
+                  }
+              } ],
+              yAxes : [ {
+                  gridLines : {
+                      display : false
+                  }
+              } ]
+            }
+          }
       }); 
   }
 
@@ -467,8 +632,8 @@ export class ProfilePage {
       labels: labels,
       datasets: [{
         label: "km",
-        fillColor: "rgb(243, 162, 115)",
-        strokeColor: "rgb(243, 162, 115)",
+        backgroundColor: "rgb(243, 162, 115)",
+        borderColor: "rgb(243, 162, 115)",
         highlightFill: "rgba(243, 162, 115,0.75)",
         highlightStroke: "rgba(243, 162, 115,1)",
         data: this.kJData
@@ -480,126 +645,23 @@ export class ProfilePage {
     this.kJChartHandle = new Chart(ctx, {
         type: 'bar',
         data: kJData, 
-        options: options
-      }); 
-  }
-
-  initHeartData() {
-    this.heartData = [[], []];
-    for (let i = 0; i < 8; i++) {
-      this.heartData[0].push(999);
-      this.heartData[1].push(0);
-    }
-    let start:Date = new Date();
-    start.setHours(0);
-    start.setMinutes(0);
-    start.setSeconds(0);
-    start = new Date(start.getTime() - 7 * 86400 * 1000);
-    let callbacksRemaining:number = 8;
-    for (let i = 0; i < 8; i++) {
-      ((i) => {
-        navigator.health.query({
-          startDate: new Date(start.getTime() + i * 86400 * 1000),
-          endDate: new Date(start.getTime() + (i + 1) * 86400 * 1000),
-          dataType: 'heart_rate'
-        }, (data) => {
-          callbacksRemaining--;
-          for (let j = 0; j < data.length; j++) {
-            if (data[j].value < this.heartData[0][i]) {
-              this.heartData[0][i] = data[j].value;
-            }
-            if (data[j].value > this.heartData[1][i]) {
-              this.heartData[1][i] = data[j].value;
+        options: {
+          legend: {
+              display: false,
+          },
+          scales : {
+              xAxes : [ {
+                  gridLines : {
+                      display : false
+                  }
+              } ],
+              yAxes : [ {
+                  gridLines : {
+                      display : false
+                  }
+              } ]
             }
           }
-          if (this.heartData[0][i] == 999) {
-            this.heartData[0][i] = 0;
-          }
-          //console.log('Activity', i, data);
-          /*if (data.value.sleep) {
-            this.sleepData[i]
-             = Math.round(data.value.sleep.duration * 10 / 3600) / 10;
-          }
-          */  
-          if (callbacksRemaining == 0 ) {
-            console.log("Heart data:");
-            console.log(this.heartData);
-            this.initHeartChart();
-          }
-        }, (error) => {
-          callbacksRemaining--;
-          console.log('Error:', error);
-          if (callbacksRemaining == 0 ) {
-            this.initHeartChart();
-          }
-        });
-      })(i);
-    }
-    /* HEART DATA FROM PARSE
-    this.heartData = [];
-    CloudFunctions.getWeekHeartData((data, error) => {
-      console.log('Got heart data:', data);
-      this.zone.run(() => {
-        this.heartDataLoading = false;
-      });
-      setTimeout(() => {
-        if (!error) {
-          this.heartData = data.averageHeartBeats;
-          this.initHeartChart();
-        } else {
-          alert('Error loading heart data');
-          console.log('Error loading heart data', error);
-        }
-      }, 200);
-    });
-    */
-  }
-
-  initHeartChart() {
-    this.zone.run(() => {
-      this.heartDataLoading = false;
-    })
-    let ctx:any = (<HTMLCanvasElement> document.getElementById("heartChart")).getContext("2d");
-    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-    let labels:string[] = [];
-    let day = new Date().getDay() - 1;
-    day = (day == -1) ? 6 : day;
-    for (let i = 0; i < this.heartData[0].length; i++) {
-      labels.push(days[(i+day) % 7]);
-    }
-    console.log("Min Heart:");
-    console.log(this.heartData[0]);
-    console.log("Max Heart:");
-    console.log(this.heartData[1]);
-    let heartData:any = {
-      labels: labels,
-      datasets: [{
-        label: "bpm min",
-        fillColor: "rgb(235, 110, 123)",
-        strokeColor: "rgb(235, 110, 123)",
-        highlightFill: "rgba(235, 110, 123)",
-        highlightStroke: "rgba(235, 110, 123,1)",
-        backgroundColor: "rgba(224, 224, 224)",
-        data: this.heartData[0]
-      },
-      {
-        label: "bpm max",
-        fillColor: "rgb(235, 110, 123)",
-        strokeColor: "rgb(235, 110, 123)",
-        highlightFill: "rgba(235, 110, 123)",
-        highlightStroke: "rgba(235, 110, 123,1)",
-        backgroundColor: "rgba(254, 149, 152)",
-        data: this.heartData[1]
-      }
-      ]
-    };
-    let options:any = {
-      scaleShowGridLines: false
-    }
-    this.heartChartHandle = new Chart(ctx, {
-        type: 'line',
-        data: heartData, 
-        options: options
       }); 
   }
 
@@ -782,4 +844,7 @@ export class ProfilePage {
       alert(JSON.stringify(error));
     });*/
   }
+
+
+
 }
