@@ -23,7 +23,8 @@ export class ProfilePage {
   kJDataLoading:boolean; cyclingDataLoading:boolean; runningDataLoading:boolean;
   heartData:number[][]; heartDataLoading:boolean;
   walkingChartHandle:any; heartChartHandle:any; cyclingChartHandle:any; kJChartHandle:any;
-  sleepData:number[]; sleepDataLoading:boolean; sleepDataHandle: any; foodStrings: string[];
+  sleepData:number[]; sleepDataLoading:boolean; sleepDataHandle: any; foodStrings: string[]; 
+  foodArray: any[];
 
   constructor(ionicApp: IonicApp, navController: NavController, navParams: NavParams,
    viewController: ViewController, zone: NgZone, platform: Platform, http: Http) {
@@ -44,6 +45,7 @@ export class ProfilePage {
     this.heartDataLoading = false;
     this.sleepDataLoading = true;
     this.foodStrings = [];
+    this.foodArray = [];
   }
 
   onPageDidEnter() {
@@ -678,11 +680,24 @@ export class ProfilePage {
         for (var i = 0; i < results.length; i++) {
           var parseObject = results[i];
           var obj = parseObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE);
+          var nutObj = parseObject.get(Consts.NUTRITION_NUTRITIONIX_INFO);
           
-          if (obj) {
-            var newObj = JSON.parse(JSON.parse(obj));
-            console.log(newObj.description.captions[0].text);
-            this.foodStrings.push(newObj.description.captions[0].text);
+          
+          if (obj && nutObj) {
+            var newObj = JSON.parse(JSON.parse(obj)).description.captions[0].text;
+            console.log(newObj);
+
+            var newNutObj = JSON.parse(JSON.parse(nutObj)).nf_calories;
+            console.log(newNutObj);
+
+            var object = {
+              microsoft: newObj,
+              nutritionix: newNutObj
+            }
+
+            this.foodArray.push(object);
+
+            //this.foodStrings.push(newObj.description.captions[0].text);
           }
           
 
