@@ -175,8 +175,8 @@ export class ProfilePage {
           }
           */  
           if (callbacksRemaining == 0 ) {
-            console.log("Heart data:");
-            console.log(this.heartData);
+            //console.log("Heart data:");
+            //console.log(this.heartData);
             this.initHeartChart();
           }
         }, (error) => {
@@ -559,7 +559,6 @@ export class ProfilePage {
           dataType: 'calories.basal'
         }, (data) => {
           callbacksRemainingBasal--;
-          console.log(data);
           //console.log('Activity', i, data);
           if (data.value) {
             this.kJData[i] += data.value*4.184;

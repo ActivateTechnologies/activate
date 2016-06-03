@@ -27,7 +27,6 @@ export class UseCamera {
   ngOnInit() {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.currentUser = Parse.User.current();
-    console.log('useCamera widget ngOnInit');
     if (!this.isReply) {
       this.saveImage(this.data.imageUri);
       this.imgsrc = "data:image/jpeg;base64," + this.data.imageUri
@@ -49,6 +48,8 @@ export class UseCamera {
     let options = {
       // Some common settings are 20, 50, and 100
       quality: 50,
+      targetWidth: 1000,
+      targetHeight: 1000,
       destinationType: Camera.DestinationType.DATA_URL,
       sourceType: Camera.PictureSourceType.CAMERA,
       encodingType: Camera.EncodingType.JPEG,
@@ -73,38 +74,37 @@ export class UseCamera {
     //elem.src = "data:image/jpeg;base64," + imageUri;
     let file = new Parse.File("image.jpeg", { base64: imageUri }); //creating file
     file.save({
-      success: (object) => {
+      success: (savedFile) => {
         console.log('File saved successfully');
-        this.produceHtmlAndCallback(object.url());
         let nutrition = new Parse.Object(Consts.NUTRITION_CLASS);
         nutrition.set(Consts.NUTRITION_USER, Parse.User.current());
         nutrition.set(Consts.NUTRITION_IMAGE, file);
         nutrition.save({
-          success: (object) => {
+          success: (savedNutritionObject) => {
             console.log('Got image info from apis');
-            if (object.get(Consts.NUTRITION_MICROSOFT_RESPONSE)
-              && object.get(Consts.NUTRITION_MICROSOFT_RESPONSE).length > 0) {
-              let obj = JSON.parse(JSON.parse(object.get(Consts.NUTRITION_MICROSOFT_RESPONSE)));
+            if (savedNutritionObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE)
+              && savedNutritionObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE).length > 0) {
+              let obj = JSON.parse(JSON.parse(savedNutritionObject
+                .get(Consts.NUTRITION_MICROSOFT_RESPONSE)));
               obj = (obj && obj.description) ? obj.description : null;
               obj = (obj && obj.captions && obj.captions.length > 0) ? obj.captions[0] : null;
               obj = (obj && obj.text) ? obj.text : null;
               this.msDescription = obj;
             }
-            if (object.get("nutrionixInformation")
-              && object.get("nutrionixInformation").length > 0) {
-              this.caloriesString = JSON.parse(object.get("nutrionixInformation")).nf_calories
-              + ' kcal';
+            if (savedNutritionObject.get(Consts.NUTRITION_NUTRITIONIX_INFO)
+              && savedNutritionObject.get(Consts.NUTRITION_NUTRITIONIX_INFO).length > 0) {
+              this.caloriesString = JSON.parse(JSON.parse(savedNutritionObject
+                .get(Consts.NUTRITION_NUTRITIONIX_INFO))).nf_calories + ' kcal';
             }
-            //alert("MS Response:" + object.get(Consts.NUTRITION_MICROSOFT_RESPONSE));
-            //let nutritionResponse = JSON.parse(object.get("nutrionixInformation"));
-            //alert("Nutritionix:" + object.get(Consts.NUTRITION_NUTRITIONIX_INFO));
+            this.produceHtmlAndCallback(savedFile.url());
           },
-          error: (object,error) => {
+          error: (savedNutritionObject, error) => {
             console.log("Error saving Nutrition object: ", error.message);
+            this.produceHtmlAndCallback(savedFile.url());
           }
         });
       },
-      error: (object, error) => {
+      error: (savedFile, error) => {
         console.log('Error saving image file: ', error.message);
       }
     });

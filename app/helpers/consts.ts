@@ -86,7 +86,7 @@ export class Consts {
   //Nutrition Class
   public static NUTRITION_CLASS = "Nutrition";
   //Pointer <_User>
-  public static NUTRITION_USER = "User";
+  public static NUTRITION_USER = "user";
   //String - Microsoft API Response
   public static NUTRITION_MICROSOFT_RESPONSE = "microsoftResponse";
   //String - Nutritionix API Response
