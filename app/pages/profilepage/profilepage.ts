@@ -23,7 +23,7 @@ export class ProfilePage {
   kJDataLoading:boolean; cyclingDataLoading:boolean; runningDataLoading:boolean;
   heartData:number[][]; heartDataLoading:boolean;
   walkingChartHandle:any; heartChartHandle:any; cyclingChartHandle:any; kJChartHandle:any;
-  sleepData:number[]; sleepDataLoading:boolean; sleepDataHandle: any;
+  sleepData:number[]; sleepDataLoading:boolean; sleepDataHandle: any; foodStrings: string[];
 
   constructor(ionicApp: IonicApp, navController: NavController, navParams: NavParams,
    viewController: ViewController, zone: NgZone, platform: Platform, http: Http) {
@@ -43,6 +43,7 @@ export class ProfilePage {
     this.runningDataLoading = true;
     this.heartDataLoading = false;
     this.sleepDataLoading = true;
+    this.foodStrings = [];
   }
 
   onPageDidEnter() {
@@ -87,6 +88,8 @@ export class ProfilePage {
     if(!this.platform.is('ios') && !this.platform.is('android')) {
       this.initStravaData();
     }
+
+    this.foodData();
     
     this.initHeartData();
   }
@@ -662,6 +665,37 @@ export class ProfilePage {
             }
           }
       }); 
+  }
+
+  foodData() {
+    console.log('Inside food data')
+    var query = new Parse.Query(Consts.NUTRITION_CLASS);
+    query.equalTo(Consts.NUTRITION_USER, Parse.User.current());
+    query.find({
+      success: (results) => {
+        console.log("Successfully retrieved " + results.length + " food entries.");
+        // Do something with the returned Parse.Object values
+        for (var i = 0; i < results.length; i++) {
+          var parseObject = results[i];
+          var obj = parseObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE);
+          
+          if (obj) {
+            var newObj = JSON.parse(JSON.parse(obj));
+            console.log(newObj.description.captions[0].text);
+            this.foodStrings.push(newObj.description.captions[0].text);
+          }
+          
+
+          //var parseObject = results[i];
+          //var obj = JSON.parse(JSON.parse(parseObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE)));
+          //console.log(obj.description.captions[0].text);
+        }
+        console.log(this.foodStrings);
+      },
+      error: (error) => {
+        console.log("Error: " + error.code + " " + error.message);
+      }
+    });
   }
 
   //STRAVA

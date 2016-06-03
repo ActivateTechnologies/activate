@@ -80,11 +80,10 @@
 	</div>
 
 
-
+	<!-- FOOD -->
 	<div class="containerProfilePageContent">
 		<p class="sectionHeader"><i class="em em-apple"></i> (g):</p>
-		<span [hidden]="!caloriesDataLoading">Working out your food ...</span>
-		<canvas id="caloriesChart" [hidden]="caloriesDataLoading"></canvas>
+		<p *ngFor="let foodString of foodStrings">{{foodString}}</p>
 	</div>
 
 	<div class="containerProfilePageContent">
