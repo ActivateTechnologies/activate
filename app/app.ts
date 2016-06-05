@@ -1,10 +1,11 @@
 /// <reference path="../typings/parse/parse.d.ts" />
 /// <reference path="../typings/custom_activate/custom_activate.d.ts" />
+/// <reference path="../typings/chart/chart.d.ts" />
+/// <reference path="../typings/cordova/plugins/Camera.d.ts" />
 import {App, IonicApp, Platform} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {HomePage} from './pages/homepage/homepage';
 import {SettingsPage} from './pages/settingspage/settingspage';
-
 
 @App({
   templateUrl: 'build/app.html',

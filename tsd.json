@@ -14,6 +14,9 @@
     "underscore/underscore.d.ts": {
       "commit": "e8f8e7471b8ca92ca417f8c878f64ae4d1067972"
     },
+    "chart/chat.d.ts": {
+      "commit": "e8f8e7471b8ca92ca417f8c878f64ae4d1067972"
+    },
     "jquery/jquery.d.ts": {
       "commit": "e8f8e7471b8ca92ca417f8c878f64ae4d1067972"
     },

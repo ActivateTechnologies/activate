@@ -12,5 +12,4 @@ interface Window {
 
 interface Navigator {
 	health: any;
-	camera: any;
 }
