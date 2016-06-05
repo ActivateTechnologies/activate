@@ -42,6 +42,9 @@ export class Health {
       if (!this.isReply && this.widgetType == 'showData') {
         this.showData();
       }
+      if (!this.isReply && this.widgetType == 'recentActivity') {
+        this.recentActivity();
+      }
       /*if (!this.isReply && this.widgetType == 'measureHeart') {
         this.measureHeart();
       }*/
@@ -54,7 +57,6 @@ export class Health {
         html.replace('<!--template bindings={}-->', ' ')
           .replace('<!--template bindings={}-->', ' '); //two occurances
         html = '<div class="health">' + html + '</div>';
-        console.log('Health html: ', html);
         if (this.widgetType == 'showData') {
           this.callbackFunction(this.chatObject, this.isReply, null, html, false);
         } else {
@@ -136,7 +138,7 @@ export class Health {
     }
   }
 
-  //Get all data and call processData. If even one has error,
+  //Get all data and call processShowData. If even one has error,
   //call callback function with no data
   showData() {
     let steps:any; 
@@ -153,7 +155,7 @@ export class Health {
       }, (data) => {
         //console.log('Got steps:', data)
         steps = data;
-        this.processData(steps, distance, activity);
+        this.processShowData(steps, distance, activity);
       }, (error) => {
         console.log('Error:', error);
         this.callbackFunction(this.chatObject, this.isReply, {error: "Error accessing steps"}, null, false);
@@ -165,7 +167,7 @@ export class Health {
       }, (data) => {
         //console.log('Got distance:', data)
         distance = data;
-        this.processData(steps, distance, activity);
+        this.processShowData(steps, distance, activity);
       }, (error) => {
         console.log('Error:', error);
         this.callbackFunction(this.chatObject, this.isReply, {error: "Error accessing distance"}, null, false);
@@ -177,7 +179,7 @@ export class Health {
       }, (data) => {
         //console.log('Got activity:', data);
         activity = data;
-        this.processData(steps, distance, activity);
+        this.processShowData(steps, distance, activity);
       }, (error) => {
         console.log('Error:', error);
         this.callbackFunction(this.chatObject, this.isReply, {error: "Error accessing activity"}, null, false);
@@ -191,7 +193,7 @@ export class Health {
         console.log('Activity JSON:', JSON.stringify(data));
         document.getElementById('activityJsonString').value = JSON.stringify(data);
         activity = data;
-        this.processData(steps, distance, activity);
+        this.processShowData(steps, distance, activity);
       }, (error) => {
         console.log('Error:', error);
         this.callbackFunction(this.chatObject, {error: "Error accessing activity"});
@@ -200,12 +202,111 @@ export class Health {
   }
 
   //Called by showData
-  processData(steps:any, distance:any, activity:any) {
+  processShowData(steps:any, distance:any, activity:any) {
     if (steps != null && distance != null && activity != null) {
       let summaryString:string = 'You walked ' + Math.round(steps.value)
        + ' steps yesterday ' + 'which covered ' + Math.round(distance.value) + distance.unit;
       this.loading = false;
       this.summaryString = summaryString;
+      /*this.callbackFunction(this.chatObject, {
+        summaryString: summaryString,
+        steps: steps,
+        distance: distance,
+        activity: activity
+      });*/
+    }
+  }
+
+  //Get recent data as per specified options
+  recentActivity() {
+    if (localStorage['healthApiAccessGranted']) {
+      Parse.User.current()
+      this.loading = true;
+      let endDate = new Date();
+      //endDate.setSeconds(0);
+      let startDate = new Date();
+      startDate.setMinutes(0);
+      startDate.setSeconds(0);
+      startDate.setHours(0)
+      navigator.health.query({
+        startDate: startDate,
+        endDate: endDate,
+        dataType: 'distance'
+      }, (data) => {
+        this.processRecentActivity(data);
+      }, (error) => {
+        console.log('Error:', error);
+        this.callbackFunction(this.chatObject, this.isReply, {error: "Error accessing distance"}, null, false);
+      });
+    } else {
+      this.summaryString = 'Recent Activity Statement (Health Api Not Available)'
+    }
+  }
+
+  //Called by showData
+  processRecentActivity (distanceArray:any[]) {
+    let ACCEPTED_INTERVAL = 5 * 60; //seconds
+    let ACCEPTED_MIN_DISTANCE = 100;
+    if (distanceArray != null) {
+      console.log(distanceArray.length, distanceArray);
+      let combinedTrips:any[] = [];
+      let lastEndTime:Date = new Date();
+      lastEndTime.setDate(lastEndTime.getDate() - 2); //2 days ago, just any date in past
+      for (let i = 0; i < distanceArray.length; i++) {
+        let trip = distanceArray[i];
+        if ((trip.endDate.getTime() - lastEndTime.getTime()) > 
+          ACCEPTED_INTERVAL * 1000) {
+          combinedTrips.push({
+            startDate: trip.startDate,
+            endDate: trip.endDate,
+            value: trip.value
+          });
+          lastEndTime = trip.endDate;
+        } else {
+          combinedTrips[combinedTrips.length-1].value += trip.value;
+          combinedTrips[combinedTrips.length-1].endDate = trip.endDate;
+          lastEndTime = trip.endDate;
+        }
+      }
+      console.log(combinedTrips.length, combinedTrips);
+      let finalTrips:any[] = [];
+      for (let i = 0; i < combinedTrips.length; i++) {
+        if (combinedTrips[i].value > ACCEPTED_MIN_DISTANCE) {
+          finalTrips.push(combinedTrips[i]);
+        }
+      }
+      let lastTrip = finalTrips[finalTrips.length-1];
+      console.log(Parse.User.current().get(Consts.USER_LASTNOTIFIEDRECENTACTIVITY), lastTrip.endDate);
+      Parse.User.current().fetch({
+        success: (object) => {
+          if (Parse.User.current().get(Consts.USER_LASTNOTIFIEDRECENTACTIVITY) &&
+            Parse.User.current().get(Consts.USER_LASTNOTIFIEDRECENTACTIVITY)
+              > lastTrip.endDate) {
+            this.summaryString = 'Time to get movin!';
+            this.loading = false;
+          } else {
+            let startMin = lastTrip.startDate.getMinutes();
+            startMin = (startMin > 9) ? startMin : "0" + startMin;
+            let startHour = lastTrip.startDate.getHours() % 12;
+            startHour = startHour ? startHour : 12;
+            let endMin = lastTrip.endDate.getMinutes();
+            endMin = (endMin > 9) ? endMin : "0" + endMin;
+            let endHour = lastTrip.endDate.getHours() % 12;
+            endHour = endHour ? endHour : 12;
+            this.summaryString = 'Nice ' + Math.round(lastTrip.value/10)/100
+              + 'km walk you did from ' + startHour + ':' + startMin + ' to '
+              + endHour + ':' + endMin + '!';
+            //Parse.User.current().set(Consts.USER_LASTNOTIFIEDRECENTACTIVITY, new Date());
+            Parse.User.current().save();
+            this.loading = false;
+          }
+        },
+        error: (object, error) => {
+          this.summaryString = 'Time to get movin!';
+          this.loading = false;
+        }
+      });
+        
       /*this.callbackFunction(this.chatObject, {
         summaryString: summaryString,
         steps: steps,

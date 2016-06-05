@@ -73,6 +73,9 @@ export class Consts {
   public static USER_STRAVACTIVITIES = "stravaActivities";
   //String - stravaActivititesLastWeek
   public static USER_STRAVACTIVITIESLASTWEEK = "stravaActivitiesLastWeek";
+  //Date - the last time user was notified of his/her last walk or activity
+  public static USER_LASTNOTIFIEDRECENTACTIVITY = "lastNotifiedRecentActivity";
+
 
   //HeartData Class
   public static HEARTDATA_CLASS = "HeartData";
