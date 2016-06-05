@@ -53,7 +53,7 @@ export class HomePage {
         this.processReceivedTreeObject(data.treeObject);
       } else {
         console.log('Error', error.message);
-        alert('There was an network error, please try again.');
+        alert('There was a network error, please try again.');
       }
     });
   }
@@ -143,7 +143,6 @@ export class HomePage {
         if (treeObjectChildConnectors[randIndexChildren][i].widgetName) {
           replyOption.isWidget = true;
           replyOption.widget = treeObjectChildConnectors[randIndexChildren][i];
-          console.log(replyOption.widget);
         } else {
           replyOption.isWidget = false;
           replyOption.message = treeObjectChildConnectors[randIndexChildren][i];
@@ -339,10 +338,6 @@ export class HomePage {
     if (Parse.User.current() != null) {
       this.nav.push(ProfilePage);
     }
-  }
-
-  moodSad() {
-    alert('Sad');
   }
 
 }

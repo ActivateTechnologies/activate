@@ -97,6 +97,13 @@ export class Consts {
   //File - Image uploaded by user
   public static NUTRITION_IMAGE = "image";
 
+  //Mood Class
+  public static MOOD_CLASS = "Mood";
+  //Pointer <_User>
+  public static MOOD_USER = "user";
+  //Number - Mood happiness value
+  public static MOOD_HAPPINESS = "happiness";
+
 
   constructor() {
   }
