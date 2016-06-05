@@ -6,7 +6,7 @@ import {Page, NavController, NavParams} from 'ionic-angular';
 })
 export class SettingsPage {
 
-  openCamera(selection) {
+  /*openCamera(selection) {
     var srcType = Camera.PictureSourceType.CAMERA;
     var options = this.setOptions(srcType);
     var func = this.createNewFileEntry;
@@ -26,12 +26,7 @@ export class SettingsPage {
     }, options);
 
 
-  }
-
-
-
-
-
+  }*/
 
 
   /*

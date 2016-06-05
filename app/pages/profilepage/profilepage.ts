@@ -23,7 +23,7 @@ export class ProfilePage {
   kJDataLoading:boolean; cyclingDataLoading:boolean; runningDataLoading:boolean;
   heartData:number[][]; heartDataLoading:boolean;
   walkingChartHandle:any; heartChartHandle:any; cyclingChartHandle:any; kJChartHandle:any;
-  sleepData:number[]; sleepDataLoading:boolean; sleepDataHandle: any; foodStrings: string[]; 
+  sleepData:number[]; sleepDataLoading:boolean; sleepChartHandle: any; foodStrings: string[]; 
   foodArray: any[];
 
   constructor(ionicApp: IonicApp, navController: NavController, navParams: NavParams,
@@ -230,7 +230,7 @@ export class ProfilePage {
         data: this.heartData[1]
       }
       ]
-    },
+    };
     this.heartChartHandle = new Chart(ctx, {
         type: 'line',
         data: heartData, 
@@ -375,7 +375,7 @@ export class ProfilePage {
         highlightStroke: "rgba(96, 208, 227,1)",
         data: dataInKm
       }]
-    },
+    };
     this.zone.run(() => {
       this.runningDataLoading = false;
       let ctx:any = (<HTMLCanvasElement> document.getElementById("runningChart")).getContext("2d");
@@ -522,26 +522,26 @@ export class ProfilePage {
       scaleShowGridLines: false
     }
     this.sleepChartHandle = new Chart(ctx, {
-        type: 'bar',
-        data: sleepData, 
-        options: {
-          legend: {
-              display: false,
-          },
-          scales : {
-              xAxes : [ {
-                  gridLines : {
-                      display : false
-                  }
-              } ],
-              yAxes : [ {
-                  gridLines : {
-                      display : false
-                  }
-              } ]
-            }
+      type: 'bar',
+      data: sleepData, 
+      options: {
+        legend: {
+            display: false,
+        },
+        scales : {
+            xAxes : [ {
+                gridLines : {
+                    display : false
+                }
+            } ],
+            yAxes : [ {
+                gridLines : {
+                    display : false
+                }
+            } ]
           }
-      }); 
+        }
+    }); 
   }
 
   initKjData() {

@@ -239,6 +239,8 @@ export class Health {
         this.callbackFunction(this.chatObject, this.isReply, {error: "Error accessing distance"}, null, false);
       });
     } else {
+      this.loading = false;
+      alert('Health API Not Available');
       this.summaryString = 'Recent Activity Statement (Health Api Not Available)'
     }
   }
@@ -248,7 +250,7 @@ export class Health {
     let ACCEPTED_INTERVAL = 5 * 60; //seconds
     let ACCEPTED_MIN_DISTANCE = 100;
     if (distanceArray != null) {
-      console.log(distanceArray.length, distanceArray);
+      //console.log(distanceArray.length, distanceArray);
       let combinedTrips:any[] = [];
       let lastEndTime:Date = new Date();
       lastEndTime.setDate(lastEndTime.getDate() - 2); //2 days ago, just any date in past
@@ -268,7 +270,7 @@ export class Health {
           lastEndTime = trip.endDate;
         }
       }
-      console.log(combinedTrips.length, combinedTrips);
+      //console.log(combinedTrips.length, combinedTrips);
       let finalTrips:any[] = [];
       for (let i = 0; i < combinedTrips.length; i++) {
         if (combinedTrips[i].value > ACCEPTED_MIN_DISTANCE) {
@@ -297,7 +299,7 @@ export class Health {
               + 'km walk you did from ' + startHour + ':' + startMin + ' to '
               + endHour + ':' + endMin + '!';
             //Parse.User.current().set(Consts.USER_LASTNOTIFIEDRECENTACTIVITY, new Date());
-            Parse.User.current().save();
+            (<Parse.Object> Parse.User.current()).save();
             this.loading = false;
           }
         },

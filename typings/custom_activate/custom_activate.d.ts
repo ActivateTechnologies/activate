@@ -10,14 +10,7 @@ interface Window {
 	FB: any;
 }
 
-interface Chart {
-
-}
-
 interface Navigator {
 	health: any;
-}
-
-interface facebookConnectPlugin {
-
+	camera: any;
 }
