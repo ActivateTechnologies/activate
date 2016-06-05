@@ -341,4 +341,8 @@ export class HomePage {
     }
   }
 
+  moodSad() {
+    alert('Sad');
+  }
+
 }
