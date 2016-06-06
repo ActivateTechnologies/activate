@@ -14,7 +14,7 @@ export class ProfilePage {
 
   nav:any;viewController:any; user:any; currentUser:any; zone:any; platform:any; http:any
   message:string; friendStatus:any; respondToRequest:boolean;
-  userRelationshipNumber:number; friends:any[]; relationship:any;
+  userRelationshipNumber:number; friends:any[]; relationship:any; arrangedDayLabels:string[];
   walkingTimeAve:number; runningTimeAve:number;
   cyclingTimeAve:number; sleepTimeAve:number;
   walkingTimeWeek:number[]; runningTimeWeek:number[]; cyclingTimeWeek:number[];
@@ -25,7 +25,7 @@ export class ProfilePage {
   heartData:number[][]; heartDataLoading:boolean;
   walkingChartHandle:any; heartChartHandle:any; cyclingChartHandle:any; kJChartHandle:any;
   sleepData:number[]; sleepDataLoading:boolean; sleepChartHandle: any; foodStrings: string[]; 
-  foodArray: any[]; moodData:any;
+  foodArray: any[]; moodData:any[]; moodDataLoading:boolean;
 
   constructor(ionicApp: IonicApp, navController: NavController, navParams: NavParams,
    viewController: ViewController, zone: NgZone, platform: Platform, http: Http) {
@@ -45,12 +45,10 @@ export class ProfilePage {
     this.runningDataLoading = true;
     this.heartDataLoading = false;
     this.sleepDataLoading = true;
+    this.moodDataLoading = true;
     this.foodStrings = [];
     this.foodArray = [];
-    this.moodData = {
-      data: [],
-      days: []
-    }
+    this.moodData = [];
   }
 
   onPageDidEnter() {
@@ -58,8 +56,15 @@ export class ProfilePage {
   }
 
   initialize() {
-    //this.initAveData();
-    //this.initWeekData();
+    //Initialize arrangedDayLabels
+    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+    this.arrangedDayLabels = [];
+    let day = new Date().getDay() - 1;
+    day = (day == -1) ? 6 : day;
+    for (let i = 0; i < 8; i++) {
+      this.arrangedDayLabels.push(days[(i+day) % 7]);
+    }
+
     if (localStorage['healthApiAccessGranted']) {
       this.initWalkingData(() => {
         this.initStravaData();
@@ -149,8 +154,15 @@ export class ProfilePage {
   initMoodData() {
     CloudFunctions.getWeekMoodsData((data, error) => {
       if (!error) {
+        this.moodDataLoading = false;
         console.log('Got moods data:', data.averageMoods);
-        this.moodData.data = data.averageMoods;
+        this.moodData = [];
+        for (let i = 0; i < data.averageMoods.length; i++) {
+          this.moodData.push({
+            dayLabel: this.arrangedDayLabels[i],
+            mood: Math.ceil(data.averageMoods[i])
+          });
+        }
       } else {
         console.log('Error getting moods data', error.message);
       }
@@ -219,19 +231,12 @@ export class ProfilePage {
     })
     let ctx:any = (<HTMLCanvasElement> document.getElementById("heartChart"))
       .getContext("2d");
-    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-    let labels:string[] = [];
-    let day = new Date().getDay() - 1;
-    day = (day == -1) ? 6 : day;
-    for (let i = 0; i < this.heartData[0].length; i++) {
-      labels.push(days[(i+day) % 7]);
-    }
-    console.log("Min Heart:");
+    /*console.log("Min Heart:");
     console.log(this.heartData[0]);
     console.log("Max Heart:");
-    console.log(this.heartData[1]);
+    console.log(this.heartData[1]);*/
     let heartData:any = {
-      labels: labels,
+      labels: this.arrangedDayLabels,
       datasets: [{
         label: "bpm min",
         backgroundColor: "rgb(224, 224, 224)",
@@ -328,15 +333,8 @@ export class ProfilePage {
     });
     let ctx:any = (<HTMLCanvasElement> document.getElementById("walkingChart"))
       .getContext("2d");
-    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-    let labels:string[] = [];
-    let day = new Date().getDay() - 1;
-    day = (day == -1) ? 6 : day;
-    for (let i = 0; i < 8; i++) {
-      labels.push(days[(i+day) % 7]);
-    }
     let walkingData:any = {
-      labels: labels,
+      labels: this.arrangedDayLabels,
       datasets: [{
         label: "km",
         backgroundColor: "rgb(104, 143, 206)",
@@ -373,20 +371,13 @@ export class ProfilePage {
   }
 
   initRunningChart() {
-    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-    let labels:string[] = [];
-    let day = new Date().getDay() - 1;
-    day = (day == -1) ? 6 : day;
-    for (let i = 0; i < this.runningData.distance.length; i++) {
-      labels.push(days[(i+day) % 7]);
-    }
     let dataInKm:any[];
     dataInKm = [];
     for (let i = 0; i < this.runningData.distance.length; i++) {
       dataInKm.push(Math.round(this.runningData.distance[i]/1000));
     }
     let runningDataObject:any = {
-      labels: labels,
+      labels: this.arrangedDayLabels,
       datasets: [{
         label: "km",
         backgroundColor: "rgb(96, 208, 227)",
@@ -408,16 +399,16 @@ export class ProfilePage {
               display: false,
           },
           scales : {
-              xAxes : [ {
-                  gridLines : {
-                      display : false
-                  }
-              } ],
-              yAxes : [ {
-                  gridLines : {
-                      display : false
-                  }
-              } ]
+            xAxes : [{
+              gridLines : {
+                display : false
+              }
+            }],
+            yAxes : [{
+              gridLines : {
+                display : false
+              }
+            }]
             }
           }
       });
@@ -425,20 +416,13 @@ export class ProfilePage {
   }
 
   initCyclingChart() {
-    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-    let labels:string[] = [];
-    let day = new Date().getDay() - 1;
-    day = (day == -1) ? 6 : day;
-    for (let i = 0; i < this.cyclingData.distance.length; i++) {
-      labels.push(days[(i+day) % 7]);
-    }
     let dataInKm:any[];
     dataInKm = [];
     for (let i = 0; i < this.cyclingData.distance.length; i++) {
       dataInKm.push(Math.round(this.cyclingData.distance[i]/1000));
     }
     let cyclingDataObject:any = {
-      labels: labels,
+      labels: this.arrangedDayLabels,
       datasets: [{
         label: "km",
         backgroundColor: "rgb(117, 223, 152)",
@@ -523,15 +507,8 @@ export class ProfilePage {
     });
     let ctx:any = (<HTMLCanvasElement> document.getElementById("sleepChart"))
       .getContext("2d");
-    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-    let labels:string[] = [];
-    let day = new Date().getDay() - 1;
-    day = (day == -1) ? 6 : day;
-    for (let i = 0; i < 8; i++) {
-      labels.push(days[(i+day) % 7]);
-    }
     let sleepData:any = {
-      labels: labels,
+      labels: this.arrangedDayLabels,
       datasets: [{
         label: "km",
         backgroundColor: "rgb(217, 153, 222)",
@@ -648,15 +625,8 @@ export class ProfilePage {
       this.kJDataLoading = false;
     });
     let ctx:any = (<HTMLCanvasElement> document.getElementById("kJChart")).getContext("2d");
-    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-    let labels:string[] = [];
-    let day = new Date().getDay() - 1;
-    day = (day == -1) ? 6 : day;
-    for (let i = 0; i < 8; i++) {
-      labels.push(days[(i+day) % 7]);
-    }
     let kJData:any = {
-      labels: labels,
+      labels: this.arrangedDayLabels,
       datasets: [{
         label: "km",
         backgroundColor: "rgb(243, 162, 115)",
@@ -694,44 +664,83 @@ export class ProfilePage {
 
   foodData() {
     console.log('Inside food data')
+    let start:Date = new Date();
+    start.setHours(0);
+    start.setMinutes(0);
+    start.setSeconds(0);
+    start = new Date(start.getTime() - 7 * 86400 * 1000);
     var query = new Parse.Query(Consts.NUTRITION_CLASS);
     query.equalTo(Consts.NUTRITION_USER, Parse.User.current());
+    query.greaterThan(Consts.CREATED_AT, start);
+    query.ascending(Consts.CREATED_AT);
     query.find({
       success: (results) => {
         console.log("Successfully retrieved " + results.length + " food entries.");
         // Do something with the returned Parse.Object values
-        for (var i = 0; i < results.length; i++) {
-          var parseObject = results[i];
-          var obj = parseObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE);
-          var nutObj = parseObject.get(Consts.NUTRITION_NUTRITIONIX_INFO);
-          
-          if (obj && nutObj) {
-            var newObj = JSON.parse(JSON.parse(obj)).description.captions[0].text;
-            //console.log(newObj);
+        /*Structure: foodArray = [
+          {
+            dayString:"Mo",
+            array:[
+              {  
+                microsoft: newMsObj,
+                nutritionix: newNutObj,
+                createdAt: hour+":"+min
+              },
+              {  
+                microsoft: newMsObj,
+                nutritionix: newNutObj,
+                createdAt: hour+":"+min
+              },
+              ...
+            ]
+          },
+          ...
+        ]*/
+        this.foodArray = [];
 
-            var newNutObj = JSON.parse(JSON.parse(nutObj)).nf_calories;
+        //Initialise foodArray with labels
+        for (let i = 0; i < 8; i++) {
+          this.foodArray.push({
+            dayString: this.arrangedDayLabels[i],
+            array: []
+          });
+        }
+
+        for (let i = 0; i < results.length; i++) {
+          let parseObject = results[i];
+          let msObject = parseObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE);
+          let nutritionObject = parseObject.get(Consts.NUTRITION_NUTRITIONIX_INFO);
+          let nutCreatedAt = parseObject.get(Consts.CREATED_AT);
+
+          //Calculating dayIndex, position in foodArray that this food object will go into
+          let timeDifference = (new Date()).getTime()
+            - results[i].get(Consts.CREATED_AT).getTime();
+          let dayIndex = Math.floor(timeDifference / (86400 * 1000));
+          
+          if (msObject && nutritionObject) {
+            let microsoftDescription = JSON.parse(JSON.parse(msObject))
+              .description.captions[0].text;
+            console.log(microsoftDescription);
+
+            let nutritionixCalories = JSON.parse(JSON.parse(nutritionObject)).nf_calories;
             //console.log(newNutObj);
 
-            var object = {
-              microsoft: newObj,
-              nutritionix: newNutObj
-            }
+            let hour = (nutCreatedAt.getHours() < 10)
+              ? '0' + nutCreatedAt.getHours() : nutCreatedAt.getHours();
+            let min = (nutCreatedAt.getMinutes() < 10)
+              ? '0' + nutCreatedAt.getMinutes() : nutCreatedAt.getMinutes();
 
-            this.foodArray.push(object);
-
-            //this.foodStrings.push(newObj.description.captions[0].text);
+            //Creating and pushing the food object into foodArray
+            this.foodArray[dayIndex].array.push({
+              microsoft: microsoftDescription,
+              nutritionix: nutritionixCalories,
+              createdAt: hour + ":" + min
+            });
           }
-          
-
-          //var parseObject = results[i];
-          //var obj = JSON.parse(JSON.parse(parseObject
-          //  .get(Consts.NUTRITION_MICROSOFT_RESPONSE)));
-          //console.log(obj.description.captions[0].text);
         }
-        //console.log(this.foodStrings);
       },
       error: (error) => {
-        console.log("Error: " + error.code + " " + error.message);
+        console.log("Error querying food data:", error.message);
       }
     });
   }

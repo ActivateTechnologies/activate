@@ -98,6 +98,8 @@ export class Consts {
   public static NUTRITION_NUTRITIONIX_INFO = "nutritionixInformation";
   //File - Image uploaded by user
   public static NUTRITION_IMAGE = "image";
+  //Date - Created At
+  public static CREATED_AT = "createdAt";
 
   //Mood Class
   public static MOOD_CLASS = "Mood";
