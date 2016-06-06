@@ -60,12 +60,11 @@ export class Health {
         html.replace('<!--template bindings={}-->', ' ')
           .replace('<!--template bindings={}-->', ' '); //two occurances
         html = '<div class="health">' + html + '</div>';
-        if (this.widgetType == 'showData') {
+        if (this.widgetType == 'showData' || this.widgetType == 'recentActivity') {
           this.callbackFunction(this.chatObject, this.isReply, null, html, false);
         } else {
           this.callbackFunction(this.chatObject, this.isReply, null, html, true);
         }
-        
       });
     }
   }

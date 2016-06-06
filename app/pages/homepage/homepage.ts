@@ -328,7 +328,6 @@ export class HomePage {
             let min = (now.getMinutes() < 10) ? '0' + now.getMinutes() : now.getMinutes();
             let dateString = now.getDay() + " " + months[now.getMonth()] + ", "
               + hour + ":" + min;
-            console.log(dateString);
             let messageObject = {
               type:'dateMessage',
               date: now,

@@ -31,6 +31,18 @@ export class CloudFunctions {
     });
   }
 
+  public static getWeekMoodsData(callback) {
+    Parse.Cloud.run('getWeekMoodData', {}, {
+      success: (data) => {
+        callback(data);
+      },
+      error: (error) => {
+        console.log('Error calling getWeekMoodsData:', error.message);
+        callback({}, error);
+      }
+    });
+  }
+
   public static stravaActivitiesLastWeek(callback) {
     Parse.Cloud.run('stravaActivitiesLastWeek', {}, {
       success: (data) => {

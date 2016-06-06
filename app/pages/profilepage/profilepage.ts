@@ -1,4 +1,5 @@
-import {Page, IonicApp, NavController, ViewController, NavParams, Platform} from 'ionic-angular';
+import {Page, IonicApp, NavController, ViewController, NavParams, Platform}
+ from 'ionic-angular';
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {UIMessages} from '../../helpers/uimessages';
@@ -24,7 +25,7 @@ export class ProfilePage {
   heartData:number[][]; heartDataLoading:boolean;
   walkingChartHandle:any; heartChartHandle:any; cyclingChartHandle:any; kJChartHandle:any;
   sleepData:number[]; sleepDataLoading:boolean; sleepChartHandle: any; foodStrings: string[]; 
-  foodArray: any[];
+  foodArray: any[]; moodData:any;
 
   constructor(ionicApp: IonicApp, navController: NavController, navParams: NavParams,
    viewController: ViewController, zone: NgZone, platform: Platform, http: Http) {
@@ -46,6 +47,10 @@ export class ProfilePage {
     this.sleepDataLoading = true;
     this.foodStrings = [];
     this.foodArray = [];
+    this.moodData = {
+      data: [],
+      days: []
+    }
   }
 
   onPageDidEnter() {
@@ -92,7 +97,7 @@ export class ProfilePage {
     }
 
     this.foodData();
-    
+    this.initMoodData();
     this.initHeartData();
   }
 
@@ -141,65 +146,79 @@ export class ProfilePage {
     });
   }
 
+  initMoodData() {
+    CloudFunctions.getWeekMoodsData((data, error) => {
+      if (!error) {
+        console.log('Got moods data:', data.averageMoods);
+        this.moodData.data = data.averageMoods;
+      } else {
+        console.log('Error getting moods data', error.message);
+      }
+    })
+  }
+
   //-------CHARTS--------
-    initHeartData() {
-    this.heartData = [[], []];
-    for (let i = 0; i < 8; i++) {
-      this.heartData[0].push(999);
-      this.heartData[1].push(0);
-    }
-    let start:Date = new Date();
-    start.setHours(0);
-    start.setMinutes(0);
-    start.setSeconds(0);
-    start = new Date(start.getTime() - 7 * 86400 * 1000);
-    let callbacksRemaining:number = 8;
-    for (let i = 0; i < 8; i++) {
-      ((i) => {
-        navigator.health.query({
-          startDate: new Date(start.getTime() + i * 86400 * 1000),
-          endDate: new Date(start.getTime() + (i + 1) * 86400 * 1000),
-          dataType: 'heart_rate'
-        }, (data) => {
-          callbacksRemaining--;
-          for (let j = 0; j < data.length; j++) {
-            if (data[j].value < this.heartData[0][i]) {
-              this.heartData[0][i] = data[j].value;
+  initHeartData() {
+    if (localStorage['healthApiAccessGranted']) {
+      this.heartData = [[], []];
+      for (let i = 0; i < 8; i++) {
+        this.heartData[0].push(999);
+        this.heartData[1].push(0);
+      }
+      let start:Date = new Date();
+      start.setHours(0);
+      start.setMinutes(0);
+      start.setSeconds(0);
+      start = new Date(start.getTime() - 7 * 86400 * 1000);
+      let callbacksRemaining:number = 8;
+      for (let i = 0; i < 8; i++) {
+        ((i) => {
+          navigator.health.query({
+            startDate: new Date(start.getTime() + i * 86400 * 1000),
+            endDate: new Date(start.getTime() + (i + 1) * 86400 * 1000),
+            dataType: 'heart_rate'
+          }, (data) => {
+            callbacksRemaining--;
+            for (let j = 0; j < data.length; j++) {
+              if (data[j].value < this.heartData[0][i]) {
+                this.heartData[0][i] = data[j].value;
+              }
+              if (data[j].value > this.heartData[1][i]) {
+                this.heartData[1][i] = data[j].value;
+              }
             }
-            if (data[j].value > this.heartData[1][i]) {
-              this.heartData[1][i] = data[j].value;
+            if (this.heartData[0][i] == 999) {
+              this.heartData[0][i] = 0;
             }
-          }
-          if (this.heartData[0][i] == 999) {
-            this.heartData[0][i] = 0;
-          }
-          //console.log('Activity', i, data);
-          /*if (data.value.sleep) {
-            this.sleepData[i]
-             = Math.round(data.value.sleep.duration * 10 / 3600) / 10;
-          }
-          */  
-          if (callbacksRemaining == 0 ) {
-            //console.log("Heart data:");
-            //console.log(this.heartData);
-            this.initHeartChart();
-          }
-        }, (error) => {
-          callbacksRemaining--;
-          console.log('Error:', error);
-          if (callbacksRemaining == 0 ) {
-            this.initHeartChart();
-          }
-        });
-      })(i);
+            //console.log('Activity', i, data);
+            /*if (data.value.sleep) {
+              this.sleepData[i]
+               = Math.round(data.value.sleep.duration * 10 / 3600) / 10;
+            }
+            */  
+            if (callbacksRemaining == 0 ) {
+              //console.log("Heart data:");
+              //console.log(this.heartData);
+              this.initHeartChart();
+            }
+          }, (error) => {
+            callbacksRemaining--;
+            console.log('Error:', error);
+            if (callbacksRemaining == 0 ) {
+              this.initHeartChart();
+            }
+          });
+        })(i);
+      }
     }
   }
 
-   initHeartChart() {
+  initHeartChart() {
     this.zone.run(() => {
       this.heartDataLoading = false;
     })
-    let ctx:any = (<HTMLCanvasElement> document.getElementById("heartChart")).getContext("2d");
+    let ctx:any = (<HTMLCanvasElement> document.getElementById("heartChart"))
+      .getContext("2d");
     let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
     let labels:string[] = [];
     let day = new Date().getDay() - 1;
@@ -307,7 +326,8 @@ export class ProfilePage {
     this.zone.run(() => {
       this.walkingDataLoading = false;
     });
-    let ctx:any = (<HTMLCanvasElement> document.getElementById("walkingChart")).getContext("2d");
+    let ctx:any = (<HTMLCanvasElement> document.getElementById("walkingChart"))
+      .getContext("2d");
     let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
     let labels:string[] = [];
     let day = new Date().getDay() - 1;
@@ -378,7 +398,8 @@ export class ProfilePage {
     };
     this.zone.run(() => {
       this.runningDataLoading = false;
-      let ctx:any = (<HTMLCanvasElement> document.getElementById("runningChart")).getContext("2d");
+      let ctx:any = (<HTMLCanvasElement> document.getElementById("runningChart"))
+        .getContext("2d");
       this.cyclingChartHandle = new Chart(ctx, {
         type: 'bar',
         data: runningDataObject,
@@ -432,7 +453,8 @@ export class ProfilePage {
     }
     this.zone.run(() => {
       this.cyclingDataLoading = false;
-      let ctx:any = (<HTMLCanvasElement> document.getElementById("cyclingChart")).getContext("2d");
+      let ctx:any = (<HTMLCanvasElement> document.getElementById("cyclingChart"))
+        .getContext("2d");
       this.cyclingChartHandle = new Chart(ctx, {
         type: 'bar',
         data: cyclingDataObject, 
@@ -499,7 +521,8 @@ export class ProfilePage {
     this.zone.run(() => {
       this.sleepDataLoading = false;
     });
-    let ctx:any = (<HTMLCanvasElement> document.getElementById("sleepChart")).getContext("2d");
+    let ctx:any = (<HTMLCanvasElement> document.getElementById("sleepChart"))
+      .getContext("2d");
     let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
     let labels:string[] = [];
     let day = new Date().getDay() - 1;
@@ -682,13 +705,12 @@ export class ProfilePage {
           var obj = parseObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE);
           var nutObj = parseObject.get(Consts.NUTRITION_NUTRITIONIX_INFO);
           
-          
           if (obj && nutObj) {
             var newObj = JSON.parse(JSON.parse(obj)).description.captions[0].text;
-            console.log(newObj);
+            //console.log(newObj);
 
             var newNutObj = JSON.parse(JSON.parse(nutObj)).nf_calories;
-            console.log(newNutObj);
+            //console.log(newNutObj);
 
             var object = {
               microsoft: newObj,
@@ -702,10 +724,11 @@ export class ProfilePage {
           
 
           //var parseObject = results[i];
-          //var obj = JSON.parse(JSON.parse(parseObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE)));
+          //var obj = JSON.parse(JSON.parse(parseObject
+          //  .get(Consts.NUTRITION_MICROSOFT_RESPONSE)));
           //console.log(obj.description.captions[0].text);
         }
-        console.log(this.foodStrings);
+        //console.log(this.foodStrings);
       },
       error: (error) => {
         console.log("Error: " + error.code + " " + error.message);
@@ -715,7 +738,10 @@ export class ProfilePage {
 
   //STRAVA
   connectStravaButton() {
-    var browserRef = window.cordova.InAppBrowser.open("https://www.strava.com/oauth/authorize?client_id=11012&response_type=code" + "&response_type=code&redirect_uri=http://localhost&approval_prompt=force", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
+    var browserRef = window.cordova.InAppBrowser.open("https://www.strava.com/oauth/authorize?"
+      + "client_id=11012&response_type=code&response_type=code"
+      + "&redirect_uri=http://localhost&approval_prompt=force",
+      "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
     browserRef.addEventListener("loadstart", (event) => {
       if ((event.url).indexOf("http://localhost") === 0) {
         browserRef.removeEventListener("exit", (event) => {});
@@ -747,7 +773,8 @@ export class ProfilePage {
         var idTest = JSON.parse(xmlhttp.responseText).athlete.id;
         Parse.User.current().set(Consts.USER_STRAVADATA, JSON.parse(xmlhttp.responseText));
         Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, access_code);
-        Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN, JSON.parse(xmlhttp.responseText).access_token);
+        Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN,
+          JSON.parse(xmlhttp.responseText).access_token);
         Parse.User.current().set(Consts.USER_STRAVAID, idTest);
         (<Parse.Object> Parse.User.current()).save();
       }
@@ -819,7 +846,10 @@ export class ProfilePage {
 
   //MOVES
   connectMoves() {
-    var browserRef = window.cordova.InAppBrowser.open("https://api.moves-app.com/oauth/v1/authorize?response_type=code&client_id=95C57N4Gt5t9l5uir45i0P6RcNd1DN6v&scope=activity%20location", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
+    var browserRef = window.cordova.InAppBrowser.open("https://api.moves-app.com/oauth/v1/"
+      + "authorize?response_type=code&client_id=95C57N4Gt5t9l5uir45i0P6RcNd1DN6v"
+      + "&scope=activity%20location", "_blank", "location=no,clearsessioncache=yes,"
+      + "clearcache=yes");
     browserRef.addEventListener("loadstart", (event) => {
         if ((event.url).indexOf("http://localhost") === 0) {
             browserRef.removeEventListener("exit", (event) => {});
@@ -858,7 +888,8 @@ export class ProfilePage {
         /*
         Parse.User.current().set(Consts.USER_STRAVADATA, JSON.parse(xmlhttp.responseText));
         Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, access_code);
-        Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN, JSON.parse(xmlhttp.responseText).access_token);
+        Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN,
+          JSON.parse(xmlhttp.responseText).access_token);
         (<Parse.Object> Parse.User.current()).save();*/
       }
     }
@@ -885,7 +916,10 @@ export class ProfilePage {
 
   //MEETUP
   connectMeetup() {
-    /*this.cordovaOauth = new CordovaOauth(new Meetup({clientId: "5mmt4kfgh5mc469f43hj8t5rh6", appScope: ["email"]}));
+    /*this.cordovaOauth = new CordovaOauth(new Meetup({
+      clientId: "5mmt4kfgh5mc469f43hj8t5rh6",
+      appScope: ["email"]
+    }));
     this.cordovaOauth.login().then((success) => {
       alert(JSON.stringify(success));
         }, (error) => {
