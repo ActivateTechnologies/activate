@@ -89,6 +89,9 @@ export class HomePage {
             messageObject.isWidget = false;
             messageObject.message = parseObjects[i].get(Consts.MESSAGES_MESSAGE);
           }
+          if (parseObjects[i].get(Consts.MESSAGES_TYPE)) {
+            messageObject.type = parseObjects[i].get(Consts.MESSAGES_TYPE);
+          }
           messageObject.usersMessage = parseObjects[i].get(Consts.MESSAGES_USERSMESSAGE);
           //this.chatMessages.push(messageObject);
           this.chatMessages.splice(0, 0, messageObject);
@@ -165,6 +168,9 @@ export class HomePage {
     let message = new Message();
     message.set(Consts.MESSAGES_USERSMESSAGE, usersMessage);
     message.set(Consts.MESSAGES_TIMESTAMP, new Date());
+    if (messageObject.type) {
+      message.set(Consts.MESSAGES_TYPE, messageObject.type);
+    }
     if (treeObject) {
       message.set(Consts.MESSAGES_TREEOBJECT, treeObject);
     }
@@ -306,18 +312,30 @@ export class HomePage {
     }, 200);
   }
 
-  navigateTreeTo(notesString, insertLine) {
+  navigateTreeTo(notesString, insertDate) {
     let TreeObjects:any = Parse.Object.extend(Consts.TREEOBJECTS_CLASS);
     let query:any = new Parse.Query(TreeObjects);
     query.equalTo(Consts.TREEOBJECTS_NOTES, notesString);
     query.first({
       success: (treeObject) => {
         //console.log('Got treeObject', treeObject)
-        if (insertLine) {
+        if (insertDate) {
           this.zone.run(() => {
-            this.chatMessages.push({
-              type:'line'
-            });
+            let now = new Date();
+            let months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+              "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+            let hour = (now.getHours() < 10) ? '0' + now.getHours() : now.getHours();
+            let min = (now.getMinutes() < 10) ? '0' + now.getMinutes() : now.getMinutes();
+            let dateString = now.getDay() + " " + months[now.getMonth()] + ", "
+              + hour + ":" + min;
+            console.log(dateString);
+            let messageObject = {
+              type:'dateMessage',
+              date: now,
+              message: dateString
+            };
+            this.chatMessages.push(messageObject);
+            this.saveMessageToParse(messageObject, null, false);
           });
         }
         setTimeout(() => {

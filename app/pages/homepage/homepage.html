@@ -17,14 +17,15 @@
     <span *ngIf="loadingMessages">Loading ...</span>
     <div *ngFor="let chatMessage of chatMessages" class="fade-in"
         [class.align-right]="chatMessage.usersMessage">
-      <div *ngIf="chatMessage.type != 'line'" [class.message-user]="chatMessage.usersMessage"
+      <div *ngIf="chatMessage.type != 'dateMessage'" [class.message-user]="chatMessage.usersMessage"
           [class.message-bot]="!chatMessage.usersMessage">
         <span *ngIf="!chatMessage.isWidget" [innerHTML]="chatMessage.message"></span>
         <Widget *ngIf="chatMessage.isWidget" [callbackFunction]="widgetBoundCallback"
          [chatObject]="chatMessage" [isReply]="false"></Widget>
       </div>
-      <div *ngIf="chatMessage.type == 'line'" class="chat-break-line"></div>
-      <br>
+      <div *ngIf="chatMessage.type == 'dateMessage'" class="chat-break-line">
+        {{chatMessage.message}}
+      </div>
     </div>
     <div class="message-typing fade-in" [hidden]="!typing">
       <span class="message-typing-inside">...</span>

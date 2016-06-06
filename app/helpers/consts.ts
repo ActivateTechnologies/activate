@@ -20,6 +20,8 @@ export class Consts {
   public static MESSAGES_TREEOBJECT = "treeObject";
   //Date - Timestamp of when the message was actually created
   public static MESSAGES_TIMESTAMP = "timestamp";
+  //String - Type of message, e.g. "dateMessage"
+  public static MESSAGES_TYPE = "type";
 
   //TreeObjects Class
   public static TREEOBJECTS_CLASS = "TreeObjects";
