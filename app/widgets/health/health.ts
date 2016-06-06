@@ -1,6 +1,7 @@
 import {NavController, IonicApp, Platform} from 'ionic-angular';
 import {Component, Input} from '@angular/core'
 import {Consts} from '../../helpers/consts';
+import {NgZone} from '@angular/core';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 
 @Component({
@@ -20,15 +21,17 @@ export class Health {
   //Called after the widget has performed its task
 	@Input() callbackFunction:Function;
 
+  zone: any;
 	loading:boolean = false; currentUser:any; lastLocation:Parse.GeoPoint;
   platform:any; healthApiAvailable:boolean = false; healthApiAccessGranted:boolean = false;
   platformId:string; widgetType:string; initHealthString:string; summaryString:string;
 
-  constructor(platform: Platform) {
+  constructor(platform: Platform, zone: NgZone) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.currentUser = Parse.User.current();
     this.loading = true;
     this.platform = platform;
+    this.zone = zone;
   }
 
   ngOnInit() {
@@ -250,27 +253,34 @@ export class Health {
     let ACCEPTED_INTERVAL = 5 * 60; //seconds
     let ACCEPTED_MIN_DISTANCE = 100;
     if (distanceArray != null) {
-      //console.log(distanceArray.length, distanceArray);
+      distanceArray = distanceArray.sort((a, b) => {
+        return a.startDate - b.startDate;
+      })
+      //console.log('All trips', distanceArray.length, JSON.stringify(distanceArray));
       let combinedTrips:any[] = [];
       let lastEndTime:Date = new Date();
       lastEndTime.setDate(lastEndTime.getDate() - 2); //2 days ago, just any date in past
+      //Combining the trips with given interval and ignoring values with source containing "watch"
       for (let i = 0; i < distanceArray.length; i++) {
-        let trip = distanceArray[i];
-        if ((trip.endDate.getTime() - lastEndTime.getTime()) > 
-          ACCEPTED_INTERVAL * 1000) {
-          combinedTrips.push({
-            startDate: trip.startDate,
-            endDate: trip.endDate,
-            value: trip.value
-          });
-          lastEndTime = trip.endDate;
-        } else {
-          combinedTrips[combinedTrips.length-1].value += trip.value;
-          combinedTrips[combinedTrips.length-1].endDate = trip.endDate;
-          lastEndTime = trip.endDate;
+        if (!distanceArray[i].source || 
+          distanceArray[i].source.toLowerCase().search("watch") == -1) {
+          let trip = distanceArray[i];
+          if ((trip.endDate.getTime() - lastEndTime.getTime()) > 
+            ACCEPTED_INTERVAL * 1000) {
+            combinedTrips.push({
+              startDate: trip.startDate,
+              endDate: trip.endDate,
+              value: trip.value
+            });
+            lastEndTime = trip.endDate;
+          } else {
+            combinedTrips[combinedTrips.length-1].value += trip.value;
+            combinedTrips[combinedTrips.length-1].endDate = trip.endDate;
+            lastEndTime = trip.endDate;
+          }
         }
       }
-      //console.log(combinedTrips.length, combinedTrips);
+      //console.log('Combined trips', combinedTrips.length, JSON.stringify(combinedTrips));
       let finalTrips:any[] = [];
       for (let i = 0; i < combinedTrips.length; i++) {
         if (combinedTrips[i].value > ACCEPTED_MIN_DISTANCE) {
@@ -278,6 +288,7 @@ export class Health {
         }
       }
       let lastTrip = finalTrips[finalTrips.length-1];
+      //console.log('Last Trip', lastTrip);
       console.log(Parse.User.current().get(Consts.USER_LASTNOTIFIEDRECENTACTIVITY), lastTrip.endDate);
       Parse.User.current().fetch({
         success: (object) => {
@@ -291,16 +302,20 @@ export class Health {
             startMin = (startMin > 9) ? startMin : "0" + startMin;
             let startHour = lastTrip.startDate.getHours() % 12;
             startHour = startHour ? startHour : 12;
+            let startAmPm = (lastTrip.startDate.getHours() < 12) ? "am" : "pm"; 
             let endMin = lastTrip.endDate.getMinutes();
             endMin = (endMin > 9) ? endMin : "0" + endMin;
             let endHour = lastTrip.endDate.getHours() % 12;
             endHour = endHour ? endHour : 12;
-            this.summaryString = 'Nice ' + Math.round(lastTrip.value/10)/100
-              + 'km walk you did from ' + startHour + ':' + startMin + ' to '
-              + endHour + ':' + endMin + '!';
+            let endAmPm = (lastTrip.endDate.getHours() < 12) ? "am" : "pm";
+            this.zone.run(() => {
+              this.summaryString = 'Nice ' + Math.round(lastTrip.value/10)/100
+                + 'km walk you did from ' + startHour + ':' + startMin + startAmPm + ' to '
+                + endHour + ':' + endMin + endAmPm + '!';
+              this.loading = false;
+            });
             //Parse.User.current().set(Consts.USER_LASTNOTIFIEDRECENTACTIVITY, new Date());
             (<Parse.Object> Parse.User.current()).save();
-            this.loading = false;
           }
         },
         error: (object, error) => {

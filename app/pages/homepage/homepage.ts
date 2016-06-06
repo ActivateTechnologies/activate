@@ -77,7 +77,7 @@ export class HomePage {
     let query = new Parse.Query(Messages);
     query.equalTo(Consts.MESSAGES_USER, Parse.User.current());
     query.descending(Consts.MESSAGES_TIMESTAMP);
-    query.limit(10);
+    query.limit(100);
     query.find({
       success: (parseObjects) => {
         for (let i = 0; i < parseObjects.length; i++) {
@@ -221,11 +221,11 @@ export class HomePage {
     //console.log('Going to fetch:', pointer);
     if (pointer == null || typeof pointer.fetch !== "function") {
       //console.log('Pointer is null, likely end of tree.');
-      this.chatMessages.push({
+      /*this.chatMessages.push({
         message: "- End of tree -",
         usersMessage: false,
         isWidget: false
-      });
+      });*/
       this.setTyping(false);
       return;
     }

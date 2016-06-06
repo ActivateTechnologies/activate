@@ -1,5 +1,6 @@
 import {NavController, IonicApp} from 'ionic-angular';
 import {Component, Input} from '@angular/core'
+import {NgZone} from '@angular/core';
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {UserFunctions} from '../../helpers/userfunctions';
@@ -21,8 +22,13 @@ export class UseCamera {
   //Called after the widget has performed its task
   @Input() callbackFunction:Function;
 
-	loading:boolean = false; message:string; currentUser:any; imgsrc:any;
+	zone:any;
+  loading:boolean = false; message:string; currentUser:any; imgsrc:any;
   msDescription:string; caloriesString:string;
+
+  constructor(zone: NgZone) {
+    this.zone = zone;
+  }
 
   ngOnInit() {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
@@ -76,6 +82,7 @@ export class UseCamera {
     file.save({
       success: (savedFile) => {
         console.log('File saved successfully');
+        this.loading = true;
         let nutrition = new Parse.Object(Consts.NUTRITION_CLASS);
         nutrition.set(Consts.NUTRITION_USER, Parse.User.current());
         nutrition.set(Consts.NUTRITION_IMAGE, file);
@@ -89,18 +96,24 @@ export class UseCamera {
               obj = (obj && obj.description) ? obj.description : null;
               obj = (obj && obj.captions && obj.captions.length > 0) ? obj.captions[0] : null;
               obj = (obj && obj.text) ? obj.text : null;
-              this.msDescription = obj;
+              this.zone.run(() => {
+                this.loading = false;
+                this.msDescription = obj;
+              });
             }
             if (savedNutritionObject.get(Consts.NUTRITION_NUTRITIONIX_INFO)
               && savedNutritionObject.get(Consts.NUTRITION_NUTRITIONIX_INFO).length > 0) {
-              this.caloriesString = JSON.parse(JSON.parse(savedNutritionObject
-                .get(Consts.NUTRITION_NUTRITIONIX_INFO))).nf_calories + ' kcal';
+              this.zone.run(() => {
+                this.caloriesString = JSON.parse(JSON.parse(savedNutritionObject
+                  .get(Consts.NUTRITION_NUTRITIONIX_INFO))).nf_calories + ' kcal';
+              });
             }
             this.produceHtmlAndCallback(savedFile.url());
           },
           error: (savedNutritionObject, error) => {
             console.log("Error saving Nutrition object: ", error.message);
             this.produceHtmlAndCallback(savedFile.url());
+            this.loading = false;
           }
         });
       },
