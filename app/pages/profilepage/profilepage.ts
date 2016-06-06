@@ -157,7 +157,7 @@ export class ProfilePage {
         this.moodDataLoading = false;
         console.log('Got moods data:', data.averageMoods);
         this.moodData = [];
-        for (let i = 0; i < data.averageMoods.length; i++) {
+        for (let i = data.averageMoods.length - 1; i < 0; i--) {
           this.moodData.push({
             dayLabel: this.arrangedDayLabels[i],
             mood: Math.ceil(data.averageMoods[i])
@@ -708,19 +708,16 @@ export class ProfilePage {
 
         //Set the day labels inside foodArray
         let days:string[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-        let labels:string[] = [];
         let day = new Date().getDay() - 1;
         day = (day == -1) ? 6 : day;
         for (let i = 0; i < 8; i++) {
-          labels.push(days[(i+day) % 7]);
           this.foodArray[i].dayString = days[(i+day) % 7];
         }
-        this.arrangedDayLabels = labels;
 
         for (var i = 0; i < results.length; i++) {
           var parseObject = results[i];
-          var msObj = parseObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE);
-          var nutObj = parseObject.get(Consts.NUTRITION_NUTRITIONIX_INFO);
+          var msObject = parseObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE);
+          var nutritionObject = parseObject.get(Consts.NUTRITION_NUTRITIONIX_INFO);
           var nutCreatedAt = parseObject.get(Consts.CREATED_AT);
 
           //Calculating dayIndex, position in foodArray that this food object will go into
