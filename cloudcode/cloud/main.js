@@ -56,7 +56,52 @@ Parse.Cloud.define("getWeekHeartData", function(request, response) {
       })
     },
     error: function(error) {
-      console.log({error: "Error getting root TreeObject: "+error.message});
+      console.log({error: "Error querying heart data: "+error.message});
+      response.error(error);
+    }
+  });
+});
+
+Parse.Cloud.define("getWeekMoodData", function(request, response) {
+  var Mood = Parse.Object.extend("Mood");
+  var query = new Parse.Query(Mood);
+  query.equalTo('user', Parse.User.current());
+  var start = new Date();
+  start.setHours(0);
+  start.setMinutes(0);
+  start.setSeconds(0);
+  var end = start;
+  start = new Date(start.getTime() - 7 * 86400 * 1000);
+  query.greaterThan('createdAt', start);
+  query.lessThan('createdAt', end);
+  query.find({
+    success: function(parseObjects) {
+      //console.log({log:'Found mood', 'obj':parseObjects.length});
+      var moods = [];
+      for (var i = 0; i < 8; i++) {
+        moods.push([]);
+      }
+      for (var i = 0; i < parseObjects.length; i++) {
+        var time = parseObjects[i].get('createdAt').getTime() - start.getTime();
+        var day = Math.floor(time/(86400*1000))
+        moods[day].push(parseObjects[i].get('happiness'));
+      }
+      var averageMoods = [];
+      for (var i = 0; i < moods.length; i++) {
+        var sum = 0;
+        for (var j = 0; j < moods[i].length; j++) {
+          sum += moods[i][j];
+        }
+        var ave = (moods[i].length == 0) ? 0 : sum/moods[i].length;
+        averageMoods.push(ave);
+      }
+      response.success({
+        status: 'Ok',
+        averageMoods: averageMoods
+      })
+    },
+    error: function(error) {
+      console.log({error: "Error querying moods: "+error.message});
       response.error(error);
     }
   });

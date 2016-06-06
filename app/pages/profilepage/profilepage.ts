@@ -1,4 +1,5 @@
-import {Page, IonicApp, NavController, ViewController, NavParams, Platform} from 'ionic-angular';
+import {Page, IonicApp, NavController, ViewController, NavParams, Platform}
+ from 'ionic-angular';
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {UIMessages} from '../../helpers/uimessages';
@@ -24,7 +25,7 @@ export class ProfilePage {
   heartData:number[][]; heartDataLoading:boolean;
   walkingChartHandle:any; heartChartHandle:any; cyclingChartHandle:any; kJChartHandle:any;
   sleepData:number[]; sleepDataLoading:boolean; sleepChartHandle: any; foodStrings: string[]; 
-  foodArray: any[];
+  foodArray: any[]; moodData:any[]; moodDataLoading:boolean;
 
   constructor(ionicApp: IonicApp, navController: NavController, navParams: NavParams,
    viewController: ViewController, zone: NgZone, platform: Platform, http: Http) {
@@ -44,8 +45,10 @@ export class ProfilePage {
     this.runningDataLoading = true;
     this.heartDataLoading = false;
     this.sleepDataLoading = true;
+    this.moodDataLoading = true;
     this.foodStrings = [];
     this.foodArray = [];
+    this.moodData = [];
   }
 
   onPageDidEnter() {
@@ -53,8 +56,15 @@ export class ProfilePage {
   }
 
   initialize() {
-    //this.initAveData();
-    //this.initWeekData();
+    //Initialize arrangedDayLabels
+    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+    this.arrangedDayLabels = [];
+    let day = new Date().getDay() - 1;
+    day = (day == -1) ? 6 : day;
+    for (let i = 0; i < 8; i++) {
+      this.arrangedDayLabels.push(days[(i+day) % 7]);
+    }
+
     if (localStorage['healthApiAccessGranted']) {
       this.initWalkingData(() => {
         this.initStravaData();
@@ -92,7 +102,7 @@ export class ProfilePage {
     }
 
     this.foodData();
-    
+    this.initMoodData();
     this.initHeartData();
   }
 
@@ -141,78 +151,92 @@ export class ProfilePage {
     });
   }
 
+  initMoodData() {
+    CloudFunctions.getWeekMoodsData((data, error) => {
+      if (!error) {
+        this.moodDataLoading = false;
+        console.log('Got moods data:', data.averageMoods);
+        this.moodData = [];
+        for (let i = 0; i < data.averageMoods.length; i++) {
+          this.moodData.push({
+            dayLabel: this.arrangedDayLabels[i],
+            mood: Math.ceil(data.averageMoods[i])
+          });
+        }
+      } else {
+        console.log('Error getting moods data', error.message);
+      }
+    })
+  }
+
   //-------CHARTS--------
-    initHeartData() {
-    this.heartData = [[], []];
-    for (let i = 0; i < 8; i++) {
-      this.heartData[0].push(999);
-      this.heartData[1].push(0);
-    }
-    let start:Date = new Date();
-    start.setHours(0);
-    start.setMinutes(0);
-    start.setSeconds(0);
-    start = new Date(start.getTime() - 7 * 86400 * 1000);
-    let callbacksRemaining:number = 8;
-    for (let i = 0; i < 8; i++) {
-      ((i) => {
-        navigator.health.query({
-          startDate: new Date(start.getTime() + i * 86400 * 1000),
-          endDate: new Date(start.getTime() + (i + 1) * 86400 * 1000),
-          dataType: 'heart_rate'
-        }, (data) => {
-          callbacksRemaining--;
-          for (let j = 0; j < data.length; j++) {
-            if (data[j].value < this.heartData[0][i]) {
-              this.heartData[0][i] = data[j].value;
+  initHeartData() {
+    if (localStorage['healthApiAccessGranted']) {
+      this.heartData = [[], []];
+      for (let i = 0; i < 8; i++) {
+        this.heartData[0].push(999);
+        this.heartData[1].push(0);
+      }
+      let start:Date = new Date();
+      start.setHours(0);
+      start.setMinutes(0);
+      start.setSeconds(0);
+      start = new Date(start.getTime() - 7 * 86400 * 1000);
+      let callbacksRemaining:number = 8;
+      for (let i = 0; i < 8; i++) {
+        ((i) => {
+          navigator.health.query({
+            startDate: new Date(start.getTime() + i * 86400 * 1000),
+            endDate: new Date(start.getTime() + (i + 1) * 86400 * 1000),
+            dataType: 'heart_rate'
+          }, (data) => {
+            callbacksRemaining--;
+            for (let j = 0; j < data.length; j++) {
+              if (data[j].value < this.heartData[0][i]) {
+                this.heartData[0][i] = data[j].value;
+              }
+              if (data[j].value > this.heartData[1][i]) {
+                this.heartData[1][i] = data[j].value;
+              }
             }
-            if (data[j].value > this.heartData[1][i]) {
-              this.heartData[1][i] = data[j].value;
+            if (this.heartData[0][i] == 999) {
+              this.heartData[0][i] = 0;
             }
-          }
-          if (this.heartData[0][i] == 999) {
-            this.heartData[0][i] = 0;
-          }
-          //console.log('Activity', i, data);
-          /*if (data.value.sleep) {
-            this.sleepData[i]
-             = Math.round(data.value.sleep.duration * 10 / 3600) / 10;
-          }
-          */  
-          if (callbacksRemaining == 0 ) {
-            //console.log("Heart data:");
-            //console.log(this.heartData);
-            this.initHeartChart();
-          }
-        }, (error) => {
-          callbacksRemaining--;
-          console.log('Error:', error);
-          if (callbacksRemaining == 0 ) {
-            this.initHeartChart();
-          }
-        });
-      })(i);
+            //console.log('Activity', i, data);
+            /*if (data.value.sleep) {
+              this.sleepData[i]
+               = Math.round(data.value.sleep.duration * 10 / 3600) / 10;
+            }
+            */  
+            if (callbacksRemaining == 0 ) {
+              //console.log("Heart data:");
+              //console.log(this.heartData);
+              this.initHeartChart();
+            }
+          }, (error) => {
+            callbacksRemaining--;
+            console.log('Error:', error);
+            if (callbacksRemaining == 0 ) {
+              this.initHeartChart();
+            }
+          });
+        })(i);
+      }
     }
   }
 
-   initHeartChart() {
+  initHeartChart() {
     this.zone.run(() => {
       this.heartDataLoading = false;
     })
-    let ctx:any = (<HTMLCanvasElement> document.getElementById("heartChart")).getContext("2d");
-    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-    let labels:string[] = [];
-    let day = new Date().getDay() - 1;
-    day = (day == -1) ? 6 : day;
-    for (let i = 0; i < this.heartData[0].length; i++) {
-      labels.push(days[(i+day) % 7]);
-    }
-    console.log("Min Heart:");
+    let ctx:any = (<HTMLCanvasElement> document.getElementById("heartChart"))
+      .getContext("2d");
+    /*console.log("Min Heart:");
     console.log(this.heartData[0]);
     console.log("Max Heart:");
-    console.log(this.heartData[1]);
+    console.log(this.heartData[1]);*/
     let heartData:any = {
-      labels: labels,
+      labels: this.arrangedDayLabels,
       datasets: [{
         label: "bpm min",
         backgroundColor: "rgb(224, 224, 224)",
@@ -307,16 +331,10 @@ export class ProfilePage {
     this.zone.run(() => {
       this.walkingDataLoading = false;
     });
-    let ctx:any = (<HTMLCanvasElement> document.getElementById("walkingChart")).getContext("2d");
-    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-    let labels:string[] = [];
-    let day = new Date().getDay() - 1;
-    day = (day == -1) ? 6 : day;
-    for (let i = 0; i < 8; i++) {
-      labels.push(days[(i+day) % 7]);
-    }
+    let ctx:any = (<HTMLCanvasElement> document.getElementById("walkingChart"))
+      .getContext("2d");
     let walkingData:any = {
-      labels: labels,
+      labels: this.arrangedDayLabels,
       datasets: [{
         label: "km",
         backgroundColor: "rgb(104, 143, 206)",
@@ -353,20 +371,13 @@ export class ProfilePage {
   }
 
   initRunningChart() {
-    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-    let labels:string[] = [];
-    let day = new Date().getDay() - 1;
-    day = (day == -1) ? 6 : day;
-    for (let i = 0; i < this.runningData.distance.length; i++) {
-      labels.push(days[(i+day) % 7]);
-    }
     let dataInKm:any[];
     dataInKm = [];
     for (let i = 0; i < this.runningData.distance.length; i++) {
       dataInKm.push(Math.round(this.runningData.distance[i]/1000));
     }
     let runningDataObject:any = {
-      labels: labels,
+      labels: this.arrangedDayLabels,
       datasets: [{
         label: "km",
         backgroundColor: "rgb(96, 208, 227)",
@@ -378,7 +389,8 @@ export class ProfilePage {
     };
     this.zone.run(() => {
       this.runningDataLoading = false;
-      let ctx:any = (<HTMLCanvasElement> document.getElementById("runningChart")).getContext("2d");
+      let ctx:any = (<HTMLCanvasElement> document.getElementById("runningChart"))
+        .getContext("2d");
       this.cyclingChartHandle = new Chart(ctx, {
         type: 'bar',
         data: runningDataObject,
@@ -387,16 +399,16 @@ export class ProfilePage {
               display: false,
           },
           scales : {
-              xAxes : [ {
-                  gridLines : {
-                      display : false
-                  }
-              } ],
-              yAxes : [ {
-                  gridLines : {
-                      display : false
-                  }
-              } ]
+            xAxes : [{
+              gridLines : {
+                display : false
+              }
+            }],
+            yAxes : [{
+              gridLines : {
+                display : false
+              }
+            }]
             }
           }
       });
@@ -404,20 +416,13 @@ export class ProfilePage {
   }
 
   initCyclingChart() {
-    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-    let labels:string[] = [];
-    let day = new Date().getDay() - 1;
-    day = (day == -1) ? 6 : day;
-    for (let i = 0; i < this.cyclingData.distance.length; i++) {
-      labels.push(days[(i+day) % 7]);
-    }
     let dataInKm:any[];
     dataInKm = [];
     for (let i = 0; i < this.cyclingData.distance.length; i++) {
       dataInKm.push(Math.round(this.cyclingData.distance[i]/1000));
     }
     let cyclingDataObject:any = {
-      labels: labels,
+      labels: this.arrangedDayLabels,
       datasets: [{
         label: "km",
         backgroundColor: "rgb(117, 223, 152)",
@@ -432,7 +437,8 @@ export class ProfilePage {
     }
     this.zone.run(() => {
       this.cyclingDataLoading = false;
-      let ctx:any = (<HTMLCanvasElement> document.getElementById("cyclingChart")).getContext("2d");
+      let ctx:any = (<HTMLCanvasElement> document.getElementById("cyclingChart"))
+        .getContext("2d");
       this.cyclingChartHandle = new Chart(ctx, {
         type: 'bar',
         data: cyclingDataObject, 
@@ -499,16 +505,10 @@ export class ProfilePage {
     this.zone.run(() => {
       this.sleepDataLoading = false;
     });
-    let ctx:any = (<HTMLCanvasElement> document.getElementById("sleepChart")).getContext("2d");
-    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-    let labels:string[] = [];
-    let day = new Date().getDay() - 1;
-    day = (day == -1) ? 6 : day;
-    for (let i = 0; i < 8; i++) {
-      labels.push(days[(i+day) % 7]);
-    }
+    let ctx:any = (<HTMLCanvasElement> document.getElementById("sleepChart"))
+      .getContext("2d");
     let sleepData:any = {
-      labels: labels,
+      labels: this.arrangedDayLabels,
       datasets: [{
         label: "km",
         backgroundColor: "rgb(217, 153, 222)",
@@ -625,15 +625,8 @@ export class ProfilePage {
       this.kJDataLoading = false;
     });
     let ctx:any = (<HTMLCanvasElement> document.getElementById("kJChart")).getContext("2d");
-    let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-    let labels:string[] = [];
-    let day = new Date().getDay() - 1;
-    day = (day == -1) ? 6 : day;
-    for (let i = 0; i < 8; i++) {
-      labels.push(days[(i+day) % 7]);
-    }
     let kJData:any = {
-      labels: labels,
+      labels: this.arrangedDayLabels,
       datasets: [{
         label: "km",
         backgroundColor: "rgb(243, 162, 115)",
@@ -705,10 +698,10 @@ export class ProfilePage {
         ]*/
         this.foodArray = [];
 
-        //Initialise foodArray
+        //Initialise foodArray with labels
         for (let i = 0; i < 8; i++) {
           this.foodArray.push({
-            dayString: "-",
+            dayString: this.arrangedDayLabels[i],
             array: []
           });
         }
@@ -730,46 +723,45 @@ export class ProfilePage {
           var nutObj = parseObject.get(Consts.NUTRITION_NUTRITIONIX_INFO);
           var nutCreatedAt = parseObject.get(Consts.CREATED_AT);
 
-          //Calculating dayIndex, the position in foodArray that this food object will go into
-          var timeDifference = (new Date()).getTime() - results[i].get(Consts.CREATED_AT).getTime();
-          var dayIndex = Math.floor(timeDifference/(86400*1000))
+          //Calculating dayIndex, position in foodArray that this food object will go into
+          let timeDifference = (new Date()).getTime()
+            - results[i].get(Consts.CREATED_AT).getTime();
+          let dayIndex = Math.floor(timeDifference / (86400 * 1000));
           
-          if (msObj && nutObj) {
-            var newMsObj = JSON.parse(JSON.parse(msObj)).description.captions[0].text;
-            console.log(newMsObj);
+          if (msObject && nutritionObject) {
+            let microsoftDescription = JSON.parse(JSON.parse(msObject))
+              .description.captions[0].text;
+            console.log(microsoftDescription);
 
-            var newNutObj = JSON.parse(JSON.parse(nutObj)).nf_calories;
-            console.log(newNutObj);
+            let nutritionixCalories = JSON.parse(JSON.parse(nutritionObject)).nf_calories;
+            //console.log(newNutObj);
 
-            let hour = (nutCreatedAt.getHours() < 10) ? '0' + nutCreatedAt.getHours() : nutCreatedAt.getHours();
-            let min = (nutCreatedAt.getMinutes() < 10) ? '0' + nutCreatedAt.getMinutes() : nutCreatedAt.getMinutes();
+            let hour = (nutCreatedAt.getHours() < 10)
+              ? '0' + nutCreatedAt.getHours() : nutCreatedAt.getHours();
+            let min = (nutCreatedAt.getMinutes() < 10)
+              ? '0' + nutCreatedAt.getMinutes() : nutCreatedAt.getMinutes();
 
-            //Creating the food object
-            var object = {
-              microsoft: newMsObj,
-              nutritionix: newNutObj,
-              createdAt: hour+":"+min
-            }
-            
-            this.foodArray[dayIndex].array.push(object);
+            //Creating and pushing the food object into foodArray
+            this.foodArray[dayIndex].array.push({
+              microsoft: microsoftDescription,
+              nutritionix: nutritionixCalories,
+              createdAt: hour + ":" + min
+            });
           }
-          
-
-          //var parseObject = results[i];
-          //var obj = JSON.parse(JSON.parse(parseObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE)));
-          //console.log(obj.description.captions[0].text);
         }
-        console.log(this.foodStrings);
       },
       error: (error) => {
-        console.log("Error: " + error.code + " " + error.message);
+        console.log("Error querying food data:", error.message);
       }
     });
   }
 
   //STRAVA
   connectStravaButton() {
-    var browserRef = window.cordova.InAppBrowser.open("https://www.strava.com/oauth/authorize?client_id=11012&response_type=code" + "&response_type=code&redirect_uri=http://localhost&approval_prompt=force", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
+    var browserRef = window.cordova.InAppBrowser.open("https://www.strava.com/oauth/authorize?"
+      + "client_id=11012&response_type=code&response_type=code"
+      + "&redirect_uri=http://localhost&approval_prompt=force",
+      "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
     browserRef.addEventListener("loadstart", (event) => {
       if ((event.url).indexOf("http://localhost") === 0) {
         browserRef.removeEventListener("exit", (event) => {});
@@ -801,7 +793,8 @@ export class ProfilePage {
         var idTest = JSON.parse(xmlhttp.responseText).athlete.id;
         Parse.User.current().set(Consts.USER_STRAVADATA, JSON.parse(xmlhttp.responseText));
         Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, access_code);
-        Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN, JSON.parse(xmlhttp.responseText).access_token);
+        Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN,
+          JSON.parse(xmlhttp.responseText).access_token);
         Parse.User.current().set(Consts.USER_STRAVAID, idTest);
         (<Parse.Object> Parse.User.current()).save();
       }
@@ -873,7 +866,10 @@ export class ProfilePage {
 
   //MOVES
   connectMoves() {
-    var browserRef = window.cordova.InAppBrowser.open("https://api.moves-app.com/oauth/v1/authorize?response_type=code&client_id=95C57N4Gt5t9l5uir45i0P6RcNd1DN6v&scope=activity%20location", "_blank", "location=no,clearsessioncache=yes,clearcache=yes");
+    var browserRef = window.cordova.InAppBrowser.open("https://api.moves-app.com/oauth/v1/"
+      + "authorize?response_type=code&client_id=95C57N4Gt5t9l5uir45i0P6RcNd1DN6v"
+      + "&scope=activity%20location", "_blank", "location=no,clearsessioncache=yes,"
+      + "clearcache=yes");
     browserRef.addEventListener("loadstart", (event) => {
         if ((event.url).indexOf("http://localhost") === 0) {
             browserRef.removeEventListener("exit", (event) => {});
@@ -912,7 +908,8 @@ export class ProfilePage {
         /*
         Parse.User.current().set(Consts.USER_STRAVADATA, JSON.parse(xmlhttp.responseText));
         Parse.User.current().set(Consts.USER_STRAVAAUTHORIZATIONCODE, access_code);
-        Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN, JSON.parse(xmlhttp.responseText).access_token);
+        Parse.User.current().set(Consts.USER_STRAVAACCESSTOKEN,
+          JSON.parse(xmlhttp.responseText).access_token);
         (<Parse.Object> Parse.User.current()).save();*/
       }
     }
@@ -939,7 +936,10 @@ export class ProfilePage {
 
   //MEETUP
   connectMeetup() {
-    /*this.cordovaOauth = new CordovaOauth(new Meetup({clientId: "5mmt4kfgh5mc469f43hj8t5rh6", appScope: ["email"]}));
+    /*this.cordovaOauth = new CordovaOauth(new Meetup({
+      clientId: "5mmt4kfgh5mc469f43hj8t5rh6",
+      appScope: ["email"]
+    }));
     this.cordovaOauth.login().then((success) => {
       alert(JSON.stringify(success));
         }, (error) => {

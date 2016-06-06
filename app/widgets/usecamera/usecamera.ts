@@ -34,6 +34,7 @@ export class UseCamera {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.currentUser = Parse.User.current();
     if (!this.isReply) {
+      this.loading = true;
       this.saveImage(this.data.imageUri);
       this.imgsrc = "data:image/jpeg;base64," + this.data.imageUri
     }
@@ -82,7 +83,6 @@ export class UseCamera {
     file.save({
       success: (savedFile) => {
         console.log('File saved successfully');
-        this.loading = true;
         let nutrition = new Parse.Object(Consts.NUTRITION_CLASS);
         nutrition.set(Consts.NUTRITION_USER, Parse.User.current());
         nutrition.set(Consts.NUTRITION_IMAGE, file);

@@ -90,7 +90,7 @@
 	<div class="containerProfilePageContent">
 		<p class="sectionHeader"><i class="em em-apple"></i>:</p>
 		<div *ngFor="let dayFoodObject of foodArray">
-			<p class="foodDayTitle">{{dayFoodObject.dayString}}</p>
+			<p class="foodDayTitle">{{dayFoodObject.dayString}}:</p>
 			<p class="foodObject" *ngFor="let foodObject of dayFoodObject.array">
 				{{foodObject.createdAt}} {{foodObject.microsoft}}: {{foodObject.nutritionix}} kcal
 			</p>
