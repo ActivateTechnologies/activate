@@ -714,7 +714,7 @@ export class ProfilePage {
         }
 
         //Set the day labels inside foodArray
-        let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+        let days:string[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
         let labels:string[] = [];
         let day = new Date().getDay() - 1;
         day = (day == -1) ? 6 : day;
