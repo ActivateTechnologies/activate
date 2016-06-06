@@ -595,7 +595,6 @@ export class ProfilePage {
           dataType: 'calories.active'
         }, (data) => {
           callbacksRemainingActive--;
-          console.log(data);
           //console.log('Activity', i, data);
           if (data.value) {
             this.kJData[i] += data.value*4.184;
@@ -663,7 +662,6 @@ export class ProfilePage {
   }
 
   foodData() {
-    console.log('Inside food data')
     let start:Date = new Date();
     start.setHours(0);
     start.setMinutes(0);
@@ -835,7 +833,7 @@ export class ProfilePage {
   initStravaData() {
     CloudFunctions.stravaActivitiesLastWeek((data, error) => {
       if (error == null) {
-        console.log('stravaActivitiesLastWeek done!');
+        //console.log('stravaActivitiesLastWeek done!');
         this.cyclingData = data.data.cycling;
         this.initCyclingChart();
         this.runningData = data.data.running;

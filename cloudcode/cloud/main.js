@@ -70,10 +70,10 @@ Parse.Cloud.define("getWeekMoodData", function(request, response) {
   start.setHours(0);
   start.setMinutes(0);
   start.setSeconds(0);
-  var end = start;
+  //var end = start;
   start = new Date(start.getTime() - 7 * 86400 * 1000);
   query.greaterThan('createdAt', start);
-  query.lessThan('createdAt', end);
+  //query.lessThan('createdAt', end);
   query.find({
     success: function(parseObjects) {
       //console.log({log:'Found mood', 'obj':parseObjects.length});
