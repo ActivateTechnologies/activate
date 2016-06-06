@@ -157,7 +157,7 @@ export class ProfilePage {
         this.moodDataLoading = false;
         console.log('Got moods data:', data.averageMoods);
         this.moodData = [];
-        for (let i = data.averageMoods.length - 1; i < 0; i--) {
+        for (let i = data.averageMoods.length - 1; i >= 0; i--) {
           this.moodData.push({
             dayLabel: this.arrangedDayLabels[i],
             mood: Math.ceil(data.averageMoods[i])
