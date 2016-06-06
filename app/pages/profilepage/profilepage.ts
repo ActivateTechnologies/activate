@@ -13,7 +13,7 @@ export class ProfilePage {
 
   nav:any;viewController:any; user:any; currentUser:any; zone:any; platform:any; http:any
   message:string; friendStatus:any; respondToRequest:boolean;
-  userRelationshipNumber:number; friends:any[]; relationship:any;
+  userRelationshipNumber:number; friends:any[]; relationship:any; arrangedDayLabels:string[];
   walkingTimeAve:number; runningTimeAve:number;
   cyclingTimeAve:number; sleepTimeAve:number;
   walkingTimeWeek:number[]; runningTimeWeek:number[]; cyclingTimeWeek:number[];
@@ -671,33 +671,87 @@ export class ProfilePage {
 
   foodData() {
     console.log('Inside food data')
+    let start:Date = new Date();
+    start.setHours(0);
+    start.setMinutes(0);
+    start.setSeconds(0);
+    start = new Date(start.getTime() - 7 * 86400 * 1000);
     var query = new Parse.Query(Consts.NUTRITION_CLASS);
     query.equalTo(Consts.NUTRITION_USER, Parse.User.current());
+    query.greaterThan(Consts.CREATED_AT, start);
+    query.ascending(Consts.CREATED_AT);
     query.find({
       success: (results) => {
         console.log("Successfully retrieved " + results.length + " food entries.");
         // Do something with the returned Parse.Object values
+        /*Structure: foodArray = [
+          {
+            dayString:"Mo",
+            array:[
+              {  
+                microsoft: newMsObj,
+                nutritionix: newNutObj,
+                createdAt: hour+":"+min
+              },
+              {  
+                microsoft: newMsObj,
+                nutritionix: newNutObj,
+                createdAt: hour+":"+min
+              },
+              ...
+            ]
+          },
+          ...
+        ]*/
+        this.foodArray = [];
+
+        //Initialise foodArray
+        for (let i = 0; i < 8; i++) {
+          this.foodArray.push({
+            dayString: "-",
+            array: []
+          });
+        }
+
+        //Set the day labels inside foodArray
+        let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+        let labels:string[] = [];
+        let day = new Date().getDay() - 1;
+        day = (day == -1) ? 6 : day;
+        for (let i = 0; i < 8; i++) {
+          labels.push(days[(i+day) % 7]);
+          this.foodArray[i].dayString = days[(i+day) % 7];
+        }
+        this.arrangedDayLabels = labels;
+
         for (var i = 0; i < results.length; i++) {
           var parseObject = results[i];
-          var obj = parseObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE);
+          var msObj = parseObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE);
           var nutObj = parseObject.get(Consts.NUTRITION_NUTRITIONIX_INFO);
+          var nutCreatedAt = parseObject.get(Consts.CREATED_AT);
+
+          //Calculating dayIndex, the position in foodArray that this food object will go into
+          var timeDifference = (new Date()).getTime() - results[i].get(Consts.CREATED_AT).getTime();
+          var dayIndex = Math.floor(timeDifference/(86400*1000))
           
-          
-          if (obj && nutObj) {
-            var newObj = JSON.parse(JSON.parse(obj)).description.captions[0].text;
-            console.log(newObj);
+          if (msObj && nutObj) {
+            var newMsObj = JSON.parse(JSON.parse(msObj)).description.captions[0].text;
+            console.log(newMsObj);
 
             var newNutObj = JSON.parse(JSON.parse(nutObj)).nf_calories;
             console.log(newNutObj);
 
+            let hour = (nutCreatedAt.getHours() < 10) ? '0' + nutCreatedAt.getHours() : nutCreatedAt.getHours();
+            let min = (nutCreatedAt.getMinutes() < 10) ? '0' + nutCreatedAt.getMinutes() : nutCreatedAt.getMinutes();
+
+            //Creating the food object
             var object = {
-              microsoft: newObj,
-              nutritionix: newNutObj
+              microsoft: newMsObj,
+              nutritionix: newNutObj,
+              createdAt: hour+":"+min
             }
-
-            this.foodArray.push(object);
-
-            //this.foodStrings.push(newObj.description.captions[0].text);
+            
+            this.foodArray[dayIndex].array.push(object);
           }
           
 
