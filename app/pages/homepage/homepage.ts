@@ -358,20 +358,13 @@ export class HomePage {
   }
 
   imageRecognition() {
-     var i = [1, 2, 3].includes(2); 
-     console.log(i);
-
     var googleInfoString = 'P RRP 99p RRP\nLipton\nPEACH\nICE TEA\n';
-    console.log(googleInfoString);
 
     var googleInfoStringLowercase = googleInfoString.toLowerCase();
-    console.log(googleInfoStringLowercase);
 
     var googleInfoStringFlattened = googleInfoStringLowercase.replace(/[^\x20-\x7E]/gmi, " ");
-    console.log(googleInfoStringFlattened);
 
     var googleInfoArray = googleInfoStringFlattened.split(" ");
-    console.log(googleInfoArray);
 
     var uselessInfo = ['99p','p','rrp','difference','taste','refrigerated', '£'];
 
@@ -379,8 +372,6 @@ export class HomePage {
 
     for (i = 0; i < uselessInfo.length; i++) {
       var y = googleInfoArray.includes(uselessInfo[i]);
-
-      console.log(uselessInfo[i] + ": " + i + " "+ y);
       
       if (y) {
         //https://davidwalsh.name/remove-item-array-javascript
@@ -388,21 +379,23 @@ export class HomePage {
         var indexOfUseless = googleInfoArray.indexOf(uselessInfo[i])
         console.log("Index of useless: "+ indexOfUseless);
 
-        /*
-        if(i != -1) {
-          googleInfoArray.splice(indexOfUseless, 1);
-        }
-        */
-
-        for(var x = googleInfoArray.length-1; x--;){
+        for(var x = googleInfoArray.length-1; x >= 0; x--){
           if (googleInfoArray[x] === uselessInfo[i]) googleInfoArray.splice(x, 1);
         }
 
       }
   
     }
-    console.log("Final array: "+googleInfoArray);
 
+    var finalArray = [];
+    for (var i = 0; i < googleInfoArray.length; i++) {
+      googleInfoArray[i] = googleInfoArray[i].trim();
+      if (googleInfoArray[i].length > 0) {
+        finalArray.push(googleInfoArray[i]);
+      }
+    }
+    
+    return finalArray;
 
   }
 
