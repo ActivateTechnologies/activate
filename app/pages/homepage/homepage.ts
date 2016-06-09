@@ -352,9 +352,12 @@ export class HomePage {
   }
 
   openUserProfile() {
-    if (Parse.User.current() != null) {
+    CloudFunctions.testGoogle((data, error) => {
+      console.log('Google test data: ', data);
+    });
+    /*if (Parse.User.current() != null) {
       this.nav.push(ProfilePage);
-    }
+    }*/
   }
 
 }

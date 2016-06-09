@@ -1,3 +1,5 @@
+var Image = require("parse-image");
+
 Parse.Cloud.define("initConversation", function(request, response) {
 	var TreeObjects = Parse.Object.extend("TreeObjects");
 	var query = new Parse.Query(TreeObjects);
@@ -199,7 +201,28 @@ Parse.Cloud.beforeSave("Nutrition", function(request, response) {
       response.success();
     }
   }
-  microsoftImageRecog(request.object, callbackFunction);
+  //microsoftImageRecog(request.object, callbackFunction);
+  googleImageRecog(request.object, callbackFunction);
+});
+
+Parse.Cloud.define("testGoogle", function(request, response) {
+  var Nutrition = Parse.Object.extend("Nutrition");
+  var query = new Parse.Query(Nutrition);
+  query.get("6SvUg1YVya", {
+    success: function(parseObject) {
+      googleImageRecog(parseObject, function (object, error) {
+        if (!error) {
+          response.success(object);
+        } else {
+          response.error(error);
+        }
+      })
+    },
+    error: function(error) {
+      console.log({error: "Error querying Nutrition: "+error.message});
+      response.error(error);
+    }
+  });
 });
 
 function microsoftImageRecog(nutritionObject, callbackFunction) {
@@ -230,9 +253,52 @@ function microsoftImageRecog(nutritionObject, callbackFunction) {
   });
 }
 
-  //NUTRITIONIX API KEYS
-  //APPLICATION ID: 6d4f0049
-  //APPLICATION KEY: fb6a273d8b2cd2a7f961668f4c8ce5ce
+function googleImageRecog(nutritionObject, callbackFunction) {
+  var imageUrl = nutritionObject.get("image").url();
+  console.log('Image URL: ' + imageUrl);
+  Parse.Cloud.httpRequest({url: imageUrl}).then(function(httpResponse) {
+    console.log({log:'Calling Google1'});
+    Parse.Cloud.httpRequest({
+      method: 'POST',
+      url: 'https://vision.googleapis.com/v1/images:annotate?key='
+        + 'AIzaSyBdGJeZg6k0luzsPgoTV2DmLxD2KFka1lY',
+      body: {
+        "requests":[{
+          "image":{
+            "content":httpResponse.buffer.toString("base64")
+          },
+          "features":[{
+            "type":"TEXT_DETECTION",
+          }, {
+            "type":"LOGO_DETECTION",
+          }]
+        }]
+      },
+      headers: {
+        "Content-type": "application/json"
+      }
+    }).then(function(httpResponse) {
+      console.log({log:"Google's data", data: httpResponse.data});
+      //callbackFunction(httpResponse.data.responses);
+      nutritionObject.set("googleResponse", httpResponse.data);
+      findFoodObject(httpResponse.data, nutritionObject, callbackFunction);
+    }, function(httpResponse) {
+      var errorMessage = 'Google Request failed with response code ' + httpResponse.status
+        + ' and response text: ' + httpResponse.text;
+      console.error(errorMessage);
+      callbackFunction({}, {message: errorMessage});
+    });
+  }, function(httpResponse) {
+    var errorMessage = 'Error getting file from url with response code ' + httpResponse.status
+     + ' and response text: ' + httpResponse.text;
+    console.log(errorMessage);
+    callbackFunction({}, {message: errorMessage});
+  });
+}
+
+/*NUTRITIONIX API KEYS
+  APPLICATION ID: 6d4f0049
+  APPLICATION KEY: fb6a273d8b2cd2a7f961668f4c8ce5ce*/
 function nutritionixSearch(microsoftResponse, nutritionObject, callbackFunction) {
   console.log("Yes nutritionix!");
   var microsoftDescription = JSON.parse(microsoftResponse).description.captions[0].text;
@@ -277,5 +343,46 @@ function nutritionixInfo(nutritionixResponse, nutritionObject, callbackFunction)
     console.error('Request failed with response code ' + httpResponse.status);
     callbackFunction('nutritionixInfo request failed with response code ' + httpResponse.status)
   });
+}
 
+function findFoodObject(googleData, nutritionObject, callbackFunction) {
+  var textString = googleData.responses[0].textAnnotations[0].description;
+  console.log("findFoodObject() with text: " + textString);
+  var usefulWords = getUsefulWords(textString);
+  
+  var FoodData = Parse.Object.extend("FoodData");
+  var query = new Parse.Query(FoodData);
+  query.contains("descriptionWords", usefulWords);
+  query.find({
+    success: function(parseObjects) {
+      if (parseObjects.length == 0) {
+        console.log('No FoodObjects found');
+      } else {
+        nutritionObject.set("foodObject", identifyBestFoodObject(parseObject), usefulWords);
+      }
+      callbackFunction({data:"success"});
+    },
+    error: function(error) {
+      var errorMessage = "Error querying FoodData objects: " + error.message;
+      console.log(errorMessage);
+      callbackFunction({}, {message: errorMessage});
+    }
+  });
+  callbackFunction({data: textString});
+}
+
+/*Uses google's text recognition response as a string input and
+  returns array of useful words in lower case */
+function getUsefulWords(textString) {
+  return ["lipton", "peach", "ice", "tea"];
+}
+
+/*Goes through list of foodObjects and finds the best one given the usefulWords*/
+function identifyBestFoodObject(foodObjects, usefulWords) {
+  if (foodObjects.length == 1) {
+    return foodObjects[0];
+  } else {
+    //Do some actual processing here
+    return foodObjects[0];
+  }
 }

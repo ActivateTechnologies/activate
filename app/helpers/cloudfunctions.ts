@@ -54,4 +54,16 @@ export class CloudFunctions {
       }
     });
   }
+
+  public static testGoogle(callback) {
+    Parse.Cloud.run('testGoogle', {}, {
+      success: (data) => {
+        callback(data);
+      },
+      error: (error) => {
+        console.log('Error calling testGoogle:', error.message);
+        callback({}, error);
+      }
+    });
+  }
 }
