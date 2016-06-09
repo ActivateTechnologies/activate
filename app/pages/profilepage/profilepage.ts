@@ -709,8 +709,10 @@ export class ProfilePage {
         let day = new Date().getDay() - 1;
         day = (day == -1) ? 6 : day;
         for (let i = 0; i < 8; i++) {
-          this.foodArray[i].dayString = days[(i+day) % 7];
+          this.foodArray[7-i].dayString = days[(i+day) % 7];
         }
+
+        console.log(this.foodArray);
 
         for (var i = 0; i < results.length; i++) {
           var parseObject = results[i];
