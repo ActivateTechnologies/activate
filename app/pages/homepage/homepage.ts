@@ -360,4 +360,47 @@ export class HomePage {
     }*/
   }
 
+  imageRecognition() {
+    var googleInfoString = 'P RRP 99p RRP\nLipton\nPEACH\nICE TEA\n';
+
+    var googleInfoStringLowercase = googleInfoString.toLowerCase();
+
+    var googleInfoStringFlattened = googleInfoStringLowercase.replace(/[^\x20-\x7E]/gmi, " ");
+
+    var googleInfoArray = googleInfoStringFlattened.split(" ");
+
+    var uselessInfo = ['99p','p','rrp','difference','taste','refrigerated', '£'];
+
+    var i = 0;
+
+    for (i = 0; i < uselessInfo.length; i++) {
+      var y = googleInfoArray.includes(uselessInfo[i]);
+      
+      if (y) {
+        //https://davidwalsh.name/remove-item-array-javascript
+        console.log(i);
+        var indexOfUseless = googleInfoArray.indexOf(uselessInfo[i])
+        console.log("Index of useless: "+ indexOfUseless);
+
+        for(var x = googleInfoArray.length-1; x >= 0; x--){
+          if (googleInfoArray[x] === uselessInfo[i]) googleInfoArray.splice(x, 1);
+        }
+
+      }
+  
+    }
+
+    var finalArray = [];
+    for (var i = 0; i < googleInfoArray.length; i++) {
+      googleInfoArray[i] = googleInfoArray[i].trim();
+      if (googleInfoArray[i].length > 0) {
+        finalArray.push(googleInfoArray[i]);
+      }
+    }
+    
+    return finalArray;
+
+  }
+
+
 }

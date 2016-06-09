@@ -310,7 +310,7 @@ export class Health {
             this.zone.run(() => {
               this.summaryString = 'Nice ' + Math.round(lastTrip.value/10)/100
                 + 'km walk you did from ' + startHour + ':' + startMin + startAmPm + ' to '
-                + endHour + ':' + endMin + endAmPm + '<i class="em em-walking"></i> <i class="em em-facepunch"></i>';
+                + endHour + ':' + endMin + endAmPm;
               this.loading = false;
             });
             //Parse.User.current().set(Consts.USER_LASTNOTIFIEDRECENTACTIVITY, new Date());
