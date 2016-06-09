@@ -195,14 +195,14 @@ Parse.Cloud.define("stravaActivitiesLastWeek", function(request, response) {
 Parse.Cloud.beforeSave("Nutrition", function(request, response) {
   var callbackFunction = function (error) {
     if (error) {
-      console.log('Error with api calls: ' + error);
+      console.log('Error with api calls: ' + JSON.stringify(error));
       response.success();
     } else {
       response.success();
     }
   }
-  //microsoftImageRecog(request.object, callbackFunction);
-  googleImageRecog(request.object, callbackFunction);
+  microsoftImageRecog(request.object, callbackFunction);
+  //googleImageRecog(request.object, callbackFunction);
 });
 
 Parse.Cloud.define("testGoogle", function(request, response) {
@@ -255,9 +255,7 @@ function microsoftImageRecog(nutritionObject, callbackFunction) {
 
 function googleImageRecog(nutritionObject, callbackFunction) {
   var imageUrl = nutritionObject.get("image").url();
-  console.log('Image URL: ' + imageUrl);
   Parse.Cloud.httpRequest({url: imageUrl}).then(function(httpResponse) {
-    console.log({log:'Calling Google1'});
     Parse.Cloud.httpRequest({
       method: 'POST',
       url: 'https://vision.googleapis.com/v1/images:annotate?key='
@@ -269,7 +267,9 @@ function googleImageRecog(nutritionObject, callbackFunction) {
           },
           "features":[{
             "type":"TEXT_DETECTION",
-          }, {
+          }/*, {
+            "type":"LABEL_DETECTION",
+          }*/, {
             "type":"LOGO_DETECTION",
           }]
         }]
@@ -286,13 +286,13 @@ function googleImageRecog(nutritionObject, callbackFunction) {
       var errorMessage = 'Google Request failed with response code ' + httpResponse.status
         + ' and response text: ' + httpResponse.text;
       console.error(errorMessage);
-      callbackFunction({}, {message: errorMessage});
+      callbackFunction({message: errorMessage});
     });
   }, function(httpResponse) {
     var errorMessage = 'Error getting file from url with response code ' + httpResponse.status
      + ' and response text: ' + httpResponse.text;
     console.log(errorMessage);
-    callbackFunction({}, {message: errorMessage});
+    callbackFunction({message: errorMessage});
   });
 }
 
@@ -350,77 +350,79 @@ function findFoodObject(googleData, nutritionObject, callbackFunction) {
   console.log("findFoodObject() with text: " + textString);
   var usefulWords = getUsefulWords(textString);
   
-  var FoodData = Parse.Object.extend("FoodData");
-  var query = new Parse.Query(FoodData);
-  query.contains("descriptionWords", usefulWords);
+  var FoodDatabase = Parse.Object.extend("FoodDatabase");
+  var query = new Parse.Query(FoodDatabase);
+  console.log({log:"useful words", data: usefulWords});
+  query.containedIn("descriptionWords", usefulWords);
   query.find({
     success: function(parseObjects) {
+      console.log('FoodData query success');
       if (parseObjects.length == 0) {
         console.log('No FoodObjects found');
       } else {
-        nutritionObject.set("foodObject", identifyBestFoodObject(parseObject), usefulWords);
+        console.log(1);
+        nutritionObject.set("foodObject", identifyBestFoodObject(parseObjects, usefulWords));
       }
-      callbackFunction({data:"success"});
+      callbackFunction();
     },
     error: function(error) {
+      console.log('FoodData query failure');
       var errorMessage = "Error querying FoodData objects: " + error.message;
       console.log(errorMessage);
-      callbackFunction({}, {message: errorMessage});
+      callbackFunction({message: errorMessage});
     }
   });
-  callbackFunction({data: textString});
+  //callbackFunction({data: textString});
 }
 
 /*Uses google's text recognition response as a string input and
   returns array of useful words in lower case */
 function getUsefulWords(textString) {
-  var googleInfoString = 'P RRP 99p RRP\nLipton\nPEACH\nICE TEA\n';
+  var googleInfoString = textString;
 
-    var googleInfoStringLowercase = googleInfoString.toLowerCase();
+  var googleInfoStringLowercase = googleInfoString.toLowerCase();
 
-    var googleInfoStringFlattened = googleInfoStringLowercase.replace(/[^\x20-\x7E]/gmi, " ");
+  var googleInfoStringFlattened = googleInfoStringLowercase.replace(/[^\x20-\x7E]/gmi, " ");
 
-    var googleInfoArray = googleInfoStringFlattened.split(" ");
+  var googleInfoArray = googleInfoStringFlattened.split(" ");
 
-    var uselessInfo = ['99p','p','rrp','difference','taste','refrigerated', '£'];
+  var uselessInfo = ['99p','p','rrp','difference','taste','refrigerated', '£'];
 
-    var i = 0;
+  var i = 0;
 
-    for (i = 0; i < uselessInfo.length; i++) {
-      var y = googleInfoArray.includes(uselessInfo[i]);
-      
-      if (y) {
-        //https://davidwalsh.name/remove-item-array-javascript
-        console.log(i);
-        var indexOfUseless = googleInfoArray.indexOf(uselessInfo[i])
-        console.log("Index of useless: "+ indexOfUseless);
-
-        for(var x = googleInfoArray.length-1; x >= 0; x--){
-          if (googleInfoArray[x] === uselessInfo[i]) googleInfoArray.splice(x, 1);
-        }
-
-      }
-  
-    }
-
-    var finalArray = [];
-    for (var i = 0; i < googleInfoArray.length; i++) {
-      googleInfoArray[i] = googleInfoArray[i].trim();
-      if (googleInfoArray[i].length > 0) {
-        finalArray.push(googleInfoArray[i]);
-      }
-    }
+  for (i = 0; i < uselessInfo.length; i++) {
+    var indexOfUseless = googleInfoArray.indexOf(uselessInfo[i])
     
-    return finalArray;
+    if (indexOfUseless != -1) {
+      //https://davidwalsh.name/remove-item-array-javascript
+      //console.log(i);
+      //console.log("Index of useless: "+ indexOfUseless);
 
+      for(var x = googleInfoArray.length-1; x >= 0; x--){
+        if (googleInfoArray[x] === uselessInfo[i]) googleInfoArray.splice(x, 1);
+      }
+    }
   }
+
+  var finalArray = [];
+  for (var i = 0; i < googleInfoArray.length && i < 9; i++) {
+    googleInfoArray[i] = googleInfoArray[i].trim();
+    if (googleInfoArray[i].length > 0) {
+      finalArray.push(googleInfoArray[i]);
+    }
+  }
+  
+  return finalArray;
 }
 
 /*Goes through list of foodObjects and finds the best one given the usefulWords*/
 function identifyBestFoodObject(foodObjects, usefulWords) {
+  console.log(2)
   if (foodObjects.length == 1) {
+    console.log(3)
     return foodObjects[0];
   } else {
+    console.log(4)
     //Do some actual processing here
     return foodObjects[0];
   }

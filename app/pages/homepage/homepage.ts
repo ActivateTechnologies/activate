@@ -360,7 +360,7 @@ export class HomePage {
     }*/
   }
 
-  imageRecognition() {
+  /*imageRecognition() {
     var googleInfoString = 'P RRP 99p RRP\nLipton\nPEACH\nICE TEA\n';
 
     var googleInfoStringLowercase = googleInfoString.toLowerCase();
@@ -400,7 +400,7 @@ export class HomePage {
     
     return finalArray;
 
-  }
+  }*/
 
 
 }
