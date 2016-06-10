@@ -374,7 +374,8 @@ function findFoodObject(googleData, nutritionObject, callbackFunction) {
 /*Uses google's text recognition response as a string input and
   returns array of useful words in lower case */
 function getUsefulWords(textString) {
-  var googleInfoString = 'P RRP 99p RRP\nLipton\nPEACH\nICE TEA\n';
+
+    var googleInfoString = 'P RRP 99p RRP\nLipton\nPEACH\nICE TEA\n';
 
     var googleInfoStringLowercase = googleInfoString.toLowerCase();
 

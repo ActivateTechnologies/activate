@@ -61,7 +61,7 @@ export class UseCamera {
       sourceType: Camera.PictureSourceType.CAMERA,
       encodingType: Camera.EncodingType.JPEG,
       mediaType: Camera.MediaType.PICTURE,
-      allowEdit: false,
+      allowEdit: true,
       correctOrientation: true  //Corrects Android orientation quirks
     }
 
