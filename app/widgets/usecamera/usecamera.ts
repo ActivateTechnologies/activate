@@ -24,7 +24,7 @@ export class UseCamera {
 
 	zone:any;
   loading:boolean = false; message:string; currentUser:any; imgsrc:any;
-  msDescription:string; caloriesString:string;
+  msDescription:string; caloriesString:string; foodObject:any;
 
   constructor(zone: NgZone) {
     this.zone = zone;
@@ -36,7 +36,7 @@ export class UseCamera {
     if (!this.isReply) {
       this.loading = true;
       this.saveImage(this.data.imageUri);
-      this.imgsrc = "data:image/jpeg;base64," + this.data.imageUri
+      this.imgsrc = "data:image/jpeg;base64," + this.data.imageUri;
     }
   }
 
@@ -88,8 +88,43 @@ export class UseCamera {
         nutrition.set(Consts.NUTRITION_IMAGE, file);
         nutrition.save({
           success: (savedNutritionObject) => {
-            console.log('Got image info from apis');
-            if (savedNutritionObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE)
+            console.log('Nutrition object saved with id' + savedNutritionObject.id);
+            CloudFunctions.processNutritionImage({objectId: savedNutritionObject.id},
+             (data, error) => {
+                if (!error) {
+                  savedNutritionObject.fetch({
+                    success: (nutritionObject) => {
+                      let foodObject = nutritionObject.get(Consts.NUTRITION_FOODOBJECT);
+                      if (foodObject) {
+                        foodObject.fetch({
+                          success: (foodDatabaseObject) => {
+                            console.log('Got nutritional object with everything');
+                            this.zone.run(() => {
+                              this.loading = false;
+                              this.msDescription = 'Energy: ' + foodDatabaseObject.get("energy");
+                              this.foodObject = foodDatabaseObject;
+                              this.produceHtmlAndCallback(savedFile.url());
+                            });
+                          },
+                          error: (object, error) => {
+                            this.loading = false;
+                            console.log('Error getting foodDatabase object');
+                            this.produceHtmlAndCallback(savedFile.url());
+                          }
+                        });
+                      } else {
+                        this.loading = false;
+                      }
+                    },
+                    error: (object, error) => {
+                      this.loading = false;
+                      console.log('Error getting nutritional object with everything');
+                      this.produceHtmlAndCallback(savedFile.url());
+                    }
+                  })
+                }
+            });
+            /*if (savedNutritionObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE)
               && savedNutritionObject.get(Consts.NUTRITION_MICROSOFT_RESPONSE).length > 0) {
               let obj = JSON.parse(JSON.parse(savedNutritionObject
                 .get(Consts.NUTRITION_MICROSOFT_RESPONSE)));
@@ -107,8 +142,7 @@ export class UseCamera {
                 this.caloriesString = JSON.parse(JSON.parse(savedNutritionObject
                   .get(Consts.NUTRITION_NUTRITIONIX_INFO))).nf_calories + ' kcal';
               });
-            }
-            this.produceHtmlAndCallback(savedFile.url());
+            }*/
           },
           error: (savedNutritionObject, error) => {
             console.log("Error saving Nutrition object: ", error.message);

@@ -66,4 +66,18 @@ export class CloudFunctions {
       }
     });
   }
+
+  public static processNutritionImage(requestData, callback) {
+    Parse.Cloud.run('processNutritionImage', requestData, {
+      success: (data) => {
+        console.log('processNutritionImage success');
+        callback(data);
+      },
+      error: (error) => {
+        console.log('Error calling processNutritionImage:', error.message);
+        callback({}, error);
+      }
+    });
+  }
+  
 }

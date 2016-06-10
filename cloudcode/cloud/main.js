@@ -193,16 +193,79 @@ Parse.Cloud.define("stravaActivitiesLastWeek", function(request, response) {
 });
 
 Parse.Cloud.beforeSave("Nutrition", function(request, response) {
-  var callbackFunction = function (error) {
+  /*var callbackFunction = function (error) {
     if (error) {
-      console.log('Error with api calls: ' + error);
+      console.log('Error with api calls: ' + JSON.stringify(error));
       response.success();
     } else {
       response.success();
     }
   }
-  //microsoftImageRecog(request.object, callbackFunction);
-  googleImageRecog(request.object, callbackFunction);
+  microsoftImageRecog(request.object, callbackFunction);
+  googleImageRecog(request.object, callbackFunction);*/
+  response.success();
+  /*var callbackFunction = function (error) {
+    if (error) {
+      console.log('Error with api calls: ' + JSON.stringify(error));
+      response.success();
+    } else if (request.object.get("microsoftResponse")
+        && request.object.get("googleResponse")) {
+      findFoodObject2(request.object, function(error) {
+        if (error) {
+          console.log('Error with FoodDatabase query: ' + error.message);
+          resposne.success();
+        } else {
+          response.success();
+        }
+      });
+    }
+  }
+  microsoftImageRecog(request.object, callbackFunction);
+  googleImageRecog(request.object, callbackFunction);*/
+});
+
+Parse.Cloud.define("processNutritionImage", function(request, response) {
+  var Nutrition = Parse.Object.extend("Nutrition");
+  var query = new Parse.Query(Nutrition);
+
+  query.get(request.params.objectId, {
+    success: function(parseObject) {
+      var callbackFunction = function (error) {
+        if (error) {
+          console.log('Error with api calls: ' + JSON.stringify(error));
+          response.success({});
+        } else if (parseObject.get("microsoftResponse")
+            && parseObject.get("googleResponse")) {
+          console.log("Microsoft and google responded");
+          findFoodObject2(parseObject, function(error) {
+            if (error) {
+              console.log('Error with FoodDatabase query: ' + error.message);
+              response.success({});
+            } else {
+              parseObject.save({
+                success: function(parseObject) {
+                  console.log('FoodDatabase object pointer set and Nutrition object saved');
+                  response.success({});
+                },
+                error: function(parseObject, error) {
+                  var errorMessage = 'Error saving nutrition object with FoodDatabase pointer'
+                    + error.message;
+                  console.log(errorMessage);
+                  response.success({});
+                }
+              })
+            }
+          });
+        }
+      }
+      microsoftImageRecog(parseObject, callbackFunction);
+      googleImageRecog(parseObject, callbackFunction);
+    },
+    error: function(error) {
+      console.log("Error querying Nutrition: " + error);
+      response.error(error);
+    }
+  });
 });
 
 Parse.Cloud.define("testGoogle", function(request, response) {
@@ -228,8 +291,6 @@ Parse.Cloud.define("testGoogle", function(request, response) {
 function microsoftImageRecog(nutritionObject, callbackFunction) {
   var imageUri = nutritionObject.get("image").url();
   console.log("calling Microsoft");
-  console.log(imageUri);
-  //var imageUri = "http://www.medicalnewstoday.com/content/images/articles/266/266765/two-heads-of-broccoli.jpg";
   var MICROSOFT_IMAGE_KEY = "01aa933905644a99b64b1a1449b0e5c5";
 
   Parse.Cloud.httpRequest({
@@ -243,9 +304,10 @@ function microsoftImageRecog(nutritionObject, callbackFunction) {
       "Ocp-Apim-Subscription-Key": MICROSOFT_IMAGE_KEY
     }
   }).then(function(httpResponse) {
-    console.log(httpResponse.text);
-    nutritionObject.set("microsoftResponse", JSON.stringify(httpResponse.text));
-    nutritionixSearch(httpResponse.text, nutritionObject, callbackFunction);
+    console.log('Microsoft Data returned');
+    nutritionObject.set("microsoftResponse", JSON.parse(httpResponse.text));
+    callbackFunction();
+    //nutritionixSearch(httpResponse.text, nutritionObject, callbackFunction);
   }, function(httpResponse) {
     console.error('microsoftImageRec Request failed with response code ' + httpResponse.status
       + ' and response text: ' + httpResponse.text);
@@ -254,10 +316,9 @@ function microsoftImageRecog(nutritionObject, callbackFunction) {
 }
 
 function googleImageRecog(nutritionObject, callbackFunction) {
+  console.log('Calling google');
   var imageUrl = nutritionObject.get("image").url();
-  console.log('Image URL: ' + imageUrl);
   Parse.Cloud.httpRequest({url: imageUrl}).then(function(httpResponse) {
-    console.log({log:'Calling Google1'});
     Parse.Cloud.httpRequest({
       method: 'POST',
       url: 'https://vision.googleapis.com/v1/images:annotate?key='
@@ -269,30 +330,38 @@ function googleImageRecog(nutritionObject, callbackFunction) {
           },
           "features":[{
             "type":"TEXT_DETECTION",
-          }, {
+          }/*, {
+            "type":"LABEL_DETECTION",
+          }*/, {
             "type":"LOGO_DETECTION",
-          }]
+          }],
+          "imageContext":{
+            "languageHints": [
+              "en"
+            ],
+          }
         }]
       },
       headers: {
         "Content-type": "application/json"
       }
     }).then(function(httpResponse) {
-      console.log({log:"Google's data", data: httpResponse.data});
-      //callbackFunction(httpResponse.data.responses);
+      console.log('Google data returned');
       nutritionObject.set("googleResponse", httpResponse.data);
-      findFoodObject(httpResponse.data, nutritionObject, callbackFunction);
+      callbackFunction();
+      //callbackFunction(httpResponse.data.responses);
+      //findFoodObject(httpResponse.data, nutritionObject, callbackFunction);
     }, function(httpResponse) {
       var errorMessage = 'Google Request failed with response code ' + httpResponse.status
         + ' and response text: ' + httpResponse.text;
       console.error(errorMessage);
-      callbackFunction({}, {message: errorMessage});
+      callbackFunction({message: errorMessage});
     });
   }, function(httpResponse) {
     var errorMessage = 'Error getting file from url with response code ' + httpResponse.status
      + ' and response text: ' + httpResponse.text;
     console.log(errorMessage);
-    callbackFunction({}, {message: errorMessage});
+    callbackFunction({message: errorMessage});
   });
 }
 
@@ -350,71 +419,164 @@ function findFoodObject(googleData, nutritionObject, callbackFunction) {
   console.log("findFoodObject() with text: " + textString);
   var usefulWords = getUsefulWords(textString);
   
-  var FoodData = Parse.Object.extend("FoodData");
-  var query = new Parse.Query(FoodData);
-  query.contains("descriptionWords", usefulWords);
+  var FoodDatabase = Parse.Object.extend("FoodDatabase");
+  var query = new Parse.Query(FoodDatabase);
+  console.log({log:"useful words", data: usefulWords});
+  query.containedIn("descriptionWords", usefulWords);
   query.find({
     success: function(parseObjects) {
+      console.log('FoodData query success');
       if (parseObjects.length == 0) {
         console.log('No FoodObjects found');
       } else {
-        nutritionObject.set("foodObject", identifyBestFoodObject(parseObject), usefulWords);
+        console.log(1);
+        nutritionObject.set("foodObject", identifyBestFoodObject(parseObjects, usefulWords));
       }
-      callbackFunction({data:"success"});
+      callbackFunction();
     },
     error: function(error) {
+      console.log('FoodData query failure');
       var errorMessage = "Error querying FoodData objects: " + error.message;
       console.log(errorMessage);
-      callbackFunction({}, {message: errorMessage});
+      callbackFunction({message: errorMessage});
     }
   });
-  callbackFunction({data: textString});
+  //callbackFunction({data: textString});
+}
+
+function findFoodObject2(nutritionObject, callbackFunction) {
+  //google data
+  var google = nutritionObject.get("googleResponse");
+  var microsoft = nutritionObject.get("microsoftResponse");
+
+  if (google.responses && Object.keys(google.responses[0]).length > 0) {
+    useGoogle();
+  } else {
+    useMicrosoft();
+  }
+
+  function useGoogle() {
+    console.log('useGoogle');
+    var textString = google.responses[0].textAnnotations[0].description;
+    var usefulWords = getUsefulWordsGoogle(textString);
+    console.log({usefulWordsGoogle: usefulWords});
+    
+    var FoodDatabase = Parse.Object.extend("FoodDatabase");
+    var query = new Parse.Query(FoodDatabase);
+    query.containedIn("descriptionWords", usefulWords);
+    query.find({
+      success: function(parseObjects) {
+        console.log('FoodData query useGoogle success');
+        if (parseObjects.length == 0) {
+          console.log('No FoodObjects found from google');
+          useMicrosoft();
+        } else {
+          nutritionObject.set("foodObject", identifyBestFoodObject(parseObjects, usefulWords));
+          callbackFunction();
+        }
+      },
+      error: function(error) {
+        console.log('FoodData query useGoogle failure');
+        var errorMessage = "Error querying FoodData objects: " + error.message;
+        console.log(errorMessage);
+        callbackFunction({message: errorMessage});
+      }
+    });
+  }
+
+  function useMicrosoft() {
+    console.log('useMicrosoft');
+    var usefulWords = getUsefulWordsMicrosoft(microsoft);
+    console.log({usefulWordsMicrosoft: usefulWords});
+    
+    var FoodDatabase = Parse.Object.extend("FoodDatabase");
+    var query = new Parse.Query(FoodDatabase);
+    query.containedIn("descriptionWords", usefulWords);
+    query.find({
+      success: function(parseObjects) {
+        console.log('FoodData query useMicrosoft success');
+        if (parseObjects.length == 0) {
+          console.log('No FoodObjects found from microsoft');
+        } else {
+          nutritionObject.set("foodObject", identifyBestFoodObject(parseObjects, usefulWords));
+        }
+        callbackFunction();
+      },
+      error: function(error) {
+        console.log('FoodData query useMicrosoft failure');
+        var errorMessage = "Error querying FoodData objects: " + error.message;
+        console.log(errorMessage);
+        callbackFunction({message: errorMessage});
+      }
+    });
+  }
+  
 }
 
 /*Uses google's text recognition response as a string input and
   returns array of useful words in lower case */
-function getUsefulWords(textString) {
+function getUsefulWordsGoogle(textString) {
+  var googleInfoString = textString;
 
-    var googleInfoString = 'P RRP 99p RRP\nLipton\nPEACH\nICE TEA\n';
+  var googleInfoStringLowercase = googleInfoString.toLowerCase();
 
-    var googleInfoStringLowercase = googleInfoString.toLowerCase();
+  var googleInfoStringFlattened = googleInfoStringLowercase.replace(/[^\x20-\x7E]/gmi, " ");
 
-    var googleInfoStringFlattened = googleInfoStringLowercase.replace(/[^\x20-\x7E]/gmi, " ");
+  var googleInfoArray = googleInfoStringFlattened.split(" ");
 
-    var googleInfoArray = googleInfoStringFlattened.split(" ");
+  var uselessInfo = ['99p','p','rrp','difference','taste','refrigerated', '£'];
 
-    var uselessInfo = ['99p','p','rrp','difference','taste','refrigerated', '£'];
+  var i = 0;
 
-    var i = 0;
-
-    for (i = 0; i < uselessInfo.length; i++) {
-      var y = googleInfoArray.includes(uselessInfo[i]);
-      
-      if (y) {
-        //https://davidwalsh.name/remove-item-array-javascript
-        console.log(i);
-        var indexOfUseless = googleInfoArray.indexOf(uselessInfo[i])
-        console.log("Index of useless: "+ indexOfUseless);
-
-        for(var x = googleInfoArray.length-1; x >= 0; x--){
-          if (googleInfoArray[x] === uselessInfo[i]) googleInfoArray.splice(x, 1);
-        }
-
-      }
-  
-    }
-
-    var finalArray = [];
-    for (var i = 0; i < googleInfoArray.length; i++) {
-      googleInfoArray[i] = googleInfoArray[i].trim();
-      if (googleInfoArray[i].length > 0) {
-        finalArray.push(googleInfoArray[i]);
-      }
-    }
+  for (i = 0; i < uselessInfo.length; i++) {
+    var indexOfUseless = googleInfoArray.indexOf(uselessInfo[i])
     
-    return finalArray;
+    if (indexOfUseless != -1) {
+      //https://davidwalsh.name/remove-item-array-javascript
+      //console.log(i);
+      //console.log("Index of useless: "+ indexOfUseless);
 
+      for(var x = googleInfoArray.length-1; x >= 0; x--){
+        if (googleInfoArray[x] === uselessInfo[i]) googleInfoArray.splice(x, 1);
+      }
+    }
   }
+
+  var finalArray = [];
+  for (var i = 0; i < googleInfoArray.length && i < 9; i++) {
+    googleInfoArray[i] = googleInfoArray[i].trim();
+    if (googleInfoArray[i].length > 0) {
+      finalArray.push(googleInfoArray[i]);
+    }
+  }
+  
+  return finalArray;
+}
+
+function getUsefulWordsMicrosoft(microsoftObject) {
+
+  var tags = microsoftObject.tags;
+
+  var uselessTags =["desk","person","computer","laptop","food","indoor","wood","hand","floor","wood","fruit"];
+
+  var tagNames = [];
+
+  var i = 0;
+  for (i = 0; i < tags.length; i++) {
+    tagNames.push(tags[i].name);
+  }
+
+  var finalArray = [];
+  var y = 0;
+  for (y = 0; y < tagNames.length; y++) {
+    var lookAtName = tagNames[y].toLowerCase();
+    var z = uselessTags.indexOf(lookAtName);
+
+    if (z == -1) {
+      finalArray.push(lookAtName);
+    }
+  }
+  return finalArray;
 }
 
 /*Goes through list of foodObjects and finds the best one given the usefulWords*/

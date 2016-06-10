@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Compare JSON objects</title>
+<script src="https://www.parsecdn.com/js/parse-1.6.12.min.js"></script>
+<script type="text/javascript">
+
+function init(objectId) {
+	objectId = (objectId) ? objectId : "6SvUg1YVya";
+	var PARSE_APPLICATION_ID = "v3NS4xBCONYmIqqtwASz1e3TuX9p1WDZod6dUxA7";
+	var PARSE_JS_KEY = "X0m2dicDJpQ4VGUi6QvKdDgivWsb9iSwaSfmNJa0";
+
+	Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
+
+	var Nutrition = Parse.Object.extend("Nutrition");
+  var query = new Parse.Query(Nutrition);
+  query.get(objectId, {
+    success: function(parseObject) {
+      console.log('Got parseObject');
+
+    },
+    error: function(error) {
+      console.log({error: "Error querying Nutrition: "+error.message});
+      response.error(error);
+    }
+  });
+}
+
+function syntaxHighlight(json) {
+  json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+    var cls = 'number';
+    if (/^"/.test(match)) {
+      if (/:$/.test(match)) {
+        cls = 'key';
+      } else {
+        cls = 'string';
+      }
+    } else if (/true|false/.test(match)) {
+      cls = 'boolean';
+    } else if (/null/.test(match)) {
+      cls = 'null';
+    }
+    return '<span class="' + cls + '">' + match + '</span>';
+  });
+}
+
+function showOutput()
+	
+
+</script>
+</head>
+<body onload="init()	">
+<table>
+	<tr>
+		<td id="name1">
+
+		</td>
+		<td id="name2">
+
+		</td>
+	</tr>
+	<tr>
+		<td id="output1">
+
+		</td>
+		<td id="output2">
+
+		</td>
+	</tr>
+</table>
+</body>
+</html>
