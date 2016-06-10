@@ -15,8 +15,17 @@
 		<table class="table"><tr>
 			<td class="imageTd">
 				<img src="{{imgsrc}}" class="profileImage">
-				{{msDescription}}<br>
-				{{caloriesString}}
+				<div *ngIf="foodObject">
+					<p *ngIf="foodObject.get('name') && foodObject.get('name').length > 0">
+						Name:{{foodObject.get('name')}}<br>
+					</p>
+					<p *ngIf="foodObject.get('fat')">
+						Fat:{{foodObject.get('fat')}}<br>
+					</p>
+					<p *ngIf="foodObject.get('vitaminA') && foodObject.get('vitaminA').length>0">
+						Vitamin A:{{foodObject.get('vitaminA')}}<br>
+					<p>
+				</div>
 				<ion-spinner name="dots" *ngIf="loading"></ion-spinner>
 			</td>
 		</tr></table>

@@ -98,6 +98,8 @@ export class Consts {
   public static NUTRITION_NUTRITIONIX_INFO = "nutritionixInformation";
   //File - Image uploaded by user
   public static NUTRITION_IMAGE = "image";
+  //Pointer<FoodDatabase> - Food object pointer
+  public static NUTRITION_FOODOBJECT = "foodObject";
   //Date - Created At
   public static CREATED_AT = "createdAt";
 
