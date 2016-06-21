@@ -7,6 +7,7 @@ import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {NgZone} from '@angular/core';
 import {ProfilePage} from '../profilepage/profilepage';
 import {Camera} from 'ionic-native';
+import {BackgroundGeolocation} from 'ionic-native';
 //import {File} from 'ionic-native';
 
 @Page({
@@ -405,53 +406,53 @@ export class HomePage {
   }*/
 
   tryLocation () {
- 
-    console.log('Inside tryLocation');
-    /**
-    * This callback will be executed every time a geolocation is recorded in the background.
-    */
-    var callbackFn = function(location) {
-        console.log('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
- 
-        // Do your HTTP request here to POST location to your server. 
-        // jQuery.post(url, JSON.stringify(location)); 
- 
-        /*
-        IMPORTANT:  You must execute the finish method here to inform the native plugin that you're finished,
-        and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
-        IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
-        */
-        backgroundGeolocation.finish();
-    };
+   // When device is ready :
 
-    console.log(1);
- 
-    var failureFn = function(error) {
-        console.log('BackgroundGeolocation error');
+    // BackgroundGeolocation is highly configurable. See platform specific configuration options
+    let config = {
+            desiredAccuracy: 10,
+            stationaryRadius: 20,
+            distanceFilter: 30,
+            debug: true, //  enable this hear sounds for background-geolocation life-cycle.
+            stopOnTerminate: false // enable this to clear background location settings when the app terminates
     };
+    
+    /*backgroundGeolocation.getLocations((locations) => {
+      console.log('Got stored locations', locations);
+    }, () => {
+      console.log('Error getting locations');
+    });*/
 
-    console.log(2);
- 
-    // BackgroundGeolocation is highly configurable. See platform specific configuration options 
-    backgroundGeolocation.configure(callbackFn, failureFn, {
-        desiredAccuracy: 10,
-        stationaryRadius: 0.1,
-        distanceFilter: 30,
-        interval: 5000,
-        debug: true, // <-- enable this hear sounds for background-geolocation life-cycle. 
-        stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates 
+    alert(1);
+
+    BackgroundGeolocation.getLocations().then((value) => {
+      console.log('something');
+    }).catch((reason) => {
+      console.log('didnt work');
+      console.log(reason);
     });
 
-    console.log(3);
-    backgroundGeolocation.stop(); 
- 
-    // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app. 
-    backgroundGeolocation.start();
+    alert(2);
 
-    console.log(4);
- 
-    // If you wish to turn OFF background-tracking, call the #stop method. 
-    // backgroundGeolocation.stop(); 
+    BackgroundGeolocation.configure(config)
+       .then((location) => {
+         alert(1);
+            console.log('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
+
+            // IMPORTANT:  You must execute the finish method here to inform the native plugin that you're finished,
+            // and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
+            // IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
+            BackgroundGeolocation.finish(); // FOR IOS ONLY
+        })
+       .catch((error) => {
+            console.log('BackgroundGeolocation error');
+        });
+    //BackgroundGeolocation.stop().then(() => {
+      //alert(9)
+      BackgroundGeolocation.start();
+  
+    //});
+    // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
+    
   }
-
 }
