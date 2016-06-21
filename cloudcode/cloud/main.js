@@ -109,6 +109,26 @@ Parse.Cloud.define("getWeekMoodData", function(request, response) {
   });
 });
 
+Parse.Cloud.afterSave("FoodDatabase", function(request) {
+  Parse.Cloud.useMasterKey();
+  var parseObject = request.object;
+  if (parseObject && parseObject.get('name')) {
+    var wordsArray = parseObject.get('name').toLowerCase().split(' ');
+    parseObject.set('descriptionWords', wordsArray);
+    parseObject.save(null, {
+      success: function(object) {
+        //console.log({log: 'search terms saved successfully'});
+      },
+      error: function(object, error) {
+        console.log({log: 'Error saving description words for FoodDatabase object terms: '
+         + error.message});
+      }
+    });
+  } else {
+    //console.log({log: 'FoodDatabase Name field not defined'});
+  }
+});
+
 Parse.Cloud.define("stravaActivitiesLastWeek", function(request, response) {
   var stravaAccessToken = Parse.User.current().get("stravaAccessToken");
 
@@ -309,9 +329,10 @@ function microsoftImageRecog(nutritionObject, callbackFunction) {
     callbackFunction();
     //nutritionixSearch(httpResponse.text, nutritionObject, callbackFunction);
   }, function(httpResponse) {
-    console.error('microsoftImageRec Request failed with response code ' + httpResponse.status
-      + ' and response text: ' + httpResponse.text);
-    callbackFunction('microsoftImageRec request failed with response code ' + httpResponse.status);
+    console.error('microsoftImageRec Request failed with response code '
+      + httpResponse.status + ' and response text: ' + httpResponse.text);
+    callbackFunction('microsoftImageRec request failed with response code '
+      + httpResponse.status);
   });
 }
 
@@ -387,9 +408,10 @@ function nutritionixSearch(microsoftResponse, nutritionObject, callbackFunction)
     console.log(nutritionixResponse);
     nutritionixInfo(nutritionixResponse, nutritionObject, callbackFunction);
   }, function(httpResponse) {
-    console.error('nutritionixSearch Request failed with response code ' + httpResponse.status 
-      + ' and response text' + httpResponse.text);
-    callbackFunction('nutritionixSearch request failed with response code ' + httpResponse.status)
+    console.error('nutritionixSearch Request failed with response code '
+     + httpResponse.status + ' and response text' + httpResponse.text);
+    callbackFunction('nutritionixSearch request failed with response code '
+     + httpResponse.status)
   });
 }
 
@@ -410,7 +432,8 @@ function nutritionixInfo(nutritionixResponse, nutritionObject, callbackFunction)
     callbackFunction();
   }, function(httpResponse) {
     console.error('Request failed with response code ' + httpResponse.status);
-    callbackFunction('nutritionixInfo request failed with response code ' + httpResponse.status)
+    callbackFunction('nutritionixInfo request failed with response code '
+      + httpResponse.status)
   });
 }
 
@@ -557,7 +580,8 @@ function getUsefulWordsMicrosoft(microsoftObject) {
 
   var tags = microsoftObject.tags;
 
-  var uselessTags =["desk","person","computer","laptop","food","indoor","wood","hand","floor","wood","fruit"];
+  var uselessTags =["desk","person","computer","laptop","food",
+    "indoor","wood","hand","floor","wood","fruit"];
 
   var tagNames = [];
 
