@@ -352,12 +352,14 @@ export class HomePage {
   }
 
   openUserProfile() {
+    /*
     CloudFunctions.testGoogle((data, error) => {
       console.log('Google test data: ', data);
     });
-    /*if (Parse.User.current() != null) {
+    */
+    if (Parse.User.current() != null) {
       this.nav.push(ProfilePage);
-    }*/
+    }
   }
 
   /*imageRecognition() {
@@ -385,9 +387,7 @@ export class HomePage {
         for(var x = googleInfoArray.length-1; x >= 0; x--){
           if (googleInfoArray[x] === uselessInfo[i]) googleInfoArray.splice(x, 1);
         }
-
-      }
-  
+      }  
     }
 
     var finalArray = [];
@@ -401,6 +401,5 @@ export class HomePage {
     return finalArray;
 
   }*/
-
 
 }
