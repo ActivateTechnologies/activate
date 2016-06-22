@@ -439,7 +439,6 @@ export class HomePage {
   }
 
   tryLocation () {
- 
     console.log('Inside tryLocation');
     // BackgroundGeolocation is highly configurable. See platform specific configuration options
     let config = {
@@ -496,5 +495,4 @@ export class HomePage {
     backgroundGeolocation.stop();
     backgroundGeolocation.start();
   }
-
 }
