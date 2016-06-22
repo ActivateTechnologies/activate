@@ -160,7 +160,9 @@ export class Health {
         this.processShowData(steps, distance, activity);
       }, (error) => {
         console.log('Error:', error);
-        this.callbackFunction(this.chatObject, this.isReply, {error: "Error accessing steps"}, null, false);
+        this.callbackFunction(this.chatObject, this.isReply, {
+          error: "Error accessing steps"
+        }, null, false);
       });
       navigator.health.queryAggregated({
         startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // one day ago
@@ -172,7 +174,9 @@ export class Health {
         this.processShowData(steps, distance, activity);
       }, (error) => {
         console.log('Error:', error);
-        this.callbackFunction(this.chatObject, this.isReply, {error: "Error accessing distance"}, null, false);
+        this.callbackFunction(this.chatObject, this.isReply, {
+          error: "Error accessing distance"
+        }, null, false);
       });
       navigator.health.queryAggregated({
         startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
@@ -184,7 +188,9 @@ export class Health {
         this.processShowData(steps, distance, activity);
       }, (error) => {
         console.log('Error:', error);
-        this.callbackFunction(this.chatObject, this.isReply, {error: "Error accessing activity"}, null, false);
+        this.callbackFunction(this.chatObject, this.isReply, {
+          error: "Error accessing activity"
+        }, null, false);
       });
       /*navigator.health.query({
         startDate: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000), // three days ago
@@ -238,7 +244,9 @@ export class Health {
         this.processRecentActivity(data);
       }, (error) => {
         console.log('Error:', error);
-        this.callbackFunction(this.chatObject, this.isReply, {error: "Error accessing distance"}, null, false);
+        this.callbackFunction(this.chatObject, this.isReply, {
+          error: "Error accessing distance"
+        }, null, false);
       });
     } else {
       this.loading = false;
@@ -259,7 +267,8 @@ export class Health {
       let combinedTrips:any[] = [];
       let lastEndTime:Date = new Date();
       lastEndTime.setDate(lastEndTime.getDate() - 2); //2 days ago, just any date in past
-      //Combining the trips with given interval and ignoring values with source containing "watch"
+      /*Combining the trips with given interval and 
+        ignoring values with source containing "watch"*/
       for (let i = 0; i < distanceArray.length; i++) {
         if (!distanceArray[i].source || 
           distanceArray[i].source.toLowerCase().search("watch") == -1) {
@@ -288,7 +297,8 @@ export class Health {
       }
       let lastTrip = finalTrips[finalTrips.length-1];
       //console.log('Last Trip', lastTrip);
-      console.log(Parse.User.current().get(Consts.USER_LASTNOTIFIEDRECENTACTIVITY), lastTrip.endDate);
+      /*console.log(Parse.User.current().get(Consts.USER_LASTNOTIFIEDRECENTACTIVITY),
+       lastTrip.endDate);*/
       Parse.User.current().fetch({
         success: (object) => {
           if (Parse.User.current().get(Consts.USER_LASTNOTIFIEDRECENTACTIVITY) &&

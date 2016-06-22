@@ -70,11 +70,24 @@ export class CloudFunctions {
   public static processNutritionImage(requestData, callback) {
     Parse.Cloud.run('processNutritionImage', requestData, {
       success: (data) => {
-        console.log('processNutritionImage success');
+        //console.log('processNutritionImage success');
         callback(data);
       },
       error: (error) => {
         console.log('Error calling processNutritionImage:', error.message);
+        callback({}, error);
+      }
+    });
+  }
+
+  public static saveLocationData(requestData, callback) {
+    Parse.Cloud.run('saveLocationData', requestData, {
+      success: (data) => {
+        //console.log('saveLocationData success');
+        callback(data);
+      },
+      error: (error) => {
+        console.log('Error calling saveLocationData:', error.message);
         callback({}, error);
       }
     });

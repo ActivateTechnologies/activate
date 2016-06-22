@@ -7,6 +7,8 @@ import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {NgZone} from '@angular/core';
 import {ProfilePage} from '../profilepage/profilepage';
 import {Camera} from 'ionic-native';
+import {BackgroundGeolocation} from 'ionic-native';
+import {Http, Headers} from '@angular/http';
 //import {File} from 'ionic-native';
 
 @Page({
@@ -15,7 +17,7 @@ import {Camera} from 'ionic-native';
 })
 export class HomePage {
   @ViewChild(Content) content: Content;
-  nav:any; app:any; zone:any; platform:any; chatMessages:any[]; replyOptions:any[];
+  nav:any; app:any; zone:any; http:any; platform:any; chatMessages:any[]; replyOptions:any[];
   typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number; SCROLL_DELAY:number;
   dev:boolean = true; loadingMessages:boolean = true; recentMessagesTemp:any[];
   // recentMessagesTemp holds all the messages recently shown to user before he has replied,
@@ -24,11 +26,13 @@ export class HomePage {
 
   public widgetBoundCallback: Function;
 
-	constructor(nav: NavController, app: IonicApp, zone: NgZone, platform: Platform) {
+	constructor(nav: NavController, app: IonicApp, zone: NgZone, platform: Platform,
+    http: Http) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = nav;
     this.app = app;
     this.zone = zone;
+    this.http = http;
     this.platform = platform;
     this.chatMessages = [];
     this.recentMessagesTemp = [];
@@ -41,7 +45,8 @@ export class HomePage {
 
   initialize() {
     console.log('About to try location');
-    this.tryLocation();
+    //this.tryLocation();
+    this.startLocationTracking();
     if (Parse.User.current()) {
       this.retrieveArchieveMessages();
       //this.navigateTreeTo('start', false); //healthApi
@@ -355,9 +360,9 @@ export class HomePage {
 
   openUserProfile() {
     /*
-    CloudFunctions.testGoogle((data, error) => {
-      console.log('Google test data: ', data);
-    });
+      CloudFunctions.testGoogle((data, error) => {
+        console.log('Google test data: ', data);
+      });
     */
     if (Parse.User.current() != null) {
       this.nav.push(ProfilePage);
@@ -401,57 +406,95 @@ export class HomePage {
     }
     
     return finalArray;
-
   }*/
+
+  startLocationTracking() {
+    backgroundGeolocation.stop();
+    let config = {
+      desiredAccuracy: 0,
+      stationaryRadius: 10,
+      distanceFilter: 2,
+      debug: true,
+      interval: 2*1000,
+      stopOnTerminate: false,
+      activityType: "Fitness"
+    };
+    backgroundGeolocation.configure((location) => {}, (error) => {}, config);
+    backgroundGeolocation.start();
+    backgroundGeolocation.getLocations((locations) => {
+      console.log('Got stored locations, count: ', locations.length);
+      if (locations.length > 0) {
+        CloudFunctions.saveLocationData(locations, (data, error) => {
+          if (!error) {
+            /*backgroundGeolocation.deleteAllLocations(() => {}, (error) => {
+              console.log('Error deleting locations');
+            });*/
+          }
+        });
+      }
+        
+    }, () => {
+      console.log('Error getting locations');
+    })
+  }
 
   tryLocation () {
  
     console.log('Inside tryLocation');
-    /**
-    * This callback will be executed every time a geolocation is recorded in the background.
-    */
-    var callbackFn = function(location) {
-        console.log('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
- 
-        // Do your HTTP request here to POST location to your server. 
-        // jQuery.post(url, JSON.stringify(location)); 
- 
-        /*
-        IMPORTANT:  You must execute the finish method here to inform the native plugin that you're finished,
-        and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
-        IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
-        */
-        backgroundGeolocation.finish();
+    // BackgroundGeolocation is highly configurable. See platform specific configuration options
+    let config = {
+      desiredAccuracy: 10,
+      stationaryRadius: 0.1,
+      distanceFilter: 30,
+      debug: true,
+      stopOnTerminate: false,
+      url: "https://api.parse.com/1/functions/logLocation",
+      httpHeaders: {
+        "X-Parse-Application-Id": "v3NS4xBCONYmIqqtwASz1e3TuX9p1WDZod6dUxA7",
+        "X-Parse-REST-API-Key": "b5DwYpHR3Rn9f55Id7lXaKpRdGgEFvgRpfNNLE3q"/*,
+        "Content-Type": "application/json"*/
+      }
     };
 
-    console.log(1);
+    var callbackFn = function(location) {
+      console.log('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
+      /*var xmlhttp = new XMLHttpRequest();
+      xmlhttp.onreadystatechange = function () {
+        console.log(xmlhttp.readyState + " ~ " + xmlhttp.status + " ~ " + xmlhttp.responseText);
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+          console.log("Successfully sent");
+        }
+      }
+      xmlhttp.open("POST", "https://api.parse.com/1/functions/logLocation", true);
+      xmlhttp.setRequestHeader("X-Parse-Application-Id", "v3NS4xBCONYmIqqtwASz1e3TuX9p1WDZod6dUxA7"); 
+      //xmlhttp.setRequestHeader("X-Parse-Client-Key", "YB0Po25rU80Z8PpzPQyYCVEzqECZnFQv55lZQakw"); 
+      xmlhttp.setRequestHeader("X-Parse-REST-API-Key", "b5DwYpHR3Rn9f55Id7lXaKpRdGgEFvgRpfNNLE3q"); 
+      //xmlhttp.setRequestHeader("Content-type", "application/json;"); 
+      xmlhttp.send(JSON.stringify({
+        lat: location.latitude,
+        lng: location.longitude,
+        time: new Date().getTime()
+      }));*/
+      
+      backgroundGeolocation.finish();
+    };
  
     var failureFn = function(error) {
-        console.log('BackgroundGeolocation error');
+      console.log('BackgroundGeolocation error');
     };
-
-    console.log(2);
  
     // BackgroundGeolocation is highly configurable. See platform specific configuration options 
-    backgroundGeolocation.configure(callbackFn, failureFn, {
-        desiredAccuracy: 10,
-        stationaryRadius: 0.1,
-        distanceFilter: 30,
-        interval: 5000,
-        debug: true, // <-- enable this hear sounds for background-geolocation life-cycle. 
-        stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates 
-    });
+    backgroundGeolocation.configure(callbackFn, failureFn, config);
 
-    console.log(3);
-    backgroundGeolocation.stop(); 
+    backgroundGeolocation.getLocations((locations) => {
+      console.log('Got stored locations', locations);
+    }, () => {
+      console.log('Error getting locations');
+    })
  
     // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app. 
+    backgroundGeolocation.stop();
     backgroundGeolocation.start();
-
-    console.log(4);
- 
-    // If you wish to turn OFF background-tracking, call the #stop method. 
-    // backgroundGeolocation.stop(); 
   }
 
 }

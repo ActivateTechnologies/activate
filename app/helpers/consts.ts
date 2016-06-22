@@ -110,6 +110,14 @@ export class Consts {
   //Number - Mood happiness value
   public static MOOD_HAPPINESS = "happiness";
 
+  //Location Class
+  public static LOCATION_DATA_CLASS = "Mood";
+  //Pointer <_User>
+  public static LOCATION_DATA_USER = "user";
+  //Date - Start timestamp of week this data is from
+  public static LOCATION_DATA_WEEKSTARTDATE = "weekStartDate";
+  //Array - Location objects
+  public static LOCATION_DATA_LOCATIONS = "locations";
 
   constructor() {
   }

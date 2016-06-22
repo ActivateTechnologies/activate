@@ -19,6 +19,123 @@ Parse.Cloud.define("initConversation", function(request, response) {
   });
 });
 
+Parse.Cloud.define("logLocation", function(request, response) {
+  console.log({log:'logLocation called', data:request.params});
+  response.success();
+});
+
+Parse.Cloud.define("saveLocationData", function(request, response) {
+  console.log({log:'saveLocationData called'});
+
+  var locations = request.params;
+  var mainArray = [];
+
+  //Define a date object set to beginning of a the first week for received data
+  var firstWeekStartDate = new Date(locations[0].time);
+  firstWeekStartDate.setTime(firstWeekStartDate.getTime()
+   - firstWeekStartDate.getTime() % (86400 * 1000));
+  firstWeekStartDate.setTime(firstWeekStartDate.getTime()
+    - firstWeekStartDate.getDay() * 86400 * 1000);
+
+  /*Fill mainArray with location objects, with mainArray[0] holding week 1 data,
+    mainArray[1] holding week 2 data, ... so on.
+    */
+  var keys = Object.keys(locations);
+  console.log({count: "-1", data: keys.length});
+  for (var i = 0; i < keys.length; i++) {
+    if (!locations[keys[i]].debug || 1) { //TODO: remove "|| 1"
+      var mainArrayIndex = locations[keys[i]].time - firstWeekStartDate.getTime();
+      mainArrayIndex = Math.floor(mainArrayIndex / (7 * 86400 * 1000));
+      if (!mainArray[mainArrayIndex]) {
+        mainArray[mainArrayIndex] = [];
+      }
+      mainArray[mainArrayIndex].push({
+        accuracy: locations[keys[i]].accuracy,
+        lat: locations[keys[i]].latitude,
+        lng: locations[keys[i]].longitude,
+        provider: locations[keys[i]].provider,
+        time: locations[keys[i]].time
+      });
+    }
+  }
+
+  /*If first week's LocationData object already exists, update that and set 
+    mainArray[0].length = 0. Regardless of if that exists or not, call 
+    saveRemainingLocationsdata()*/
+  if (mainArray.length > 0) {
+    var LocationData = Parse.Object.extend("LocationData");
+    var query = new Parse.Query(LocationData);
+    query.equalTo('user', Parse.User.current());
+    query.equalTo('weekStartDate', firstWeekStartDate);
+    query.first({
+      success: function (parseObject) {
+        if (parseObject) {
+          console.log('Length of already stored locations: '
+            + parseObject.get("locations").length);
+          console.log('Length of mainArray[0]: ' + mainArray[0].length);
+          for (var i = 0; i < mainArray[0].length; i++) {
+            parseObject.addUnique('locations', mainArray[0][i]);
+          }
+          parseObject.save({
+            success: function (parseObject) {
+              mainArray[0].length = 0;
+              console.log(3);
+              saveRemainingLocationData();
+            },
+            error: function (error) {
+              console.log("Error updating this weeks LocationData object");
+              console.log(4);
+              saveRemainingLocationData();
+            }
+          });
+        } else {
+          console.log("First week LocationData object doesnt exist");
+          saveRemainingLocationData();
+        }
+      },
+      error: function (error) {
+        console.log("Error finding this weeks LocationData object");
+        saveRemainingLocationData();
+      }
+    });
+  } else {
+    response.success({});
+  }
+
+  //Save the location data for remaining weeks (and mainArray[0] if it's not empty)
+  function saveRemainingLocationData() {
+    var objectsToSave = [];
+    for (var i = 0; i < mainArray.length; i++) {
+      if (mainArray[i].length > 0) {
+        var weekStartDate = new Date(firstWeekStartDate.getTime() + i * 7 * 86400 * 1000);
+        var LocationData = Parse.Object.extend("LocationData");
+        var locationData = new LocationData();
+        console.log({log:"parse user", user: Parse.User.current()})
+        locationData.set("user", Parse.User.current());
+        locationData.set("weekStartDate", weekStartDate);
+        locationData.set("locations", []);
+        for (var j = 0; j < mainArray[i].length; j++) { 
+          locationData.addUnique("locations", mainArray[i][j]);
+        }
+        objectsToSave.push(locationData);
+      }
+    }
+    Parse.Object.saveAll(objectsToSave, {
+      success: function (objets) {
+        response.success({});
+      },
+      error: function (error) {
+        console.log('Error saving all objects: ' + error.message)
+        response.error({
+          error: error, 
+          message: 'Error saving all objects: ' + error.message
+        });
+      }
+    });
+  }
+});
+
+    
 Parse.Cloud.define("getWeekHeartData", function(request, response) {
   var HeardData = Parse.Object.extend("HeartData");
   var query = new Parse.Query(HeardData);
