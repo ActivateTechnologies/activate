@@ -44,7 +44,6 @@ export class HomePage {
   }
 
   initialize() {
-    console.log('About to try location');
     //this.tryLocation();
     this.startLocationTracking();
     if (Parse.User.current()) {
@@ -412,8 +411,8 @@ export class HomePage {
     backgroundGeolocation.stop();
     let config = {
       desiredAccuracy: 0,
-      stationaryRadius: 10,
-      distanceFilter: 2,
+      stationaryRadius: 30,
+      distanceFilter: 1,
       debug: true,
       interval: 2*1000,
       stopOnTerminate: false,
@@ -424,18 +423,54 @@ export class HomePage {
     backgroundGeolocation.getLocations((locations) => {
       console.log('Got stored locations, count: ', locations.length);
       if (locations.length > 0) {
-        CloudFunctions.saveLocationData(locations, (data, error) => {
-          if (!error) {
-            /*backgroundGeolocation.deleteAllLocations(() => {}, (error) => {
-              console.log('Error deleting locations');
-            });*/
-          }
-        });
+        this.saveLocationsToParse(locations);
       }
-        
     }, () => {
       console.log('Error getting locations');
     })
+  }
+
+  saveLocationsToParse(locations) {
+    let keys = Object.keys(locations);
+    let locationsToSend = {};
+    for (let i = 0; i < keys.length; i++) {
+      locationsToSend[locations[keys[i]].time] = {
+        accuracy: locations[keys[i]].accuracy,
+        lat: locations[keys[i]].latitude,
+        lng: locations[keys[i]].longitude,
+        provider: locations[keys[i]].provider,
+        debug: locations[keys[i]].debug
+      };
+    }
+    CloudFunctions.saveLocationData(locationsToSend, (data, error) => {
+      if (!error) {
+        /*backgroundGeolocation.deleteAllLocations(() => {}, (error) => {
+          console.log('Error deleting locations');
+        });*/
+      }
+    });
+  }
+
+  saveLocationsToParseOriginal(locations) {
+    let keys = Object.keys(locations);
+    let locationsToSend = [];
+    for (let i = 0; i < keys.length; i++) {
+      locationsToSend.push({
+        accuracy: locations[keys[i]].accuracy,
+        lat: locations[keys[i]].latitude,
+        lng: locations[keys[i]].longitude,
+        provider: locations[keys[i]].provider,
+        time: locations[keys[i]].time,
+        debug: locations[keys[i]].debug
+      });
+    }
+    CloudFunctions.saveLocationData(locationsToSend, (data, error) => {
+      if (!error) {
+        /*backgroundGeolocation.deleteAllLocations(() => {}, (error) => {
+          console.log('Error deleting locations');
+        });*/
+      }
+    });
   }
 
   tryLocation () {

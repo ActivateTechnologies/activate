@@ -19,106 +19,85 @@ Parse.Cloud.define("initConversation", function(request, response) {
   });
 });
 
-Parse.Cloud.define("logLocation", function(request, response) {
-  console.log({log:'logLocation called', data:request.params});
-  response.success();
-});
-
 Parse.Cloud.define("saveLocationData", function(request, response) {
-  console.log({log:'saveLocationData called'});
+  var timeNow = (new Date()).getTime();
+  console.log("saveLocationData called");
 
   var locations = request.params;
+  var locationsKeys = Object.keys(locations);
   var mainArray = [];
+  var maxTime = parseInt(locationsKeys[0]);
+  var minTime = parseInt(locationsKeys[0]);
+  var firstWeekStartDate;
 
-  //Define a date object set to beginning of a the first week for received data
-  var firstWeekStartDate = new Date(locations[0].time);
-  firstWeekStartDate.setTime(firstWeekStartDate.getTime()
-   - firstWeekStartDate.getTime() % (86400 * 1000));
+  //Find maxTime, minTime and firstWeekStartDate
+  for (var i = 0; i < locationsKeys.length; i++) {
+    var time = parseInt(locationsKeys[i]);
+    maxTime = (time > maxTime) ? time : maxTime;
+    minTime = (time < minTime) ? time : minTime;
+  }
+  firstWeekStartDate = new Date(minTime);
+  firstWeekStartDate.setTime(minTime - minTime % (86400 * 1000));
   firstWeekStartDate.setTime(firstWeekStartDate.getTime()
     - firstWeekStartDate.getDay() * 86400 * 1000);
 
-  /*Fill mainArray with location objects, with mainArray[0] holding week 1 data,
-    mainArray[1] holding week 2 data, ... so on.
-    */
-  var keys = Object.keys(locations);
-  console.log({count: "-1", data: keys.length});
-  for (var i = 0; i < keys.length; i++) {
-    if (!locations[keys[i]].debug || 1) { //TODO: remove "|| 1"
-      var mainArrayIndex = locations[keys[i]].time - firstWeekStartDate.getTime();
-      mainArrayIndex = Math.floor(mainArrayIndex / (7 * 86400 * 1000));
-      if (!mainArray[mainArrayIndex]) {
-        mainArray[mainArrayIndex] = [];
-      }
-      mainArray[mainArrayIndex].push({
-        accuracy: locations[keys[i]].accuracy,
-        lat: locations[keys[i]].latitude,
-        lng: locations[keys[i]].longitude,
-        provider: locations[keys[i]].provider,
-        time: locations[keys[i]].time
-      });
-    }
+  //Initialise mainArray based on number of weeks of data
+  var numOfWeeks = Math.ceil(
+    (maxTime - firstWeekStartDate.getTime()) / (7 * 86400 * 1000));
+  for (var i = 0; i < numOfWeeks; i++) {
+    mainArray.push({});
   }
 
-  /*If first week's LocationData object already exists, update that and set 
-    mainArray[0].length = 0. Regardless of if that exists or not, call 
-    saveRemainingLocationsdata()*/
-  if (mainArray.length > 0) {
-    var LocationData = Parse.Object.extend("LocationData");
-    var query = new Parse.Query(LocationData);
-    query.equalTo('user', Parse.User.current());
-    query.equalTo('weekStartDate', firstWeekStartDate);
-    query.first({
-      success: function (parseObject) {
-        if (parseObject) {
-          console.log('Length of already stored locations: '
-            + parseObject.get("locations").length);
-          console.log('Length of mainArray[0]: ' + mainArray[0].length);
-          for (var i = 0; i < mainArray[0].length; i++) {
-            parseObject.addUnique('locations', mainArray[0][i]);
-          }
-          parseObject.save({
-            success: function (parseObject) {
-              mainArray[0].length = 0;
-              console.log(3);
-              saveRemainingLocationData();
-            },
-            error: function (error) {
-              console.log("Error updating this weeks LocationData object");
-              console.log(4);
-              saveRemainingLocationData();
-            }
-          });
-        } else {
-          console.log("First week LocationData object doesnt exist");
-          saveRemainingLocationData();
+  //Fill objects in the array with the location objects
+  for (var i = 0; i < locationsKeys.length; i++) {
+    var mainArrayIndex = (locationsKeys[i] - firstWeekStartDate.getTime());
+    mainArrayIndex = Math.floor(mainArrayIndex / (7 * 86400 * 1000));
+    mainArray[mainArrayIndex][locationsKeys[i]] = locations[locationsKeys[i]];
+  }
+
+  //Retrieve current week object and merge
+  var objectsToSave = [];
+  var LocationData = Parse.Object.extend("LocationData");
+  var query = new Parse.Query(LocationData);
+  query.equalTo('user', Parse.User.current());
+  query.equalTo('weekStartDate', firstWeekStartDate);
+  query.first({
+    success: function (parseObject) {
+      var currentLocationsObject = parseObject.get("locationsObject");
+      var currentLocationsObjectKeys = Object.keys(currentLocationsObject);
+      for (var i = 0; i < currentLocationsObjectKeys.length; i++) {
+        mainArray[0][currentLocationsObjectKeys[i]] = 
+          currentLocationsObject[currentLocationsObjectKeys[i]];
+      }
+      parseObject.destroy({
+        success: function (object) {
+
+        },
+        error: function (object, error) {
+          console.log("Error deleting current week parse object: "
+            + error.message);
         }
-      },
-      error: function (error) {
-        console.log("Error finding this weeks LocationData object");
-        saveRemainingLocationData();
-      }
-    });
-  } else {
-    response.success({});
-  }
+      })
+      saveAllWeeksLocationData();
+    },
+    error: function (error) {
+      console.log("Error finding current week parse object: "
+        + error.message);
+      saveAllWeeksLocationData();
+    }
+  });
 
-  //Save the location data for remaining weeks (and mainArray[0] if it's not empty)
-  function saveRemainingLocationData() {
+  //Save all weeks
+  function saveAllWeeksLocationData() {
     var objectsToSave = [];
     for (var i = 0; i < mainArray.length; i++) {
-      if (mainArray[i].length > 0) {
-        var weekStartDate = new Date(firstWeekStartDate.getTime() + i * 7 * 86400 * 1000);
-        var LocationData = Parse.Object.extend("LocationData");
-        var locationData = new LocationData();
-        console.log({log:"parse user", user: Parse.User.current()})
-        locationData.set("user", Parse.User.current());
-        locationData.set("weekStartDate", weekStartDate);
-        locationData.set("locations", []);
-        for (var j = 0; j < mainArray[i].length; j++) { 
-          locationData.addUnique("locations", mainArray[i][j]);
-        }
-        objectsToSave.push(locationData);
-      }
+      var weekStartDate = new Date(firstWeekStartDate.getTime() + (i * 7 * 86400 * 1000));
+      var LocationData = Parse.Object.extend("LocationData");
+      var locationData = new LocationData();
+      locationData.set("user", Parse.User.current());
+      locationData.set("weekStartDate", weekStartDate);
+      locationData.set("locationsObject", mainArray[i]);
+      objectsToSave.push(locationData);
     }
     Parse.Object.saveAll(objectsToSave, {
       success: function (objets) {
@@ -135,7 +114,6 @@ Parse.Cloud.define("saveLocationData", function(request, response) {
   }
 });
 
-    
 Parse.Cloud.define("getWeekHeartData", function(request, response) {
   var HeardData = Parse.Object.extend("HeartData");
   var query = new Parse.Query(HeardData);
@@ -597,6 +575,12 @@ function findFoodObject2(nutritionObject, callbackFunction) {
 
   function useGoogle() {
     console.log('useGoogle');
+    if (!google.responses || google.responses.length == 0
+     || !google.responses[0].textAnnotations
+     || google.responses[0].textAnnotations.length == 0) {
+      useMicrosoft();
+      return;
+    }
     var textString = google.responses[0].textAnnotations[0].description;
     var usefulWords = getUsefulWordsGoogle(textString);
     console.log({usefulWordsGoogle: usefulWords});
