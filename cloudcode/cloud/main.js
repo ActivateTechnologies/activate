@@ -1,4 +1,5 @@
 var Image = require("parse-image");
+var Buffer = require('buffer').Buffer;
 
 Parse.Cloud.define("initConversation", function(request, response) {
 	var TreeObjects = Parse.Object.extend("TreeObjects");
@@ -20,6 +21,171 @@ Parse.Cloud.define("initConversation", function(request, response) {
 });
 
 Parse.Cloud.define("saveLocationData", function(request, response) {
+  var timeNow = (new Date()).getTime();
+
+  var locations = request.params;
+  var locationsKeys = Object.keys(locations);
+  var mainArray = [];
+  var maxTime = parseInt(locationsKeys[0]);
+  var minTime = parseInt(locationsKeys[0]);
+  var firstWeekStartDate;
+
+  //console.log("1 Time: " + ((new Date()).getTime() - timeNow));
+  //Find maxTime, minTime and firstWeekStartDate
+  for (var i = 0; i < locationsKeys.length; i++) {
+    var time = parseInt(locationsKeys[i]);
+    maxTime = (time > maxTime) ? time : maxTime;
+    minTime = (time < minTime) ? time : minTime;
+  }
+  firstWeekStartDate = new Date(minTime);
+  firstWeekStartDate.setTime(minTime - minTime % (86400 * 1000));
+  firstWeekStartDate.setTime(firstWeekStartDate.getTime()
+    - firstWeekStartDate.getDay() * 86400 * 1000);
+
+  //console.log("2 Time: " + ((new Date()).getTime() - timeNow));
+  //Initialise mainArray based on number of weeks of data
+  var numOfWeeks = Math.ceil(
+    (maxTime - firstWeekStartDate.getTime()) / (7 * 86400 * 1000));
+  for (var i = 0; i < numOfWeeks; i++) {
+    mainArray.push({});
+  }
+
+  //console.log("3 Time: " + ((new Date()).getTime() - timeNow));
+  //Fill objects in the array with the location objects
+  for (var i = 0; i < locationsKeys.length; i++) {
+    var mainArrayIndex = (locationsKeys[i] - firstWeekStartDate.getTime());
+    mainArrayIndex = Math.floor(mainArrayIndex / 604800000); //(7 * 86400 * 1000)
+    mainArray[mainArrayIndex][locationsKeys[i]] = locations[locationsKeys[i]];
+  }
+
+  //console.log("4 Time: " + ((new Date()).getTime() - timeNow));
+  //Retrieve current week object and merge
+  var objectsToSave = [];
+  var fileToDelete = "";
+  var LocationData = Parse.Object.extend("LocationData");
+  var query = new Parse.Query(LocationData);
+  query.equalTo('user', Parse.User.current());
+  query.equalTo('weekStartDate', firstWeekStartDate);
+  query.first({
+    success: function (parseObject) {
+      //console.log("5 Time: " + ((new Date()).getTime() - timeNow));
+      if (parseObject) {
+        Parse.Cloud.httpRequest({
+          url: parseObject.get("locationFile").url()
+        }).then(function(fileResponse) {
+          fileToDelete = parseObject.get("locationFile").name();
+          //console.log("6 Time: " + ((new Date()).getTime() - timeNow));
+          var currentLocationsObject = JSON.parse(fileResponse.buffer.toString('utf8'));
+          var currentLocationsObjectKeys = Object.keys(currentLocationsObject);
+          for (var i = 0; i < currentLocationsObjectKeys.length; i++) {
+            mainArray[0][currentLocationsObjectKeys[i]] = 
+              currentLocationsObject[currentLocationsObjectKeys[i]];
+          }
+          saveAllWeeksLocationData(function (error) {
+            if (error) {
+              response.error(error);
+            } else {
+              //TODO - Delete file here
+              parseObject.destroy({
+                success: function (object) {
+                  //console.log("11 Time: " + ((new Date()).getTime() - timeNow));
+                  Parse.Cloud.httpRequest({
+                    method: 'DELETE',
+                    url: 'https://api.parse.com/1/files/' + fileToDelete,
+                    headers: {
+                      "X-Parse-Application-Id": "v3NS4xBCONYmIqqtwASz1e3TuX9p1WDZod6dUxA7",
+                      "X-Parse-Master-Key": "lTfiVyxxddFhbaCbs9NhvZTBdjmTw8ldWRmv5KoH"
+                    }
+                  }).then(function() {
+                    //console.log("12 Time: " + ((new Date()).getTime() - timeNow));
+                    console.log("File Deleted Successfully");
+                    response.success({});
+                  }, function(error) {
+                    console.log("Error deleting file: " + JSON.stringify(error));
+                    response.success({});
+                  });
+                },
+                error: function (object, error) {
+                  console.log("Error deleting current week parse object: "
+                    + error.message);
+                  response.success({});
+                }
+              })
+            }
+          });
+        }, function (error) {
+          console.log("Error reading current week locationFile: "
+            + error.message);
+        });
+      } else {
+        saveAllWeeksLocationData(function (error) {
+          if (error) {
+            response.error(error);
+          } else {
+            response.success({});
+          }
+        });
+      }
+    },
+    error: function (error) {
+      console.log("Error finding current week parse object: "
+        + error.message);
+      saveAllWeeksLocationData(function (error) {
+        if (error) {
+          response.error(error);
+        } else {
+          response.success({});
+        }
+      });
+    }
+  });
+
+  //Save all weeks
+  function saveAllWeeksLocationData(callback) {
+    filesToSave = [];
+    var objectsToSave = [];
+    var fileSavePromises = [];
+    for (var i = 0; i < mainArray.length; i++) {
+      (function(i) {
+        var base64text = new Buffer(JSON.stringify(mainArray[i])).toString('base64');
+        var file = new Parse.File("locationFile.txt", { base64: base64text });
+        fileSavePromises.push(
+          file.save().then(function () {
+            var weekStartDate = new Date(firstWeekStartDate.getTime() + (i * 7 * 86400 * 1000));
+            var LocationData = Parse.Object.extend("LocationData");
+            var locationData = new LocationData();
+            locationData.set("user", Parse.User.current());
+            locationData.set("weekStartDate", weekStartDate);
+            locationData.set("locationFile", file);
+            objectsToSave.push(locationData);
+          })
+        );
+      })(i);
+    }
+    Parse.Promise.when(fileSavePromises).then(
+      function() {
+        Parse.Object.saveAll(objectsToSave, {
+          success: function (objets) {
+            //console.log("10 Time: " + ((new Date()).getTime() - timeNow));
+            callback();
+          },
+          error: function (error) {
+            var errorMessage = 'Error saving all LocationData objects: ' + error.message;
+            console.log(errorMessage);
+            callback({error: error, message: errorMessage});
+          }
+        });
+      }, function(error) {
+        var errorMessage = "Error saving all LocationFile files "
+          + "(message from Parse.Promise.when): " + error.message;
+        console.log(errorMessage);
+        callback({error: error, message: errorMessage});
+      }
+    );
+  }
+});
+
+Parse.Cloud.define("saveLocationDataOriginal", function(request, response) {
   var timeNow = (new Date()).getTime();
   console.log("saveLocationData called");
 

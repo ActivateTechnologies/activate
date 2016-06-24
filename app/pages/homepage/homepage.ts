@@ -413,7 +413,7 @@ export class HomePage {
       desiredAccuracy: 0,
       stationaryRadius: 30,
       distanceFilter: 1,
-      debug: true,
+      debug: false,
       interval: 2*1000,
       stopOnTerminate: false,
       activityType: "Fitness"
