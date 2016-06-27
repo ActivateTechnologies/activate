@@ -3,6 +3,7 @@ import {Component, Input} from '@angular/core'
 import {Consts} from '../../helpers/consts';
 import {NgZone} from '@angular/core';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
+import {HelperFunctions} from '../../helpers/helperfunctions';
 
 @Component({
 	selector: 'Health',
@@ -257,45 +258,14 @@ export class Health {
 
   //Called by showData
   processRecentActivity (distanceArray:any[]) {
-    let ACCEPTED_INTERVAL = 5 * 60; //seconds
+    let ACCEPTED_INTERVAL = 1 * 5000; //seconds
     let ACCEPTED_MIN_DISTANCE = 100;
     if (distanceArray != null) {
-      distanceArray = distanceArray.sort((a, b) => {
-        return a.startDate - b.startDate;
-      })
-      //console.log('All trips', distanceArray.length, JSON.stringify(distanceArray));
-      let combinedTrips:any[] = [];
-      let lastEndTime:Date = new Date();
-      lastEndTime.setDate(lastEndTime.getDate() - 2); //2 days ago, just any date in past
-      /*Combining the trips with given interval and 
-        ignoring values with source containing "watch"*/
-      for (let i = 0; i < distanceArray.length; i++) {
-        if (!distanceArray[i].source || 
-          distanceArray[i].source.toLowerCase().search("watch") == -1) {
-          let trip = distanceArray[i];
-          if ((trip.endDate.getTime() - lastEndTime.getTime()) > 
-            ACCEPTED_INTERVAL * 1000) {
-            combinedTrips.push({
-              startDate: trip.startDate,
-              endDate: trip.endDate,
-              value: trip.value
-            });
-            lastEndTime = trip.endDate;
-          } else {
-            combinedTrips[combinedTrips.length-1].value += trip.value;
-            combinedTrips[combinedTrips.length-1].endDate = trip.endDate;
-            lastEndTime = trip.endDate;
-          }
-        }
-      }
-      //console.log('Combined trips', combinedTrips.length, JSON.stringify(combinedTrips));
-      let finalTrips:any[] = [];
-      for (let i = 0; i < combinedTrips.length; i++) {
-        if (combinedTrips[i].value > ACCEPTED_MIN_DISTANCE) {
-          finalTrips.push(combinedTrips[i]);
-        }
-      }
-      let lastTrip = finalTrips[finalTrips.length-1];
+      let distanceArrayCombined = HelperFunctions.combineHealthDate(distanceArray,
+       ACCEPTED_INTERVAL, ACCEPTED_MIN_DISTANCE, true);
+      let lastTrip = distanceArrayCombined[distanceArrayCombined.length-1];
+      lastTrip.startDate = new Date(lastTrip.startDate);
+      lastTrip.endDate = new Date(lastTrip.endDate);
       //console.log('Last Trip', lastTrip);
       /*console.log(Parse.User.current().get(Consts.USER_LASTNOTIFIEDRECENTACTIVITY),
        lastTrip.endDate);*/
@@ -328,6 +298,7 @@ export class Health {
           }
         },
         error: (object, error) => {
+          console.log('Error fetching user object: ' + error.message);
           this.summaryString = 'Time to get movin!';
           this.loading = false;
         }

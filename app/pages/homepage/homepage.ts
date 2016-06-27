@@ -4,6 +4,7 @@ import {ViewChild} from '@angular/core';
 import {Consts} from '../../helpers/consts';
 import {Widget} from '../../widgets/widget';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
+import {HelperFunctions} from '../../helpers/helperfunctions';
 import {NgZone} from '@angular/core';
 import {ProfilePage} from '../profilepage/profilepage';
 import {Camera} from 'ionic-native';
@@ -20,9 +21,9 @@ export class HomePage {
   nav:any; app:any; zone:any; http:any; platform:any; chatMessages:any[]; replyOptions:any[];
   typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number; SCROLL_DELAY:number;
   dev:boolean = true; loadingMessages:boolean = true; recentMessagesTemp:any[];
-  // recentMessagesTemp holds all the messages recently shown to user before he has replied,
-  // these will only be saved once the user has made a selection. Also used to hold messages
-  // before user has signed in.
+  /*recentMessagesTemp holds all the messages recently shown to user before
+    he has replied, these will only be saved once the user has made a 
+    selection. Also used to hold messages before user has signed in.*/
 
   public widgetBoundCallback: Function;
 
@@ -44,9 +45,8 @@ export class HomePage {
   }
 
   initialize() {
-    //console.log('About to try location');
-    //this.tryLocation();
-    //this.startLocationTracking();
+    this.startLocationTracking();
+    this.uploadDetailedWalkingData();
     if (Parse.User.current()) {
       this.retrieveArchieveMessages();
       //this.navigateTreeTo('start', false); //healthApi
@@ -369,53 +369,60 @@ export class HomePage {
     }
   }
 
-  /*imageRecognition() {
-    var googleInfoString = 'P RRP 99p RRP\nLipton\nPEACH\nICE TEA\n';
-
-    var googleInfoStringLowercase = googleInfoString.toLowerCase();
-
-    var googleInfoStringFlattened = googleInfoStringLowercase.replace(/[^\x20-\x7E]/gmi, " ");
-
-    var googleInfoArray = googleInfoStringFlattened.split(" ");
-
-    var uselessInfo = ['99p','p','rrp','difference','taste','refrigerated', '£'];
-
-    var i = 0;
-
-    for (i = 0; i < uselessInfo.length; i++) {
-      var y = googleInfoArray.includes(uselessInfo[i]);
-      
-      if (y) {
-        //https://davidwalsh.name/remove-item-array-javascript
-        console.log(i);
-        var indexOfUseless = googleInfoArray.indexOf(uselessInfo[i])
-        console.log("Index of useless: "+ indexOfUseless);
-
-        for(var x = googleInfoArray.length-1; x >= 0; x--){
-          if (googleInfoArray[x] === uselessInfo[i]) googleInfoArray.splice(x, 1);
+  uploadDetailedWalkingData() {
+    console.log('getDetailedWalkingData called');
+    let WalkingData = Parse.Object.extend("WalkingData");
+    let query = new Parse.Query(WalkingData);
+    query.equalTo('user', Parse.User.current());
+    query.descending('weekStartDate');
+    query.first({
+      success: (parseObject) => {
+        if (parseObject) {
+          process(parseObject.get('weekStartDate').getTime());
+        } else {
+          process(0);
         }
-      }  
-    }
-
-    var finalArray = [];
-    for (var i = 0; i < googleInfoArray.length; i++) {
-      googleInfoArray[i] = googleInfoArray[i].trim();
-      if (googleInfoArray[i].length > 0) {
-        finalArray.push(googleInfoArray[i]);
+      }, error: (error) => {
+        process(0);
       }
+    })
+
+    function process(lastWeekStartDate) {
+      let MAX_HISTORY_WEEKS = 10;
+      let weekStart = new Date();
+      weekStart.setTime(weekStart.getTime() //Start of today
+       - weekStart.getTime() % (86400 * 1000));
+      weekStart.setTime(weekStart.getTime() //Start of this week
+       - weekStart.getDay() * 86400 * 1000);
+      weekStart.setTime(weekStart.getTime() //Start of MAX_HISTORY_WEEKS ago
+       - MAX_HISTORY_WEEKS * 7 * 86400 * 1000);
+      weekStart.setTime(Math.max(lastWeekStartDate, weekStart.getTime()));
+      navigator.health.query({
+        startDate: weekStart,
+        endDate: new Date(),
+        dataType: 'distance'
+      }, (data) => {
+        console.log('Data received');
+        let combinedHealthData = HelperFunctions.combineHealthDate(data, 1000, 30, false); 
+        CloudFunctions.saveWalkingData(combinedHealthData, (data, error) => {
+          if (!error) {
+            console.log('Walking data saved to cloud');
+          }
+        });
+      }, (error) => {
+        console.log('Error getting detailed walking data: ', error);
+      });
     }
-    
-    return finalArray;
-  }*/
+  }
 
   startLocationTracking() {
     alert(BackgroundGeolocation);
     let config = {
       desiredAccuracy: 0,
-      stationaryRadius: 10,
-      distanceFilter: 2,
+      stationaryRadius: 30,
+      distanceFilter: 1,
       debug: true,
-      interval: 2*1000,
+      interval: 2 * 1000,
       stopOnTerminate: false,
       activityType: "Fitness"
     };
@@ -438,75 +445,53 @@ export class HomePage {
     backgroundGeolocation.getLocations((locations) => {
       console.log('Got stored locations, count: ', locations.length);
       if (locations.length > 0) {
-        CloudFunctions.saveLocationData(locations, (data, error) => {
-          if (!error) {
-            /*backgroundGeolocation.deleteAllLocations(() => {}, (error) => {
-              console.log('Error deleting locations');
-            });*/
-          }
-        });
+        this.saveLocationsToParse(locations);
       }
-        
     }, () => {
       console.log('Error getting locations');
     })
   }
 
-  tryLocation () {
-    console.log('Inside tryLocation');
-    // BackgroundGeolocation is highly configurable. See platform specific configuration options
-    let config = {
-      desiredAccuracy: 10,
-      stationaryRadius: 0.1,
-      distanceFilter: 30,
-      debug: true,
-      stopOnTerminate: false,
-      url: "https://api.parse.com/1/functions/logLocation",
-      httpHeaders: {
-        "X-Parse-Application-Id": "v3NS4xBCONYmIqqtwASz1e3TuX9p1WDZod6dUxA7",
-        "X-Parse-REST-API-Key": "b5DwYpHR3Rn9f55Id7lXaKpRdGgEFvgRpfNNLE3q"/*,
-        "Content-Type": "application/json"*/
+  saveLocationsToParse(locations) {
+    let keys = Object.keys(locations);
+    let locationsToSend = {};
+    for (let i = 0; i < keys.length; i++) {
+      locationsToSend[locations[keys[i]].time] = {
+        accuracy: locations[keys[i]].accuracy,
+        lat: locations[keys[i]].latitude,
+        lng: locations[keys[i]].longitude,
+        provider: locations[keys[i]].provider,
+        debug: locations[keys[i]].debug
+      };
+    }
+    CloudFunctions.saveLocationData(locationsToSend, (data, error) => {
+      if (!error) {
+        /*backgroundGeolocation.deleteAllLocations(() => {}, (error) => {
+          console.log('Error deleting locations');
+        });*/
       }
-    };
+    });
+  }
 
-    var callbackFn = function(location) {
-      console.log('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
-      /*var xmlhttp = new XMLHttpRequest();
-      xmlhttp.onreadystatechange = function () {
-        console.log(xmlhttp.readyState + " ~ " + xmlhttp.status + " ~ " + xmlhttp.responseText);
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-          console.log("Successfully sent");
-        }
+  saveLocationsToParseOriginal(locations) {
+    let keys = Object.keys(locations);
+    let locationsToSend = [];
+    for (let i = 0; i < keys.length; i++) {
+      locationsToSend.push({
+        accuracy: locations[keys[i]].accuracy,
+        lat: locations[keys[i]].latitude,
+        lng: locations[keys[i]].longitude,
+        provider: locations[keys[i]].provider,
+        time: locations[keys[i]].time,
+        debug: locations[keys[i]].debug
+      });
+    }
+    CloudFunctions.saveLocationData(locationsToSend, (data, error) => {
+      if (!error) {
+        /*backgroundGeolocation.deleteAllLocations(() => {}, (error) => {
+          console.log('Error deleting locations');
+        });*/
       }
-      xmlhttp.open("POST", "https://api.parse.com/1/functions/logLocation", true);
-      xmlhttp.setRequestHeader("X-Parse-Application-Id", "v3NS4xBCONYmIqqtwASz1e3TuX9p1WDZod6dUxA7"); 
-      //xmlhttp.setRequestHeader("X-Parse-Client-Key", "YB0Po25rU80Z8PpzPQyYCVEzqECZnFQv55lZQakw"); 
-      xmlhttp.setRequestHeader("X-Parse-REST-API-Key", "b5DwYpHR3Rn9f55Id7lXaKpRdGgEFvgRpfNNLE3q"); 
-      //xmlhttp.setRequestHeader("Content-type", "application/json;"); 
-      xmlhttp.send(JSON.stringify({
-        lat: location.latitude,
-        lng: location.longitude,
-        time: new Date().getTime()
-      }));*/
-      
-      backgroundGeolocation.finish();
-    };
- 
-    var failureFn = function(error) {
-      console.log('BackgroundGeolocation error');
-    };
- 
-    // BackgroundGeolocation is highly configurable. See platform specific configuration options 
-    backgroundGeolocation.configure(callbackFn, failureFn, config);
-
-    backgroundGeolocation.getLocations((locations) => {
-      console.log('Got stored locations', locations);
-    }, () => {
-      console.log('Error getting locations');
-    })
- 
-    // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app. 
-    backgroundGeolocation.stop();
-    backgroundGeolocation.start();
+    });
   }
 }

@@ -2,6 +2,7 @@ import {Page, IonicApp, NavController, ViewController, NavParams, Platform}
  from 'ionic-angular';
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
+import {HelperFunctions} from '../../helpers/helperfunctions';
 import {UIMessages} from '../../helpers/uimessages';
 import {NgZone} from '@angular/core';
 import {Http, Headers} from '@angular/http';
@@ -64,7 +65,6 @@ export class ProfilePage {
     for (let i = 0; i < 8; i++) {
       this.arrangedDayLabels.push(days[(i+day) % 7]);
     }
-
     if (localStorage['healthApiAccessGranted']) {
       this.initWalkingData(() => {
         this.initStravaData();
@@ -155,7 +155,6 @@ export class ProfilePage {
     CloudFunctions.getWeekMoodsData((data, error) => {
       if (!error) {
         this.moodDataLoading = false;
-        console.log('Got moods data:', data.averageMoods);
         this.moodData = [];
         for (let i = data.averageMoods.length - 1; i >= 0; i--) {
           this.moodData.push({
@@ -314,6 +313,7 @@ export class ProfilePage {
             this.walkingData[i] = val;
           }  
           if (callbacksRemaining == 0 ) {
+            //this.getDetailedWalkingData(start);
             callback();
           }
         }, (error) => {
@@ -673,7 +673,6 @@ export class ProfilePage {
     query.ascending(Consts.CREATED_AT);
     query.find({
       success: (results) => {
-        console.log("Successfully retrieved " + results.length + " food entries.");
         // Do something with the returned Parse.Object values
         /*Structure: foodArray = [
           {
@@ -711,8 +710,6 @@ export class ProfilePage {
         for (let i = 0; i < 8; i++) {
           this.foodArray[7-i].dayString = days[(i+day) % 7];
         }
-
-        console.log(this.foodArray);
 
         for (var i = 0; i < results.length; i++) {
           var parseObject = results[i];
