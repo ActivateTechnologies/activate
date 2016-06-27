@@ -92,5 +92,18 @@ export class CloudFunctions {
       }
     });
   }
+
+  public static saveWalkingData(requestData, callback) {
+    Parse.Cloud.run('saveWalkingData', requestData, {
+      success: (data) => {
+        //console.log('saveLocationData success');
+        callback(data);
+      },
+      error: (error) => {
+        console.log('Error calling saveWalkingData:', error.message);
+        callback({}, error);
+      }
+    });
+  }
   
 }

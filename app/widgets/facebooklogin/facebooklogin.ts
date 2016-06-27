@@ -26,7 +26,7 @@ export class FacebookLogin {
   ngOnInit() {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.currentUser = Parse.User.current();
-    console.log('facebooklogin widget ngOnInit');
+    //console.log('facebooklogin widget ngOnInit');
     if (!this.isReply) {
       setTimeout(() => {
         let arrayOfElements = document.getElementsByClassName("facebookLogin");

@@ -2,6 +2,7 @@ import {Page, IonicApp, NavController, ViewController, NavParams, Platform}
  from 'ionic-angular';
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
+import {HelperFunctions} from '../../helpers/helperfunctions';
 import {UIMessages} from '../../helpers/uimessages';
 import {NgZone} from '@angular/core';
 import {Http, Headers} from '@angular/http';
@@ -312,7 +313,7 @@ export class ProfilePage {
             this.walkingData[i] = val;
           }  
           if (callbacksRemaining == 0 ) {
-            this.getDetailedWalkingData(start);
+            //this.getDetailedWalkingData(start);
             callback();
           }
         }, (error) => {
@@ -324,16 +325,6 @@ export class ProfilePage {
         });
       })(i);
     }
-  }
-
-  getDetailedWalkingData(start) {
-    navigator.health.queryAggregated({
-      startDate: new Date(start.getTime() + 0 * 86400 * 1000),
-      endDate: new Date(start.getTime() + 7 * 86400 * 1000),
-      dataType: 'distance'
-    }, (data) => {
-      console.log(JSON.stringify(data));
-    });
   }
 
   initWalkingChart() {

@@ -20,6 +20,97 @@ Parse.Cloud.define("initConversation", function(request, response) {
   });
 });
 
+Parse.Cloud.define("saveWalkingData", function (request, response) {
+  var walkingDataArray = request.params;
+  var walkingDataKeys = Object.keys(walkingDataArray);
+  console.log('walkingDataKeys.length: ' + walkingDataKeys.length);
+  var maxTime = walkingDataArray[0].startDate;
+  var minTime = walkingDataArray[0].startDate;
+  var mainArray = [];
+  var firstWeekStartDate;
+
+  var firstObjectProcessed = false, otherObjectsProcessed = false;
+
+  //Find maxTime, minTime and firstWeekStartDate
+  for (var i = 0; i < walkingDataKeys.length; i++) {
+    var time = walkingDataArray[walkingDataKeys[i]].startDate;
+    maxTime = (time > maxTime) ? time : maxTime;
+    minTime = (time < minTime) ? time : minTime;
+  }
+  firstWeekStartDate = new Date(minTime);
+  firstWeekStartDate.setTime(minTime - minTime % (86400 * 1000));
+  firstWeekStartDate.setTime(firstWeekStartDate.getTime()
+    - firstWeekStartDate.getDay() * 86400 * 1000);
+
+  //Initialise mainArray based on number of weeks of data
+  var numOfWeeks = Math.ceil(
+    (maxTime - firstWeekStartDate.getTime()) / (7 * 86400 * 1000));
+  for (var i = 0; i < numOfWeeks; i++) {
+    mainArray.push([]);
+  }
+
+  //Fill objects in the array with the location objects
+  for (var i = 0; i < walkingDataKeys.length; i++) {
+    var mainArrayIndex = (walkingDataArray[walkingDataKeys[i]].startDate
+     - firstWeekStartDate.getTime());
+    mainArrayIndex = Math.floor(mainArrayIndex / 604800000); //(7 * 86400 * 1000)
+    mainArray[mainArrayIndex].push(walkingDataArray[walkingDataKeys[i]]);
+  }
+  
+  //Save first week object (update if necessary)
+  var WalkingData = Parse.Object.extend("WalkingData");
+  var query = new Parse.Query(WalkingData);
+  query.equalTo('user', Parse.User.current());
+  query.equalTo('weekStartDate', firstWeekStartDate);
+  query.first({
+    success: function(parseObject) {
+      if (parseObject) {
+        parseObject.set("walkingArray", mainArray[0]);
+        parseObject.save({
+          success: function (parseObject) {
+            saveAllWeeks(true);
+          }, error: function (parseObject, error) {
+            console.log('Error saving updated first week parse object');
+            saveAllWeeks(false);
+          }
+        });
+      } else {
+        saveAllWeeks(false);
+      }
+    },
+    error: function(error) {
+      console.log("Error getting firstWeekStartDate object");
+      saveAllWeeks(false);
+    }
+  });
+
+  function saveAllWeeks(firstWeekSaved) {
+    var objectsToSave = [];
+    for (var i = (firstWeekSaved) ? 1 : 0; i < mainArray.length; i++) {
+      console.log(i);
+      var weekStartDate = new Date(firstWeekStartDate.getTime() + (i * 7 * 86400 * 1000));
+      var WalkingData = Parse.Object.extend("WalkingData");
+      var walkingData = new WalkingData();
+      walkingData.set("user", Parse.User.current());
+      walkingData.set("weekStartDate", weekStartDate);
+      walkingData.set("walkingArray", mainArray[i]);
+      objectsToSave.push(walkingData);
+    }
+
+    Parse.Object.saveAll(objectsToSave, {
+      success: function (objets) {
+        response.success({});
+      },
+      error: function (error) {
+        var errorMessage = 'Error saving all WalkingData objects: ' + error.message;
+        console.log(errorMessage);
+        response.error({error: error, message: errorMessage});
+      }
+    });
+  }
+
+});
+
 Parse.Cloud.define("saveLocationData", function(request, response) {
   var timeNow = (new Date()).getTime();
 
@@ -110,7 +201,7 @@ Parse.Cloud.define("saveLocationData", function(request, response) {
                     + error.message);
                   response.success({});
                 }
-              })
+              });
             }
           });
         }, function (error) {
