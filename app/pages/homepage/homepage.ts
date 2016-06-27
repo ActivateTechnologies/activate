@@ -44,9 +44,9 @@ export class HomePage {
   }
 
   initialize() {
-    console.log('About to try location');
+    //console.log('About to try location');
     //this.tryLocation();
-    this.startLocationTracking();
+    //this.startLocationTracking();
     if (Parse.User.current()) {
       this.retrieveArchieveMessages();
       //this.navigateTreeTo('start', false); //healthApi
@@ -409,7 +409,7 @@ export class HomePage {
   }*/
 
   startLocationTracking() {
-    backgroundGeolocation.stop();
+    alert(BackgroundGeolocation);
     let config = {
       desiredAccuracy: 0,
       stationaryRadius: 10,
@@ -419,6 +419,20 @@ export class HomePage {
       stopOnTerminate: false,
       activityType: "Fitness"
     };
+    BackgroundGeolocation.configure(config).then((value) => {
+      alert('configured');
+    }).catch((error) => {
+      alert("error 1: " + JSON.stringify(error));
+    });
+    alert(2)
+    BackgroundGeolocation.start().then((value) => {
+      alert('started');
+    }).catch((error) => {
+      alert("error 2: " + JSON.stringify(error));
+    });
+    alert(3)
+    backgroundGeolocation.stop();
+    
     backgroundGeolocation.configure((location) => {}, (error) => {}, config);
     backgroundGeolocation.start();
     backgroundGeolocation.getLocations((locations) => {
