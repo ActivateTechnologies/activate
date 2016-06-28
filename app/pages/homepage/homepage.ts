@@ -27,7 +27,7 @@ export class HomePage {
 
   public widgetBoundCallback: Function;
 
-	constructor(nav: NavController, app: IonicApp, zone: NgZone, platform: Platform,
+  constructor(nav: NavController, app: IonicApp, zone: NgZone, platform: Platform,
     http: Http) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = nav;
