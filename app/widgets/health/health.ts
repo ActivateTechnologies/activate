@@ -49,6 +49,9 @@ export class Health {
       if (!this.isReply && this.widgetType == 'recentActivity') {
         this.recentActivity();
       }
+      if (!this.isReply && this.widgetType == 'recentSleep') {
+        this.recentSleep();
+      }
       /*if (!this.isReply && this.widgetType == 'measureHeart') {
         this.measureHeart();
       }*/
@@ -61,7 +64,8 @@ export class Health {
         html.replace('<!--template bindings={}-->', ' ')
           .replace('<!--template bindings={}-->', ' '); //two occurances
         html = '<div class="health">' + html + '</div>';
-        if (this.widgetType == 'showData' || this.widgetType == 'recentActivity') {
+        if (this.widgetType == 'showData' || this.widgetType == 'recentActivity'
+           || this.widgetType == 'recentSleep') {
           this.callbackFunction(this.chatObject, this.isReply, null, html, false);
         } else {
           this.callbackFunction(this.chatObject, this.isReply, null, html, true);
@@ -256,7 +260,6 @@ export class Health {
     }
   }
 
-  //Called by showData
   processRecentActivity (distanceArray:any[]) {
     let ACCEPTED_INTERVAL = 1 * 5000; //seconds
     let ACCEPTED_MIN_DISTANCE = 100;
@@ -310,6 +313,73 @@ export class Health {
         distance: distance,
         activity: activity
       });*/
+    }
+  }
+
+  recentSleep() {
+    if (localStorage['healthApiAccessGranted']) {
+      Parse.User.current()
+      this.loading = true;
+      let endDate = new Date();
+      //endDate.setSeconds(0);
+      let startDate = new Date();
+      startDate.setTime(startDate.getTime() - (86400 * 1000));
+      navigator.health.queryAggregated({
+        startDate: startDate,
+        endDate: new Date(),
+        dataType: 'activity'
+      }, (data) => {
+        if (data.value.sleep) {
+          this.processRecentSleep(Math.round(data.value.sleep.duration * 10 / 3600) / 10);
+        } 
+      }, (error) => {
+        console.log('Error:', error);
+        this.callbackFunction(this.chatObject, this.isReply, {
+          error: "Error accessing sleep data"
+        }, null, false);
+      });
+    } else {
+      this.loading = false;
+      alert('Health API Not Available');
+      this.summaryString = 'Recent Sleep Statement (Health Api Not Available)'
+    }
+  }
+
+  //Called by showData
+  processRecentSleep (sleepNumber) {
+    let SLEEP_MEAN = 8; //seconds
+    let SLEEP_TROLERANCE = 0.75;
+    if (sleepNumber && sleepNumber > 0) {
+      Parse.User.current().fetch({
+        success: (object) => {
+          let date5MinAgo = new Date();
+          date5MinAgo.setTime(date5MinAgo.getTime() - 5 * 60000);
+          if (!Parse.User.current().get(Consts.USER_LASTOPENED) &&
+           Parse.User.current().get(Consts.USER_LASTOPENED) < date5MinAgo) {
+            this.zone.run(() => {
+              if (sleepNumber < (SLEEP_MEAN - SLEEP_TROLERANCE)) {
+                this.summaryString = 'You slept too little!';
+              } else if (sleepNumber > (SLEEP_MEAN + SLEEP_TROLERANCE)) {
+                this.summaryString = 'You got the right about of sleep.';
+              } else {
+                this.summaryString = 'You slept too much!';
+              }
+              this.loading = false;
+            });
+            //Parse.User.current().set(Consts.USER_LASTOPENED, new Date());
+            (<Parse.Object> Parse.User.current()).save();
+          }
+        },
+        error: (object, error) => {
+          console.log('Error fetching user object: ' + error.message);
+          this.summaryString = 'Time to get movin!';
+          this.loading = false;
+        }
+      });
+    } else {
+      //TODO Skip to next message
+      this.summaryString = 'Howdy!';
+      this.loading = false;
     }
   }
 

@@ -421,12 +421,14 @@ export class HomePage {
       desiredAccuracy: 0,
       stationaryRadius: 30,
       distanceFilter: 1,
-      debug: true,
+      debug: false,
       interval: 2 * 1000,
       stopOnTerminate: false,
       activityType: "Fitness"
     };
-    backgroundGeolocation.configure((location) => {}, (error) => {}, config);
+    backgroundGeolocation.configure((location) => {
+      console.log(location);
+    }, (error) => {}, config);
     backgroundGeolocation.start();
     backgroundGeolocation.getLocations((locations) => {
       console.log('Got stored locations, count: ', locations.length);

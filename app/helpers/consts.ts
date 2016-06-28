@@ -77,6 +77,8 @@ export class Consts {
   public static USER_STRAVACTIVITIESLASTWEEK = "stravaActivitiesLastWeek";
   //Date - the last time user was notified of his/her last walk or activity
   public static USER_LASTNOTIFIEDRECENTACTIVITY = "lastNotifiedRecentActivity";
+  //Date - the last time app was opened
+  public static USER_LASTOPENED = "lastOpened";
 
 
   //HeartData Class
