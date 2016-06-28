@@ -416,7 +416,7 @@ export class HomePage {
   }
 
   startLocationTracking() {
-    backgroundGeolocation.stop();
+    alert(BackgroundGeolocation);
     let config = {
       desiredAccuracy: 0,
       stationaryRadius: 30,
