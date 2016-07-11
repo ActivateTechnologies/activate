@@ -20,6 +20,96 @@ Parse.Cloud.define("initConversation", function(request, response) {
   });
 });
 
+Parse.Cloud.define("updateFriends", function(request, response) {
+  if (!request.params.friendsFbIdArray 
+    || request.params.friendsFbIdArray.length == 0) {
+    response.success('No friendsFbIdArray specified');
+  }
+  //received fb friend ids list from device
+  var newFriendsList = request.params.friendsFbIdArray;
+  //existing friends (who have fb) ids list
+  getFriends(function(currentFriendsList, error) {
+    if (error) {
+      response.error(error);
+    } else {
+      //list of fb friend ids to add
+      var friendsToAdd = [];
+      for (var i = 0; i < newFriendsList.length; i++) {
+        if (currentFriendsList.indexOf(newFriendsList[i]) == -1) {
+          friendsToAdd.push(newFriendsList[i]);
+        }
+      }
+      var objectsToSave = [];
+      var currentUser = Parse.User.current();
+      var query = new Parse.Query(Parse.User);
+      query.containedIn("facebookId", friendsToAdd);
+      query.find({
+        success: function(users) {
+          for (var i = 0; i < users.length; i++) {
+            var Relationships = Parse.Object.extend("Relationships");
+            var relationship = new Relationships();
+            relationship.set("user1", currentUser);
+            relationship.set("user2", users[i]);
+            relationship.set("status", 4);
+            objectsToSave.push(relationship);
+          }
+          Parse.Object.saveAll(objectsToSave, {
+            success: function (objets) {
+              response.success({});
+            },
+            error: function (error) {
+              var errorMessage = 
+                'Error saving all WalkingData objects: ' + error.message;
+              console.log(errorMessage);
+              response.error({error: error, message: errorMessage});
+            }
+          });
+        },
+        error: function(error) {
+          var errorMessage = 
+            "Error finding users in updateFriends: " + error.message;
+          console.log(errorMessage);
+          response.error({error: error, message: errorMessage});
+        }
+      });
+    }
+  });
+});
+
+//Returns list of facebook friend facebookIds.
+function getFriends(callback) {
+  var Relationships = Parse.Object.extend("Relationships");
+  var query1 = new Parse.Query(Relationships);
+  query1.equalTo('user1', Parse.User.current());
+
+  var query2 = new Parse.Query(Relationships);
+  query2.equalTo('user2', Parse.User.current());
+
+  var friends = [];
+  var query = Parse.Query.or(query1, query2);
+  query.include('user1');
+  query.include('user2');
+  query.find({
+    success: function (relationships) {
+      for (var i = 0; i < relationships.length; i++) {
+        var friendObject = 
+          (relationships[i].get('user1').id != Parse.User.current().id) ?
+            relationships[i].get('user1') :
+              relationships[i].get('user2');
+        if (friendObject.get('facebookId')) {
+          friends.push(friendObject.get('facebookId'));
+        }
+      }
+      callback(friends);
+    },
+    error: function (error) {
+      var message = "Error querying relationships" + error.message;
+      console.log(message);
+      callback(null, {message: message, error: error});
+    }
+  });
+}
+
 Parse.Cloud.define("saveWalkingData", function (request, response) {
   var walkingDataArray = request.params;
   var walkingDataKeys = Object.keys(walkingDataArray);
@@ -88,7 +178,8 @@ Parse.Cloud.define("saveWalkingData", function (request, response) {
     var objectsToSave = [];
     for (var i = (firstWeekSaved) ? 1 : 0; i < mainArray.length; i++) {
       console.log(i);
-      var weekStartDate = new Date(firstWeekStartDate.getTime() + (i * 7 * 86400 * 1000));
+      var weekStartDate = new Date(firstWeekStartDate.getTime() 
+        + (i * 7 * 86400 * 1000));
       var WalkingData = Parse.Object.extend("WalkingData");
       var walkingData = new WalkingData();
       walkingData.set("user", Parse.User.current());
@@ -102,7 +193,8 @@ Parse.Cloud.define("saveWalkingData", function (request, response) {
         response.success({});
       },
       error: function (error) {
-        var errorMessage = 'Error saving all WalkingData objects: ' + error.message;
+        var errorMessage = 
+          'Error saving all WalkingData objects: ' + error.message;
         console.log(errorMessage);
         response.error({error: error, message: errorMessage});
       }
@@ -242,7 +334,8 @@ Parse.Cloud.define("saveLocationData", function(request, response) {
         var file = new Parse.File("locationFile.txt", { base64: base64text });
         fileSavePromises.push(
           file.save().then(function () {
-            var weekStartDate = new Date(firstWeekStartDate.getTime() + (i * 7 * 86400 * 1000));
+            var weekStartDate = new Date(firstWeekStartDate.getTime() 
+              + (i * 7 * 86400 * 1000));
             var LocationData = Parse.Object.extend("LocationData");
             var locationData = new LocationData();
             locationData.set("user", Parse.User.current());
@@ -261,7 +354,8 @@ Parse.Cloud.define("saveLocationData", function(request, response) {
             callback();
           },
           error: function (error) {
-            var errorMessage = 'Error saving all LocationData objects: ' + error.message;
+            var errorMessage = 
+              'Error saving all LocationData objects: ' + error.message;
             console.log(errorMessage);
             callback({error: error, message: errorMessage});
           }
@@ -524,7 +618,8 @@ Parse.Cloud.define("stravaActivitiesLastWeek", function(request, response) {
       }
 
       for (var i = 0; i < stravaData.length; i++) {
-        var deltaMilliseconds = new Date(stravaData[i].start_date_local).getTime() - past.getTime();
+        var deltaMilliseconds = new Date(stravaData[i].start_date_local).getTime() 
+          - past.getTime();
         var day = Math.floor(deltaMilliseconds/(86400*1000));
         var type = stravaData[i].type;
         if (type == "Ride") {
@@ -725,14 +820,16 @@ function googleImageRecog(nutritionObject, callbackFunction) {
       //callbackFunction(httpResponse.data.responses);
       //findFoodObject(httpResponse.data, nutritionObject, callbackFunction);
     }, function(httpResponse) {
-      var errorMessage = 'Google Request failed with response code ' + httpResponse.status
+      var errorMessage = 
+        'Google Request failed with response code ' + httpResponse.status
         + ' and response text: ' + httpResponse.text;
       console.error(errorMessage);
       callbackFunction({message: errorMessage});
     });
   }, function(httpResponse) {
-    var errorMessage = 'Error getting file from url with response code ' + httpResponse.status
-     + ' and response text: ' + httpResponse.text;
+    var errorMessage = 
+      'Error getting file from url with response code ' + httpResponse.status
+      + ' and response text: ' + httpResponse.text;
     console.log(errorMessage);
     callbackFunction({message: errorMessage});
   });

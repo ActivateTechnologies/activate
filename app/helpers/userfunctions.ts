@@ -1,5 +1,6 @@
 import {App} from 'ionic-angular';
 import {Consts} from './consts';
+import {CloudFunctions} from './cloudfunctions';
 
 export class UserFunctions {
 
@@ -147,16 +148,20 @@ export class UserFunctions {
             }
           })
         });
-        /*FB.api('/me/friends?fields=installed', function(response) {
+        FB.api('/me/friends', function(response) {
+          console.log(response);
           let friends = response.data;
           let friendsFbIds = [];
           for (let i = 0; i < friends.length; i++) {
             friendsFbIds.push(friends[i].id);
           }
-          Parse.Cloud.run('updateFriends', { friendsFbIdArray: friendsFbIds })
+          console.log('Facebook Friends Ids: ', friendsFbIds);
+          CloudFunctions.updateFriends({ friendsFbIdArray: friendsFbIds },
+           () => {});
+          /*Parse.Cloud.run('updateFriends', )
             .then(function(data) {
-          });
-        });*/
+          });*/
+        });
       },
       error: (user, error) => {
         console.log("User cancelled the Facebook login or did not fully authorize.");

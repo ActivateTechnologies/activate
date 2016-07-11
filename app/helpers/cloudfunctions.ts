@@ -19,6 +19,18 @@ export class CloudFunctions {
     });
   }
 
+  public static updateFriends(requestData, callback) {
+    Parse.Cloud.run('updateFriends', requestData, {
+      success: (data) => {
+        callback(data);
+      },
+      error: (error) => {
+        console.log('Error calling updateFriends:', error.message);
+        callback({}, error);
+      }
+    });
+  }
+
   public static getWeekHeartData(callback) {
     Parse.Cloud.run('getWeekHeartData', {}, {
       success: (data) => {

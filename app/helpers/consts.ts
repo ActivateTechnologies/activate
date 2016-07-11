@@ -121,6 +121,19 @@ export class Consts {
   //Array - Location objects
   public static LOCATION_DATA_LOCATIONS = "locations";
 
+  //Relationships Class
+  public static RELATIONSHIPS_CLASS = "Relationships";
+  //Pointer <_User> - first user
+  public static RELATIONSHIPS_USER1 = "user1";
+  //Pointer <_User> - second user
+  public static RELATIONSHIPS_USER2 = "user2";
+  /* Number - status
+   user1 adds user2, and user2: rejected/removed-1, has been requested-2, 
+   accepted-4 user2 then adds user1, and user1: has been requested-3 */
+  public static RELATIONSHIPS_STATUS = "status";
+  //Number - interaction count
+  public static RELATIONSHIPS_INTERACTIONCOUNT = "interactionCount";
+
   constructor() {
   }
 }
