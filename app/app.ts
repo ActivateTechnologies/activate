@@ -2,20 +2,20 @@
 /// <reference path="../typings/custom_activate/custom_activate.d.ts" />
 /// <reference path="../typings/chart/chart.d.ts" />
 /// <reference path="../typings/cordova/plugins/Camera.d.ts" />
-import {App, IonicApp, Platform} from 'ionic-angular';
+import {ionicBootstrap, App, Platform} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
+import {Component} from '@angular/core';
 import {HomePage} from './pages/homepage/homepage';
 import {SettingsPage} from './pages/settingspage/settingspage';
 
-@App({
+@Component({
   templateUrl: 'build/app.html',
-  config: {} // http://ionicframework.com/docs/v2/api/config/Config/
 })
 class MyApp {
   rootPage: any = HomePage;
   pages: Array<{title: string, component: any}>
 
-  constructor(private app: IonicApp, private platform: Platform) {
+  constructor(private app: App, private platform: Platform) {
     this.initializeApp();
 
     // used for an example of ngFor and navigation
@@ -41,3 +41,4 @@ class MyApp {
     nav.setRoot(page.component);
   }
 }
+ionicBootstrap(MyApp, [], {});

@@ -29,6 +29,11 @@
 			<span *ngIf="platformId == 'browser'">Recent Activity not supported in browser.</span>
 			<!-- <textarea id="activityJsonString" style="color:black;"></textarea> -->
 		</div>
+		<div *ngIf="widgetType == 'recentSleep'">
+			{{summaryString}}<span [hidden]="!loading" class="loading">&nbsp;...</span>
+			<span *ngIf="platformId == 'browser'">Recent Sleep not supported in browser.</span>
+			<!-- <textarea id="activityJsonString" style="color:black;"></textarea> -->
+		</div>
 		<div *ngIf="widgetType == 'measureHeart'">
 			{{data.summaryString}}<span [hidden]="!loading" class="loading">&nbsp;...</span>
 		</div>

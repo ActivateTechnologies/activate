@@ -1,18 +1,18 @@
-import {Page, NavController, Content, IonicApp, Platform, Modal, ViewController}
+import {NavController, Content, App, Platform, Modal, ViewController}
  from 'ionic-angular';
 import {ViewChild} from '@angular/core';
 import {Consts} from '../../helpers/consts';
 import {Widget} from '../../widgets/widget';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {HelperFunctions} from '../../helpers/helperfunctions';
-import {NgZone} from '@angular/core';
+import {NgZone, Component} from '@angular/core';
 import {ProfilePage} from '../profilepage/profilepage';
 import {Camera} from 'ionic-native';
-import {BackgroundGeolocation} from 'ionic-native';
+//import {BackgroundGeolocation} from 'ionic-native';
 import {Http, Headers} from '@angular/http';
 //import {File} from 'ionic-native';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/homepage/homepage.html',
   directives: [Widget]
 })
@@ -27,7 +27,7 @@ export class HomePage {
 
   public widgetBoundCallback: Function;
 
-	constructor(nav: NavController, app: IonicApp, zone: NgZone, platform: Platform,
+	constructor(nav: NavController, app: App, zone: NgZone, platform: Platform,
     http: Http) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = nav;
@@ -65,7 +65,7 @@ export class HomePage {
     });
   }
 
-  onPageDidEnter() {
+  ionViewDidEnter() {
     //this.openUserProfile();
   }
 
@@ -370,22 +370,24 @@ export class HomePage {
   }
 
   uploadDetailedWalkingData() {
-    console.log('getDetailedWalkingData called');
-    let WalkingData = Parse.Object.extend("WalkingData");
-    let query = new Parse.Query(WalkingData);
-    query.equalTo('user', Parse.User.current());
-    query.descending('weekStartDate');
-    query.first({
-      success: (parseObject) => {
-        if (parseObject) {
-          process(parseObject.get('weekStartDate').getTime());
-        } else {
+    if (this.platform.is('android') || this.platform.is('ios')) {
+      console.log('getDetailedWalkingData called');
+      let WalkingData = Parse.Object.extend("WalkingData");
+      let query = new Parse.Query(WalkingData);
+      query.equalTo('user', Parse.User.current());
+      query.descending('weekStartDate');
+      query.first({
+        success: (parseObject) => {
+          if (parseObject) {
+            process(parseObject.get('weekStartDate').getTime());
+          } else {
+            process(0);
+          }
+        }, error: (error) => {
           process(0);
         }
-      }, error: (error) => {
-        process(0);
-      }
-    })
+      });
+    }
 
     function process(lastWeekStartDate) {
       let MAX_HISTORY_WEEKS = 10;
@@ -416,8 +418,7 @@ export class HomePage {
   }
 
   startLocationTracking() {
-    alert(BackgroundGeolocation);
-    let config = {
+    /*let config = {
       desiredAccuracy: 0,
       stationaryRadius: 30,
       distanceFilter: 1,
@@ -437,7 +438,7 @@ export class HomePage {
       }
     }, () => {
       console.log('Error getting locations');
-    })
+    });*/
   }
 
   saveLocationsToParse(locations) {

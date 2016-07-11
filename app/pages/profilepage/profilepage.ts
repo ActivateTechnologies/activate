@@ -1,14 +1,14 @@
-import {Page, IonicApp, NavController, ViewController, NavParams, Platform}
+import {App, NavController, ViewController, NavParams, Platform}
  from 'ionic-angular';
 import {Consts} from '../../helpers/consts';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {HelperFunctions} from '../../helpers/helperfunctions';
 import {UIMessages} from '../../helpers/uimessages';
-import {NgZone} from '@angular/core';
+import {NgZone, Component} from '@angular/core';
 import {Http, Headers} from '@angular/http';
 //import {CordovaOauth, Meetup} from 'ng2-cordova-oauth/core';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/profilepage/profilepage.html'
 })
 export class ProfilePage {
@@ -28,7 +28,7 @@ export class ProfilePage {
   sleepData:number[]; sleepDataLoading:boolean; sleepChartHandle: any; foodStrings: string[]; 
   foodArray: any[]; moodData:any[]; moodDataLoading:boolean;
 
-  constructor(ionicApp: IonicApp, navController: NavController, navParams: NavParams,
+  constructor(ionicApp: App, navController: NavController, navParams: NavParams,
    viewController: ViewController, zone: NgZone, platform: Platform, http: Http) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = navController;
@@ -52,7 +52,7 @@ export class ProfilePage {
     this.moodData = [];
   }
 
-  onPageDidEnter() {
+  ionViewDidEnter() {
     this.initialize();
   }
 

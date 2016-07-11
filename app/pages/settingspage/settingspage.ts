@@ -1,7 +1,7 @@
-import {Page, NavController, NavParams} from 'ionic-angular';
+import {NavController, NavParams} from 'ionic-angular';
+import {Component} from '@angular/core';
 
-
-@Page({
+@Component({
   templateUrl: 'build/pages/settingspage/settingspage.html'
 })
 export class SettingsPage {
@@ -24,10 +24,7 @@ export class SettingsPage {
         console.debug("Unable to obtain picture: " + error, "app");
 
     }, options);
-
-
   }*/
-
 
   /*
   public nav; app; selectedItem; icons; items;
