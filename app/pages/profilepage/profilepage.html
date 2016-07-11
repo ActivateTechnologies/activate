@@ -1,8 +1,10 @@
-<ion-navbar *navbar class="profilepage navbarProfile">
-  <div class="settings-cog">
-  	<ion-icon name="settings" (click)="showSettings()"></ion-icon>
-  </div>
-</ion-navbar>
+<ion-header>
+	<ion-navbar class="profilepage navbarProfile">
+	  <div class="settings-cog">
+	  	<ion-icon name="settings" (click)="showSettings()"></ion-icon>
+	  </div>
+	</ion-navbar>
+</ion-header>
 
 <ion-content class="profilepage">
 
@@ -14,20 +16,15 @@
 	  <p class="nameProfile">{{currentUser.get('name')}}</p>
 
 	</div>
-
 	
 	<!-- OVERVIEW GRAPH 
 	<div class="containerProfilePageContent" id="myDiv">
-
-		
-		
 	</div>
 	-->
 
-
 	<div class="containerProfilePageContent">
-	<!--  [hidden]="walkingDataLoading || caloriesDataLoading
-	 || cyclingDataLoading || runningDataLoading || heartDataLoading || sleepDataLoading" -->
+		<!--  [hidden]="walkingDataLoading || caloriesDataLoading
+		 || cyclingDataLoading || runningDataLoading || heartDataLoading || sleepDataLoading" -->
 
 	 	<!-- HEART RATE -->
 		<p class="sectionHeader">
@@ -118,17 +115,13 @@
 	<img (click)="connectStravaButton()" class="connectStravaButton" src="images/stravaConnect.png">
 
 	<!--
-	<button (click)="stravaStats()" class="stravaAPIPOST">Strava Stats</button>
-
-	<button (click)="stravaActivities()" class="stravaAPIPOST">Strava Activities</button>
-
-	<button (click)="stravaActivitiesLastWeek()" class="stravaAPIPOST">Strava Activities Last Week</button>
-
-	<img (click)="connectMoves()" src="images/MovesLogowithName.png" class="movesLogoConnectButton">
-
-	<button (click)="movesAPIPOST()" class="stravaAPIPOST">Moves API POST</button>
+		<button (click)="stravaStats()" class="stravaAPIPOST">Strava Stats</button>
+		<button (click)="stravaActivities()" class="stravaAPIPOST">Strava Activities</button>
+		<button (click)="stravaActivitiesLastWeek()" class="stravaAPIPOST">Strava Activities Last Week</button>
+		<img (click)="connectMoves()" src="images/MovesLogowithName.png" class="movesLogoConnectButton">
+		<button (click)="movesAPIPOST()" class="stravaAPIPOST">Moves API POST</button>
 	-->
 	<!--
-	<img (click)="connectMeetup()" class="connectMeetupButton" src="images/meetup.png">
+		<img (click)="connectMeetup()" class="connectMeetupButton" src="images/meetup.png">
 	-->
 </ion-content>
