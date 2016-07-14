@@ -370,7 +370,6 @@ export class HomePage {
   uploadDetailedWalkingData() {
     if (Parse.User.current() && 
       (this.platform.is('android') || this.platform.is('ios'))) {
-      console.log('getDetailedWalkingData called');
       let WalkingData = Parse.Object.extend("WalkingData");
       let query = new Parse.Query(WalkingData);
       query.equalTo('user', Parse.User.current());
@@ -403,7 +402,6 @@ export class HomePage {
         endDate: new Date(),
         dataType: 'distance'
       }, (data) => {
-        console.log('Data received');
         let combinedHealthData = HelperFunctions.combineHealthDate(data, 1000, 30, false); 
         CloudFunctions.saveWalkingData(combinedHealthData, (data, error) => {
           if (!error) {

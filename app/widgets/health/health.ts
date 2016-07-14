@@ -330,7 +330,10 @@ export class Health {
       }, (data) => {
         if (data.value.sleep) {
           this.processRecentSleep(Math.round(data.value.sleep.duration * 10 / 3600) / 10);
-        } 
+        } else {
+          this.loading = false;
+          this.summaryString = 'Sleep Data unavaliable.'
+        }
       }, (error) => {
         console.log('Error:', error);
         this.callbackFunction(this.chatObject, this.isReply, {
@@ -339,8 +342,8 @@ export class Health {
       });
     } else {
       this.loading = false;
-      alert('Health API Not Available');
-      this.summaryString = 'Recent Sleep Statement (Health Api Not Available)'
+      //alert('Health API Not Available');
+      this.summaryString = 'Recent Sleep Statement (Health Api Not Available)';
     }
   }
 
