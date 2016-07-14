@@ -50,7 +50,8 @@ export class FacebookLogin {
         this.callbackFunction(this.chatObject, this.isReply, null, null, true);
       }, (message, error) => {
         console.log('Error logging through facebook:', message);
-        alert('Error' + message);
+        alert(message);
+        this.loading = false;
       });
     }
 	}

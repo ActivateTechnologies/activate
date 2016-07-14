@@ -21,7 +21,8 @@
         [class.align-right]="chatMessage.usersMessage">
       <div *ngIf="chatMessage.type != 'dateMessage'" [class.message-user]="chatMessage.usersMessage"
           [class.message-bot]="!chatMessage.usersMessage">
-        <span *ngIf="!chatMessage.isWidget" [innerHTML]="chatMessage.message"></span>
+        <span *ngIf="!chatMessage.isWidget" 
+        [innerHTML]="sanitizer.bypassSecurityTrustHtml(chatMessage.message)"></span>
         <Widget *ngIf="chatMessage.isWidget" [callbackFunction]="widgetBoundCallback"
          [chatObject]="chatMessage" [isReply]="false"></Widget>
       </div>

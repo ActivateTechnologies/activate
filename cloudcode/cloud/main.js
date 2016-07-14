@@ -114,6 +114,7 @@ Parse.Cloud.define("saveWalkingData", function (request, response) {
   var walkingDataArray = request.params;
   var walkingDataKeys = Object.keys(walkingDataArray);
   console.log('walkingDataKeys.length: ' + walkingDataKeys.length);
+
   if (walkingDataKeys.length > 0) {
     var maxTime = walkingDataArray[0].startDate;
     var minTime = walkingDataArray[0].startDate;

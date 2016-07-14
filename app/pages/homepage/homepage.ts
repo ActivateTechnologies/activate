@@ -6,6 +6,7 @@ import {Widget} from '../../widgets/widget';
 import {CloudFunctions} from '../../helpers/cloudfunctions';
 import {HelperFunctions} from '../../helpers/helperfunctions';
 import {NgZone, Component} from '@angular/core';
+import {DomSanitizationService} from '@angular/platform-browser';
 import {ProfilePage} from '../profilepage/profilepage';
 import {Camera} from 'ionic-native';
 //import {BackgroundGeolocation} from 'ionic-native';
@@ -18,9 +19,10 @@ import {Http, Headers} from '@angular/http';
 })
 export class HomePage {
   @ViewChild(Content) content: Content;
-  nav:any; app:any; zone:any; http:any; platform:any; chatMessages:any[]; replyOptions:any[];
-  typing:boolean; TYPING_DELAY:number; THINKING_DELAY:number; SCROLL_DELAY:number;
-  dev:boolean = true; loadingMessages:boolean = true; recentMessagesTemp:any[];
+  nav:any; app:any; zone:any; http:any; platform:any; sanitizer:any; 
+  chatMessages:any[]; replyOptions:any[]; typing:boolean; TYPING_DELAY:number; 
+  THINKING_DELAY:number; SCROLL_DELAY:number; dev:boolean = true;
+  loadingMessages:boolean = true; recentMessagesTemp:any[];
   /*recentMessagesTemp holds all the messages recently shown to user before
     he has replied, these will only be saved once the user has made a 
     selection. Also used to hold messages before user has signed in.*/
@@ -28,12 +30,13 @@ export class HomePage {
   public widgetBoundCallback: Function;
 
 	constructor(nav: NavController, app: App, zone: NgZone, platform: Platform,
-    http: Http) {
+    http: Http, sanitizer: DomSanitizationService) {
     Parse.initialize(Consts.PARSE_APPLICATION_ID, Consts.PARSE_JS_KEY);
     this.nav = nav;
     this.app = app;
     this.zone = zone;
     this.http = http;
+    this.sanitizer = sanitizer;
     this.platform = platform;
     this.chatMessages = [];
     this.recentMessagesTemp = [];
@@ -50,7 +53,6 @@ export class HomePage {
     } else if (this.platform.is("android")) {
       this.startLocationTracking();
     }
-    
     //this.uploadDetailedWalkingData();
     if (Parse.User.current()) {
       this.retrieveArchieveMessages();
@@ -370,7 +372,8 @@ export class HomePage {
   }
 
   uploadDetailedWalkingData() {
-    if (this.platform.is('android') || this.platform.is('ios')) {
+    if (Parse.User.current() && 
+      (this.platform.is('android') || this.platform.is('ios'))) {
       console.log('getDetailedWalkingData called');
       let WalkingData = Parse.Object.extend("WalkingData");
       let query = new Parse.Query(WalkingData);

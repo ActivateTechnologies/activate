@@ -254,7 +254,7 @@ export class Health {
       });
     } else {
       this.loading = false;
-      alert('Health API Not Available');
+      //alert('Health API Not Available');
       this.summaryString = 'Recent Activity Statement (Health Api Not Available)'
     }
   }

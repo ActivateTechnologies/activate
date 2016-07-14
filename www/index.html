@@ -10,6 +10,7 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
 
+  <link rel="shortcut icon" href="">
   <link ios-href="build/css/app.ios.css" rel="stylesheet">
   <link md-href="build/css/app.md.css" rel="stylesheet">
   <link wp-href="build/css/app.wp.css" rel="stylesheet">  
@@ -29,6 +30,8 @@
 
   <script>
     window.fbAsyncInit = function() {
+      Parse.initialize("v3NS4xBCONYmIqqtwASz1e3TuX9p1WDZod6dUxA7",
+        "X0m2dicDJpQ4VGUi6QvKdDgivWsb9iSwaSfmNJa0");
       Parse.FacebookUtils.init({
         appId      : '1701291596814936',
         status     : false,
