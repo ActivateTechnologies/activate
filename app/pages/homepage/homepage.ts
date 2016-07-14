@@ -51,7 +51,7 @@ export class HomePage {
     if (this.platform.is("ios")) {
       this.startLocationTrackingIOS();
     } else if (this.platform.is("android")) {
-      this.startLocationTracking();
+      this.startLocationTrackingAndroid();
     }
     //this.uploadDetailedWalkingData();
     if (Parse.User.current()) {
@@ -418,28 +418,28 @@ export class HomePage {
     }
   }
 
-  startLocationTracking() {
-    /*let config = {
+  startLocationTrackingAndroid() {
+    let config = {
       desiredAccuracy: 0,
       stationaryRadius: 30,
       distanceFilter: 1,
-      debug: false,
+      debug: true,
       interval: 2 * 1000,
       stopOnTerminate: false,
       activityType: "Fitness"
     };
-    backgroundGeolocation.configure((location) => {
+    window.backgroundGeolocation.configure((location) => {
       console.log(location);
     }, (error) => {}, config);
-    backgroundGeolocation.start();
-    backgroundGeolocation.getLocations((locations) => {
-      console.log('Got stored locations, count: ', locations.length);
+    window.backgroundGeolocation.start();
+    window.backgroundGeolocation.getLocations((locations) => {
+      console.log('Got stored locations, count: ', locations.length, locations);
       if (locations.length > 0) {
         this.saveLocationsToParse(locations, true);
       }
     }, () => {
       console.log('Error getting locations');
-    });*/
+    });
   }
 
   startLocationTrackingIOS() {

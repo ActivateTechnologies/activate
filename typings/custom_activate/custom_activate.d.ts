@@ -9,6 +9,7 @@ interface Window {
 	facebookConnectPlugin: any;
 	FB: any;
 	BackgroundGeolocation: any;
+	backgroundGeolocation: any;
 }
 
 interface Navigator {
