@@ -114,66 +114,71 @@ Parse.Cloud.define("saveWalkingData", function (request, response) {
   var walkingDataArray = request.params;
   var walkingDataKeys = Object.keys(walkingDataArray);
   console.log('walkingDataKeys.length: ' + walkingDataKeys.length);
-  var maxTime = walkingDataArray[0].startDate;
-  var minTime = walkingDataArray[0].startDate;
-  var mainArray = [];
-  var firstWeekStartDate;
 
-  var firstObjectProcessed = false, otherObjectsProcessed = false;
+  if (walkingDataKeys.length > 0) {
+    var maxTime = walkingDataArray[0].startDate;
+    var minTime = walkingDataArray[0].startDate;
+    var mainArray = [];
+    var firstWeekStartDate;
 
-  //Find maxTime, minTime and firstWeekStartDate
-  for (var i = 0; i < walkingDataKeys.length; i++) {
-    var time = walkingDataArray[walkingDataKeys[i]].startDate;
-    maxTime = (time > maxTime) ? time : maxTime;
-    minTime = (time < minTime) ? time : minTime;
-  }
-  firstWeekStartDate = new Date(minTime);
-  firstWeekStartDate.setTime(minTime - minTime % (86400 * 1000));
-  firstWeekStartDate.setTime(firstWeekStartDate.getTime()
-    - firstWeekStartDate.getDay() * 86400 * 1000);
+    var firstObjectProcessed = false, otherObjectsProcessed = false;
 
-  //Initialise mainArray based on number of weeks of data
-  var numOfWeeks = Math.ceil(
-    (maxTime - firstWeekStartDate.getTime()) / (7 * 86400 * 1000));
-  for (var i = 0; i < numOfWeeks; i++) {
-    mainArray.push([]);
-  }
+    //Find maxTime, minTime and firstWeekStartDate
+    for (var i = 0; i < walkingDataKeys.length; i++) {
+      var time = walkingDataArray[walkingDataKeys[i]].startDate;
+      maxTime = (time > maxTime) ? time : maxTime;
+      minTime = (time < minTime) ? time : minTime;
+    }
+    firstWeekStartDate = new Date(minTime);
+    firstWeekStartDate.setTime(minTime - minTime % (86400 * 1000));
+    firstWeekStartDate.setTime(firstWeekStartDate.getTime()
+      - firstWeekStartDate.getDay() * 86400 * 1000);
 
-  //Fill objects in the array with the location objects
-  for (var i = 0; i < walkingDataKeys.length; i++) {
-    var mainArrayIndex = (walkingDataArray[walkingDataKeys[i]].startDate
-     - firstWeekStartDate.getTime());
-    mainArrayIndex = Math.floor(mainArrayIndex / 604800000); //(7 * 86400 * 1000)
-    mainArray[mainArrayIndex].push(walkingDataArray[walkingDataKeys[i]]);
-  }
-  
-  //Save first week object (update if necessary)
-  var WalkingData = Parse.Object.extend("WalkingData");
-  var query = new Parse.Query(WalkingData);
-  query.equalTo('user', Parse.User.current());
-  query.equalTo('weekStartDate', firstWeekStartDate);
-  query.first({
-    success: function(parseObject) {
-      if (parseObject) {
-        parseObject.set("walkingArray", mainArray[0]);
-        parseObject.save({
-          success: function (parseObject) {
-            saveAllWeeks(true);
-          }, error: function (parseObject, error) {
-            console.log('Error saving updated first week parse object');
-            saveAllWeeks(false);
-          }
-        });
-      } else {
+    //Initialise mainArray based on number of weeks of data
+    var numOfWeeks = Math.ceil(
+      (maxTime - firstWeekStartDate.getTime()) / (7 * 86400 * 1000));
+    for (var i = 0; i < numOfWeeks; i++) {
+      mainArray.push([]);
+    }
+
+    //Fill objects in the array with the location objects
+    for (var i = 0; i < walkingDataKeys.length; i++) {
+      var mainArrayIndex = (walkingDataArray[walkingDataKeys[i]].startDate
+       - firstWeekStartDate.getTime());
+      mainArrayIndex = Math.floor(mainArrayIndex / 604800000); //(7 * 86400 * 1000)
+      mainArray[mainArrayIndex].push(walkingDataArray[walkingDataKeys[i]]);
+    }
+    
+    //Save first week object (update if necessary)
+    var WalkingData = Parse.Object.extend("WalkingData");
+    var query = new Parse.Query(WalkingData);
+    query.equalTo('user', Parse.User.current());
+    query.equalTo('weekStartDate', firstWeekStartDate);
+    query.first({
+      success: function(parseObject) {
+        if (parseObject) {
+          parseObject.set("walkingArray", mainArray[0]);
+          parseObject.save({
+            success: function (parseObject) {
+              saveAllWeeks(true);
+            }, error: function (parseObject, error) {
+              console.log('Error saving updated first week parse object');
+              saveAllWeeks(false);
+            }
+          });
+        } else {
+          saveAllWeeks(false);
+        }
+      },
+      error: function(error) {
+        console.log("Error getting firstWeekStartDate object");
         saveAllWeeks(false);
       }
-    },
-    error: function(error) {
-      console.log("Error getting firstWeekStartDate object");
-      saveAllWeeks(false);
-    }
-  });
-
+    });
+  } else {
+    response.success({});
+  }
+    
   function saveAllWeeks(firstWeekSaved) {
     var objectsToSave = [];
     for (var i = (firstWeekSaved) ? 1 : 0; i < mainArray.length; i++) {

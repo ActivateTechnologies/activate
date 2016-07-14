@@ -48,8 +48,12 @@ export class HomePage {
   }
 
   initialize() {
-    this.startLocationTracking();
-    this.uploadDetailedWalkingData();
+    if (this.platform.is("ios")) {
+      this.startLocationTrackingIOS();
+    } else if (this.platform.is("android")) {
+      this.startLocationTracking();
+    }
+    //this.uploadDetailedWalkingData();
     if (Parse.User.current()) {
       this.retrieveArchieveMessages();
       //this.navigateTreeTo('start', false); //healthApi
@@ -431,30 +435,90 @@ export class HomePage {
     backgroundGeolocation.getLocations((locations) => {
       console.log('Got stored locations, count: ', locations.length);
       if (locations.length > 0) {
-        this.saveLocationsToParse(locations);
+        this.saveLocationsToParse(locations, true);
       }
     }, () => {
       console.log('Error getting locations');
     });*/
   }
 
-  saveLocationsToParse(locations) {
+  startLocationTrackingIOS() {
+    // Get a reference to the plugin.
+    let bgGeo = window.BackgroundGeolocation;
+
+    let successFunction = function(location, taskId) {
+      let coords = location.coords;
+      let lat    = coords.latitude;
+      let lng    = coords.longitude;
+      console.log('Location: ', lat, lng);
+      bgGeo.finish(taskId);
+    };
+
+    var errorFunction = function(errorCode) {
+      console.warn('BackgroundGeoLocation error: ', errorCode);
+    }
+
+    bgGeo.on('location', successFunction, errorFunction);
+
+    bgGeo.configure({
+      desiredAccuracy: 0,
+      distanceFilter: 10,
+      stationaryRadius: 30,
+      locationUpdateInterval: 1000,
+      fastestLocationUpdateInterval: 5000,
+      activityType: 'Fitness',
+      activityRecognitionInterval: 5000,
+      stopTimeout: 5,
+      debug: true,
+      stopOnTerminate: false,
+      startOnBoot: true
+    }, (state) => {
+      // This callback is executed when the plugin is ready to use.
+      if (!state.enabled) {
+        bgGeo.start();
+      }
+      bgGeo.getLocations((locations) => {
+        console.log('Got stored locations, count: ' + locations.length);
+        if (locations.length > 0) {
+          this.saveLocationsToParse(locations, false);
+        }
+      }, () => {
+        console.log('Error getting locations');
+      });
+    });
+  }
+
+  saveLocationsToParse(locations, isAndroid) {
     let keys = Object.keys(locations);
     let locationsToSend = {};
     for (let i = 0; i < keys.length; i++) {
-      locationsToSend[locations[keys[i]].time] = {
-        accuracy: locations[keys[i]].accuracy,
-        lat: locations[keys[i]].latitude,
-        lng: locations[keys[i]].longitude,
-        provider: locations[keys[i]].provider,
-        debug: locations[keys[i]].debug
-      };
+      if (isAndroid) {
+        locationsToSend[locations[keys[i]].time] = {
+          accuracy: locations[keys[i]].accuracy,
+          lat: locations[keys[i]].latitude,
+          lng: locations[keys[i]].longitude,
+          provider: locations[keys[i]].provider
+        };
+      } else {
+        locationsToSend[new Date(locations[keys[i]].timestamp).getTime()] = {
+          accuracy: locations[keys[i]].coords.accuracy,
+          lat: locations[keys[i]].coords.latitude,
+          lng: locations[keys[i]].coords.longitude,
+          provider: null
+        };
+      }
     }
     CloudFunctions.saveLocationData(locationsToSend, (data, error) => {
       if (!error) {
-        /*backgroundGeolocation.deleteAllLocations(() => {}, (error) => {
-          console.log('Error deleting locations');
-        });*/
+        /*if (isAndroid) {
+          backgroundGeolocation.deleteAllLocations(() => {}, (error) => {
+            console.log('Error deleting locations');
+          });
+        } else {
+          window.BackgroundGeolocation.clearDatabase(() => {}, (error) => {
+            console.log('Error deleting locations');
+          });
+        }*/
       }
     });
   }

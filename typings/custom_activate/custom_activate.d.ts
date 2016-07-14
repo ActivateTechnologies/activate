@@ -8,6 +8,7 @@ interface Window {
 	heartbeat: any;
 	facebookConnectPlugin: any;
 	FB: any;
+	BackgroundGeolocation: any;
 }
 
 interface Navigator {

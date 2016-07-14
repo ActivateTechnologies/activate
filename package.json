@@ -53,6 +53,7 @@
     "cordova-plugin-inappbrowser",
     "cordova-plugin-file",
     "cordova-plugin-camera",
+    "cordova-background-geolocation-lt",
     "cordova-plugin-mauron85-background-geolocation"
   ],
   "cordovaPlatforms": [
