@@ -1,6 +1,7 @@
 export class Consts {
   
   //DEVELOPMENT activate-dev
+  //Also hard coded in index.html
   public static PARSE_APPLICATION_ID = "v3NS4xBCONYmIqqtwASz1e3TuX9p1WDZod6dUxA7";
   public static PARSE_CLIENT_KEY = "YB0Po25rU80Z8PpzPQyYCVEzqECZnFQv55lZQakw";
   public static PARSE_JS_KEY = "X0m2dicDJpQ4VGUi6QvKdDgivWsb9iSwaSfmNJa0";

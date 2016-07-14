@@ -43,10 +43,10 @@ export class UserFunctions {
 
   public static facebookLogin(successCallback, errorCallback) {
     if (!window.cordova) {
-      UserFunctions.facebookParseLogin(null, successCallback, errorCallback);
+      UserFunctions.facebookParseLogin("email,user_friends", successCallback, errorCallback);
       return;
     }
-    window.facebookConnectPlugin.login(['email'],
+    window.facebookConnectPlugin.login(['email', 'user_friends'],
       (response) => {
         //console.log(response);
         if (!response.authResponse){
@@ -129,9 +129,6 @@ export class UserFunctions {
           /*if (response.age_range && response.age_range.min) {
             currentUser.set(Consts.USER_AGEMIN, parseInt(response.age_range.min));
           }*/
-          /*if (!currentUser.get(Consts.USER_STARVOTES)) {
-            currentUser.set(Consts.USER_STARVOTES, 0);
-          }*/
           if (!currentUser.get(Consts.USER_NOOFGAMES)) {
             currentUser.set(Consts.USER_NOOFGAMES, 0);
           }
@@ -148,7 +145,7 @@ export class UserFunctions {
             }
           })
         });
-        FB.api('/me/friends', function(response) {
+        window.FB.api('/me/friends', function(response) {
           console.log(response);
           let friends = response.data;
           let friendsFbIds = [];
