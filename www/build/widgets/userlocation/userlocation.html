@@ -1,0 +1,11 @@
+<div class="userlocation">
+	<!-- When isReply -->
+	<div *ngIf="isReply" (click)="getUserLocation()">
+		Yes <span [hidden]="!loading" class="loading">&nbsp;...</span>
+	</div>
+	<!-- When !isReply -->
+	<div *ngIf="!isReply">
+		<img *ngIf="lastLocation" class="map-image" src="https://maps.googleapis.com/maps/api/staticmap?center={{lastLocation.latitude}},{{lastLocation.longitude}}&zoom=16&size=400x300&maptype=map&markers=color:red%7C{{lastLocation.latitude}},{{lastLocation.longitude}}"/>
+		<span *ngIf="!lastLocation">Location Permission Denied</span>
+	</div>
+</div>

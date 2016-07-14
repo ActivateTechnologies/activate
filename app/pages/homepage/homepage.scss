@@ -1,0 +1,216 @@
+.homepage {
+
+  p {
+    margin: 20px 0;
+    line-height: 22px;
+    font-size: 16px;
+  }
+
+  .message-bot {
+  	display: inline-block;
+  	max-width: 80%;
+  	font-size: 16px;
+  	padding: 6px;
+  	margin-top:5px;
+  	margin-bottom:5px;
+  	color: #ffffff;
+  	background-color: #ff524f;
+  	border-radius: 5px;
+    border-bottom-left-radius: 0px;
+  	text-align:left;
+  }
+
+  .message-user {
+  	display: inline-block;
+  	max-width: 80%;
+  	font-size: 16px;
+  	padding: 6px;
+  	margin-top:5px;
+  	margin-bottom:5px;
+  	color: #E5E5EA;
+  	background-color: #e0e0e0;
+  	border-radius: 5px;
+    border-bottom-right-radius: 0px;
+  	text-align:right;
+    color: #444444;
+  }
+
+  .message-typing {
+  	display: inline-block;
+  	font-size: 16px;
+  	padding: 6px;
+  	margin-top:4px;
+  	margin-bottom:4px;
+  	color: #ffffff;
+  	background-color: #ff524f;
+  	border-radius: 5px;
+    border-bottom-left-radius: 0px;
+  	text-align:left;
+  }
+
+  .align-right {
+  	text-align: right;
+  }
+
+  .message-typing-inside {
+  	font-weight: bold;
+  	-webkit-animation:fade 1.5s linear infinite;
+    -moz-animation:fade 1.5s linear infinite;
+    animation:fade 1.5s linear infinite;
+  }
+
+  @-moz-keyframes fade { 50% { opacity: 0; } 100% { opacity: 1; } }
+	@-webkit-keyframes fade { 50% { opacity: 0; } 100% { opacity: 1; } }
+	@keyframes fade { 50% { opacity: 0; } 100% { opacity: 1; } }
+
+  .replyOption {
+  	padding: 6px;
+  	margin-left: 15px; margin-right: 15px;
+  	color: #ffffff;
+    margin-top: 5px;
+  	background-color: #1288F8;
+  	border-radius: 5px;
+    position: relative;
+    border-bottom-right-radius: 0px;
+    font-size: 16px;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+
+  .replyBox {
+  	position:fixed;
+  	padding-bottom: 10px;
+  	width: 100%;
+  	height: auto;
+  	bottom: 0px;
+  	text-align: center;
+  	background-color: #FFFFFF;
+  }
+
+  @-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+	@-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+	@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+	.fade-in {
+    opacity: 0;
+    -webkit-animation:fadeIn ease-in 1;
+    -moz-animation:fadeIn ease-in 1;
+    animation:fadeIn ease-in 1;
+
+    -webkit-animation-fill-mode:forwards;
+    -moz-animation-fill-mode:forwards;
+    animation-fill-mode:forwards;
+
+    -webkit-animation-duration:0.25s;
+    -moz-animation-duration:0.25s;
+    animation-duration:0.25s;
+	}
+
+  .em {
+    font-size: 10px;
+  }
+
+  .emojiBottom {
+    font-size: 16px;
+  }
+
+  .chatBubbleMenu {
+    font-size: 28px;
+    color: #ECECEC;
+    padding-bottom: 30px;
+    padding-right: 10px;
+  }
+
+  .chatMenuDiv {
+    position: absolute;
+    z-index: 100;
+    bottom: 0;
+    right: 0;
+  }
+
+  .replyOptionsTopContainer {
+  }
+
+  .replyOptionsBottomContainer {
+    height: 20px;
+  }
+
+  .bottomReplyContainer {
+    width: 24%;
+    display: inline-block;
+    height: 20px;
+    margin: 0;
+  }
+
+  .bottomReplyContainer2 {
+    width: 19%;
+    display: inline-block;
+    height: 20px;
+    margin: 0;
+  }
+
+  .bottomReplyIcon {
+    color: #CECECE;
+    font-size: 18px;
+  }
+
+  .topNavbarWhiteBackground {
+    height: 20px;
+    width: 100%;
+    background: #FFFFFF;
+    position: fixed;
+    z-index: 200;
+  }
+
+  .chat-break-line {
+    width:100%;
+    text-align:center;
+    margin-top:8px;
+    font-size:10px;
+    color: #808080;
+  }
+
+  /* WIDGETS */
+
+  .widget-facebookLogin-button {
+    z-index: 100;
+    width: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+  }
+
+  .replyOptionWidget {
+    color: #FFFFFF;
+  }
+
+  .gamePic {
+    margin-top: 5px;
+  }
+
+  .chatContainerContent {
+  
+  }
+
+  .leftChatContainerContent {
+    width: 7%;
+    min-width: 18px;
+    display: inline-block;
+
+  }
+
+  .rightChatContainerContent {
+    width: 93%;
+    float: right;
+    display: inline-block;
+    
+  }
+
+  .spinner svg {
+    width: 28px;
+    height: 28px;
+    stroke: #FFFFFF;
+    fill: #FFFFFF;
+  }
+
+}

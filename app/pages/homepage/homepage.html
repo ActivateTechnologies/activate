@@ -1,0 +1,89 @@
+
+<!--
+<ion-navbar *navbar class="navbar">
+  <button menuToggle>
+    <ion-icon name="menu"></ion-icon>
+  </button>
+  <ion-title>Activate</ion-title>
+</ion-navbar>
+-->
+<ion-header>
+  <div class="homepage">
+    <div class="topNavbarWhiteBackground">
+    </div>
+  </div>
+</ion-header>
+
+<ion-content class="homepage" id="homepage-content">
+  <ion-list padding>
+    <span *ngIf="loadingMessages">Loading ...</span>
+    <div *ngFor="let chatMessage of chatMessages" class="fade-in"
+        [class.align-right]="chatMessage.usersMessage">
+      <div *ngIf="chatMessage.type != 'dateMessage'" [class.message-user]="chatMessage.usersMessage"
+          [class.message-bot]="!chatMessage.usersMessage">
+        <span *ngIf="!chatMessage.isWidget" [innerHTML]="chatMessage.message"></span>
+        <Widget *ngIf="chatMessage.isWidget" [callbackFunction]="widgetBoundCallback"
+         [chatObject]="chatMessage" [isReply]="false"></Widget>
+      </div>
+      <div *ngIf="chatMessage.type == 'dateMessage'" class="chat-break-line">
+        {{chatMessage.message}}
+      </div>
+    </div>
+    <!--
+    <div class="message-typing fade-in" [hidden]="!typing">
+      <ion-spinner name="dots"></ion-spinner>
+    </div>
+    -->
+    <span style="font-size: 24px;"><br>&nbsp;</span>
+  </ion-list>
+</ion-content>
+
+<ion-footer class="homepage">
+  
+  <div class="replyBox">
+    <img [hidden]="true" id="imageFile">
+    <div class="replyOptionsTopContainer">
+      <div *ngFor="let option of replyOptions" class="replyOption"
+       (click)="replyWithMessage(option)">
+        <span *ngIf="!option.isWidget" [innerHTML]="option.message"></span>
+        <Widget *ngIf="option.isWidget" [callbackFunction]="widgetBoundCallback"
+         [chatObject]="option" [isReply]="true"></Widget>
+      </div>
+    </div>
+
+    <div class="replyOptionsBottomContainer">
+
+      <div class="bottomReplyContainer2">
+        <ion-icon name="ios-nutrition" class="bottomReplyIcon" (click)="navigateTreeTo('useCamera', true)"></ion-icon>
+      </div>
+
+      <div class="bottomReplyContainer2">
+        <ion-icon name="ios-happy" class="bottomReplyIcon" (click)="navigateTreeTo('mood', true)"></ion-icon>
+      </div>
+      
+      <div class="bottomReplyContainer2">
+        <!-- <ion-icon name="ios-heart" class="bottomReplyIcon"
+         (click)="navigateTreeTo('healthApiHeart', true)"></ion-icon> -->
+         
+        <ion-icon name="ios-heart" class="bottomReplyIcon"
+          (click)="getDetailedWalkingData()"></ion-icon>
+      </div>
+
+      <div class="bottomReplyContainer2">
+        <ion-icon name="ios-people" class="bottomReplyIcon"
+         (click)="navigateTreeTo('start', true)"></ion-icon>
+      </div>
+
+      <div class="bottomReplyContainer2">
+         <ion-icon name="ios-person" class="bottomReplyIcon"
+         (click)="openUserProfile()"></ion-icon>
+      </div>
+    </div>
+  </div>
+</ion-footer>
+
+<!-- <ion-toolbar position="bottom" padding class="fixed">
+  <div class="replyOption" *ngFor="let option of replyOptions">
+    {{option.message}}
+  </div>
+</ion-toolbar> -->

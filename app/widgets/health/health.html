@@ -1,0 +1,41 @@
+<div class="health">
+	<!-- When isReply -->
+	<div *ngIf="isReply">
+		<div *ngIf="widgetType == 'initHealth'" (click)="initHealth()">
+			Yes<span [hidden]="!loading" class="loading">&nbsp;...</span>
+			<span *ngIf="platformId == 'browser'">(not supported in browser)</span>
+		</div>
+		<div *ngIf="widgetType == 'showData'">
+			<!-- Nothing should be here --> Error
+		</div>
+		<div *ngIf="widgetType == 'measureHeart'" (click)="measureHeart()">
+			Measure Away<span [hidden]="!loading" class="loading">&nbsp;...</span>
+			<span *ngIf="platformId == 'browser'">(simulating in browser)</span>
+		</div>
+	</div>
+	<!-- When !isReply -->
+	<div *ngIf="!isReply">
+		<div *ngIf="widgetType == 'initHealth'">
+			{{initHealthString}}<span [hidden]="!loading" class="loading">&nbsp;...</span>
+			<span *ngIf="platformId == 'browser'">Init not supported in browser.</span>
+		</div>
+		<div *ngIf="widgetType == 'showData'">
+			{{summaryString}}<span [hidden]="!loading" class="loading">&nbsp;...</span>
+			<span *ngIf="platformId == 'browser'">Summary not supported in browser.</span>
+			<!-- <textarea id="activityJsonString" style="color:black;"></textarea> -->
+		</div>
+		<div *ngIf="widgetType == 'recentActivity'">
+			{{summaryString}}<span [hidden]="!loading" class="loading">&nbsp;...</span>
+			<span *ngIf="platformId == 'browser'">Recent Activity not supported in browser.</span>
+			<!-- <textarea id="activityJsonString" style="color:black;"></textarea> -->
+		</div>
+		<div *ngIf="widgetType == 'recentSleep'">
+			{{summaryString}}<span [hidden]="!loading" class="loading">&nbsp;...</span>
+			<span *ngIf="platformId == 'browser'">Recent Sleep not supported in browser.</span>
+			<!-- <textarea id="activityJsonString" style="color:black;"></textarea> -->
+		</div>
+		<div *ngIf="widgetType == 'measureHeart'">
+			{{data.summaryString}}<span [hidden]="!loading" class="loading">&nbsp;...</span>
+		</div>
+	</div>
+</div>

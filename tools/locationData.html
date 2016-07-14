@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Location Data Processing</title>
+
+<script src="location.js"></script>
+<script src="walking.js"></script>
+<script type="text/javascript">
+
+var locationDataArr = [];
+function init () {
+	var locationKeys = Object.keys(locationData);
+	for (var i = 0; i < locationKeys.length; i++) {
+		locationDataArr.push({
+			time: locationKeys[i],
+			lat: locationData[locationKeys[i]].lat,
+			lng: locationData[locationKeys[i]].lng
+		});
+	}
+	locationDataArr.sort(function (a, b) {
+    return a.time - b.time;
+  });
+  console.log('Walking Data Length: ', walkingData.length);
+	console.log('Location Data Length: ', locationDataArr.length);
+	outputLocationData(locationDataArr, 'Raw Location Data ('
+		+ locationDataArr.length + ')', 1);
+	//smoothData();
+	removeNonWalkingPoints();
+	//nonWalkingPoints();
+}
+
+function smoothData() {
+	var S_COEFF = 0.1;
+	var S_LEVELS = 15;
+	/*If time between points is greater than this, 
+		smoothing will not be performed for those points*/
+	var TIME_TOLERENCE = 5000 * (S_LEVELS - 1) / 2; 
+	var multiplier = (1 - S_COEFF) / (S_LEVELS - 1);
+	console.log('multiplier: ' + multiplier);
+	for (var i = (S_LEVELS - 1) / 2; i < locationDataArr.length - (S_LEVELS - 1) / 2; i++) {
+		if ((locationDataArr[i + (S_LEVELS - 1) / 2].time - locationDataArr[i].time)
+		 < TIME_TOLERENCE) {
+		 	var latSum = locationDataArr[i].lat * S_COEFF;
+		 	var lngSum = locationDataArr[i].lng * S_COEFF;
+		 	for (var j = 1; j < (S_LEVELS + 1) / 2; j++) {
+		 		latSum += locationDataArr[i + j].lat * multiplier;
+		 		latSum += locationDataArr[i - j].lat * multiplier;
+		 		lngSum += locationDataArr[i + j].lng * multiplier;
+		 		lngSum += locationDataArr[i - j].lng * multiplier;
+		 	}
+		 	console.log(1);
+		 	locationDataArr[i].lat = latSum;
+			locationDataArr[i].lng = lngSum;
+		}
+	}
+	outputLocationData(locationDataArr, 'Smoothed Location Data ('
+		+ locationDataArr.length + ')', 2);
+}
+
+function removeNonWalkingPoints() {
+	var a = 0, b = 0;
+	var filteredLocationData = [];
+	console.log(walkingData[0]);
+	while(a < locationDataArr.length && b < walkingData.length) {
+		if (locationDataArr[a].time < walkingData[b].startDate) {
+			a++;
+		} else if (locationDataArr[a].time <= walkingData[b].endDate) {
+			filteredLocationData.push(locationDataArr[a]);
+			a++;
+		} else {
+			b++;
+		}
+	}
+	console.log('Walking Location Data Length: ', filteredLocationData.length);
+	outputLocationData(filteredLocationData, 'Walking Location Data ('
+		+ filteredLocationData.length + ')', 2);
+}
+
+function nonWalkingPoints() {
+	var a = 0, b = 0;
+	var filteredLocationData = [];
+	console.log(walkingData[0]);
+	while(a < locationDataArr.length && b < walkingData.length) {
+		if (locationDataArr[a].time < walkingData[b].startDate) {
+			filteredLocationData.push(locationDataArr[a]);
+			a++;
+		} else if (locationDataArr[a].time <= walkingData[b].endDate) {
+			a++;
+		} else {
+			b++;
+		}
+	}
+	console.log('Non Walking Location Data Length: ', filteredLocationData.length);
+	outputLocationData(filteredLocationData, 'Non Walking Location Data ('
+		+ filteredLocationData.length + ')', 2);
+}
+
+function outputLocationData(data, title, boxNumber) {
+	ele('title_' + boxNumber).innerHTML = title;
+	var dataString = 'time,latitude,longitude,gv_track_number\n';
+	for (var i = 0; i < data.length; i++) {
+		dataString += data[i].time + ',' + data[i].lat + ','
+		 + data[i].lng + ',' + 3 + '\n';
+	}
+	ele('out_' + boxNumber).value = dataString;
+}
+
+function ele(id) {
+	return document.getElementById(id);
+}
+</script>
+</head>
+<body onload="init()">
+<a id="title_1">Output 1</a>
+<textarea id="out_1" cols="45" rows="8"></textarea>
+<a id="title_2">Output 2</a>
+<textarea id="out_2" cols="45" rows="8"></textarea>
+
+</body>
+</html>

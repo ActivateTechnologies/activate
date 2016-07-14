@@ -1,0 +1,17 @@
+<div class="widget">
+	<FacebookLogin *ngIf="widget.widgetName == 'facebookLogin'"
+	 [callbackFunction]="callbackFunction" [chatObject]="chatObject"
+	 [isReply]="isReply" [options]="chatObject.widget.options" [data]="data"></FacebookLogin>
+	<UserLocation *ngIf="widget.widgetName == 'userLocation'"
+	 [callbackFunction]="callbackFunction" [chatObject]="chatObject"
+	 [isReply]="isReply" [options]="chatObject.widget.options" [data]="chatObject.data"></UserLocation>
+	<Health *ngIf="widget.widgetName == 'health'"
+	 [callbackFunction]="callbackFunction" [chatObject]="chatObject"
+	 [isReply]="isReply" [options]="chatObject.widget.options" [data]="chatObject.data"></Health>
+  <UseCamera *ngIf="widget.widgetName == 'useCamera'"
+	 [callbackFunction]="callbackFunction" [chatObject]="chatObject"
+	 [isReply]="isReply" [options]="chatObject.widget.options" [data]="chatObject.data"></UseCamera>
+ 	<Mood *ngIf="widget.widgetName == 'mood'"
+	 [callbackFunction]="callbackFunction" [chatObject]="chatObject"
+	 [isReply]="isReply" [options]="chatObject.widget.options" [data]="chatObject.data"></Mood>
+</div>

@@ -1,0 +1,69 @@
+<div class="useCamera">
+	<!-- When isReply -->
+	<!--
+	<div *ngIf="isReply" (click)="login()">
+		<img class="button" src="images/widget-facebookLogin-facebook.png" />
+		<span [hidden]="!loading" class="loading">&nbsp;...</span>
+	</div>
+	-->
+	<div *ngIf="isReply" (click)="openCamera()" class="replyOptionWidget">
+		Take a picture
+		<span [hidden]="!loading" class="loading">&nbsp;...</span>
+	</div>
+	<!-- When !isReply -->
+	<div *ngIf="!isReply">
+		<table class="table"><tr>
+			<td class="imageTd">
+				<img src="{{imgsrc}}" class="profileImage">
+				<div *ngIf="foodObject">
+					<p class="foodTitle" *ngIf="foodObject.get('name') && foodObject.get('name').length > 0">
+						{{foodObject.get('name')}}
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('energy')">
+						Energy: {{foodObject.get('energy')}}KJ
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('fat')">
+						Fat: {{foodObject.get('fat')}}g
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('saturates')">
+						Saturates: {{foodObject.get('saturates')}}g
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('protein')">
+						Protein: {{foodObject.get('protein')}}g
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('carbohydrates')">
+						Carbohydrates: {{foodObject.get('carbohydrates')}}g
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('fibre')">
+						Fibre: {{foodObject.get('fibre')}}g
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('sugars')">
+						Sugars: {{foodObject.get('sugars')}}g
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('vitaminA')">
+						Vitamin A: {{foodObject.get('vitaminA')}}%
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('vitaminB')">
+						Vitamin C: {{foodObject.get('vitaminB')}}%
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('calcium')">
+						Calcium: {{foodObject.get('calcium')}}%
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('iron')">
+						Iron: {{foodObject.get('iron')}}%
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('phosphorous')">
+						Phosphorous: {{foodObject.get('phosphorous')}}mg
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('potassium')">
+						Potassium: {{foodObject.get('potassium')}}mg
+					</p>
+					<p class="foodInfo" *ngIf="foodObject.get('caffeine')">
+						Caffeine: {{foodObject.get('caffeine')}}mg
+					</p>
+				</div>
+				<ion-spinner name="dots" *ngIf="loading"></ion-spinner>
+			</td>
+		</tr></table>
+	</div>
+</div>
