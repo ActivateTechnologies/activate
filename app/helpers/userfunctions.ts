@@ -146,25 +146,21 @@ export class UserFunctions {
           })
         });
         window.FB.api('/me/friends', function(response) {
-          console.log(response);
           let friends = response.data;
           let friendsFbIds = [];
           for (let i = 0; i < friends.length; i++) {
             friendsFbIds.push(friends[i].id);
           }
-          console.log('Facebook Friends Ids: ', friendsFbIds);
-          CloudFunctions.updateFriends({ friendsFbIdArray: friendsFbIds },
-           () => {});
-          /*Parse.Cloud.run('updateFriends', )
-            .then(function(data) {
-          });*/
+          console.log('Found ' + friendsFbIds.length + ' friend(s).');
+          CloudFunctions.updateFriends({friendsFbIdArray:friendsFbIds}, () => {});
         });
       },
       error: (user, error) => {
         console.log("User cancelled the Facebook login or did not fully authorize.");
         /*this.message = 'Please ensure you authorize Activate to log you in through facebook.';
         this.loading = false;*/
-        errorCallback('Please ensure you authorize Activate to log you in through facebook.', error);
+        errorCallback('Please ensure you authorize Activate to log you ' 
+          + 'in through facebook.', error);
       }
     });
   }
