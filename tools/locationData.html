@@ -24,8 +24,8 @@ function init () {
 	console.log('Location Data Length: ', locationDataArr.length);
 	outputLocationData(locationDataArr, 'Raw Location Data ('
 		+ locationDataArr.length + ')', 1);
-	//smoothData();
-	removeNonWalkingPoints();
+	smoothData();
+	//removeNonWalkingPoints();
 	//nonWalkingPoints();
 }
 
@@ -112,7 +112,7 @@ function ele(id) {
 </head>
 <body onload="init()">
 <a id="title_1">Output 1</a>
-<textarea id="out_1" cols="45" rows="8"></textarea>
+<textarea id="out_1" cols="45" rows="8"></textarea><br>
 <a id="title_2">Output 2</a>
 <textarea id="out_2" cols="45" rows="8"></textarea>
 

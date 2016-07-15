@@ -23,6 +23,29 @@
 	-->
 
 	<div class="containerProfilePageContent">
+		<b>Timeline of events:</b>
+		<div *ngFor="let event of timelineEvents">
+			<span *ngIf="event.type=='message'">
+				{{event.time | date: 'shortTime'}}: <b>{{event.message}}</b>
+			</span>
+			<span *ngIf="event.type=='location'">
+				{{event.time | date: 'shortTime'}}: <b>{{event.lat}},{{event.lng}}</b>
+			</span>
+			<span *ngIf="event.type=='sleep'">
+				{{event.time | date: 'shortTime'}}: <b>Sleeping</b>
+			</span>
+			<span *ngIf="event.type=='walk'">
+				{{event.time | date: 'shortTime'}}:
+				<b>Walking ({{event.distance}}km)</b>
+			</span>
+			<span *ngIf="event.type=='run'">
+				{{event.time | date: 'shortTime'}}:
+				<b>Running ({{event.distance}}km)</b>
+			</span>
+		</div><br>
+	</div>
+
+	<div class="containerProfilePageContent">
 		<!--  [hidden]="walkingDataLoading || caloriesDataLoading
 		 || cyclingDataLoading || runningDataLoading || heartDataLoading || sleepDataLoading" -->
 

@@ -20,6 +20,128 @@ Parse.Cloud.define("initConversation", function(request, response) {
   });
 });
 
+Parse.Cloud.define("getTimelineEvents", function(request, response) {
+
+  //DATA
+  var locationFileUrl;
+  var locationData = {};
+  var walkingData = {};
+  var sleepingData = {};
+  var promises = [];
+
+  //INITIALIZE START WEEK
+  var todayStartDate = request.params.startDate;
+  todayStartDate.setTime(todayStartDate.getTime() - 
+    (todayStartDate.getTime() % (86400 * 1000)));
+  var weekStartDate = new Date(todayStartDate.getTime());
+  weekStartDate.setTime(weekStartDate.getTime() - 
+    (weekStartDate.getDay() * 86400 * 1000));
+
+  //GET LOCATION DATA
+  var LocationData = Parse.Object.extend("LocationData");
+  var query = new Parse.Query(LocationData);
+  query.equalTo('user', Parse.User.current());
+  query.equalTo('weekStartDate', weekStartDate);
+  promises.push(
+    query.first().then(
+      function (parseObject) {
+        console.log('Location data returned');
+        if (parseObject) {
+          locationFileUrl = parseObject.get('locationFile').url();
+          console.log(parseObject.get("locationFile").url());
+          Parse.Cloud.httpRequest({
+            url: parseObject.get("locationFile").url()
+          }).then(function(fileResponse) {
+            console.log(2);
+            var allLocData = JSON.parse(fileResponse.buffer.toString('utf8'));
+            var keys = Object.keys(allLocData);
+            console.log(3);
+            console.log('Raw locations length: ' + keys.length);
+            for (var i = 0; i < keys.length; i++) {
+              if (keys[i] >= todayStartDate.getTime() 
+               && keys[i] <= (todayStartDate.getTime() + 86400 * 1000)) {
+                locationData[keys[i]] = allLocData[keys[i]];
+              }
+            }
+            console.log('Filtered locations length: ' + Object.keys(locationData).length);
+            //clean location data to select only today
+          }, function (error) {
+            console.log("Error reading locationFile: " + error.message);
+          });
+          console.log(4)
+        } else {
+          console.log('No location data found');
+        }
+      }, function (error) {
+        console.log("Error finding locationData parse object: "
+          + error.message);
+      }
+    )
+  );
+
+  //GET WAKING DATA
+  var WalkingData = Parse.Object.extend("WalkingData");
+  var query = new Parse.Query(WalkingData);
+  query.equalTo('user', Parse.User.current());
+  query.equalTo('weekStartDate', weekStartDate);
+  promises.push(
+    query.first().then(
+      function(parseObject) {
+        console.log('Walking data returned');
+        if (parseObject) {
+          walkingData = parseObject.get("walkingArray");
+          //clean walking data to select only today
+        } else {
+          console.log('No walking data found');
+        }
+      }, function(error) {
+        console.log("Error getting walkingData object");
+      }
+    )
+  );
+
+  Parse.Promise.when(promises).then(
+    function() {
+      console.log('All promises returned successfully!');
+      response.success([
+        {
+          type: 'location',
+          message: '51.5249296,-0.1319759',
+          time: new Date('Fri Jul 15 2016 08:00:00 GMT+0100'),
+          lat: 51.5249296,
+          lng: -0.1319759
+        },{
+          type: 'message',
+          message: 'One',
+          time: new Date('Fri Jul 15 2016 10:00:00 GMT+0100')
+        },{
+          type: 'sleep',
+          message: 'Sleeping',
+          time: new Date('Fri Jul 15 2016 12:00:00 GMT+0100')
+        },{
+          type: 'run',
+          message: 'Running',
+          time: new Date('Fri Jul 15 2016 14:00:00 GMT+0100'),
+          distance: 3,
+          steps: 5000
+        },{
+          type: 'walk',
+          message: 'Walking',
+          time: new Date('Fri Jul 15 2016 16:00:00 GMT+0100'),
+          distance: 0.2,
+          steps: 400
+        }
+      ]);
+    }, function(error) {
+      var errorMessage = "Error with the promises "
+        + "(message from Parse.Promise.when): " + error.message;
+      console.log(errorMessage);
+      response.error({error: error, message: errorMessage});
+    }
+  );
+      
+});
+
 Parse.Cloud.define("updateFriends", function(request, response) {
   if (!request.params.friendsFbIdArray 
     || request.params.friendsFbIdArray.length == 0) {
@@ -205,7 +327,6 @@ Parse.Cloud.define("saveWalkingData", function (request, response) {
       }
     });
   }
-
 });
 
 Parse.Cloud.define("saveLocationData", function(request, response) {

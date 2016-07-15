@@ -26,7 +26,7 @@ export class ProfilePage {
   heartData:number[][]; heartDataLoading:boolean;
   walkingChartHandle:any; heartChartHandle:any; cyclingChartHandle:any; kJChartHandle:any;
   sleepData:number[]; sleepDataLoading:boolean; sleepChartHandle: any; foodStrings: string[]; 
-  foodArray: any[]; moodData:any[]; moodDataLoading:boolean;
+  foodArray: any[]; moodData:any[]; moodDataLoading:boolean; timelineEvents:any[];
 
   constructor(ionicApp: App, navController: NavController, navParams: NavParams,
    viewController: ViewController, zone: NgZone, platform: Platform, http: Http) {
@@ -50,6 +50,7 @@ export class ProfilePage {
     this.foodStrings = [];
     this.foodArray = [];
     this.moodData = [];
+    this.timelineEvents = [];
   }
 
   ionViewDidEnter() {
@@ -57,6 +58,15 @@ export class ProfilePage {
   }
 
   initialize() {
+
+    let disableAll = true;
+    if (disableAll) {
+      this.walkingDataLoading = false;
+      this.kJDataLoading = false; 
+    }
+
+    this.initTimelineEvents();
+    
     //Initialize arrangedDayLabels
     let days:string[] = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
     this.arrangedDayLabels = [];
@@ -66,21 +76,25 @@ export class ProfilePage {
       this.arrangedDayLabels.push(days[(i+day) % 7]);
     }
     if (localStorage['healthApiAccessGranted']) {
-      this.initWalkingData(() => {
-        this.initStravaData();
-      });
-      this.initKjData();
-      this.initSleepData();
+      if (!disableAll) {  
+        this.initWalkingData(() => {
+          this.initStravaData();
+        });
+        this.initKjData();
+        this.initSleepData();
+      }
     } else if (navigator.health) {
       navigator.health.isAvailable(() => {
         navigator.health.requestAuthorization(['steps', 'distance', 'activity'],
           () => {
             localStorage['healthApiAccessGranted'] = true;
-            this.initWalkingData(() => {
-              this.initStravaData();
-            });
-            this.initKjData();
-            this.initSleepData();
+            if (!disableAll) {
+              this.initWalkingData(() => {
+                this.initStravaData();
+              });
+              this.initKjData();
+              this.initSleepData();
+            }
           }, (err) => {
             localStorage['healthApiAccessGranted'] = false;
             console.log('Health auth error', err);
@@ -98,12 +112,32 @@ export class ProfilePage {
     }
 
     if(!this.platform.is('ios') && !this.platform.is('android')) {
-      this.initStravaData();
+      if (!disableAll) {
+        this.initStravaData();
+      }
     }
 
-    this.foodData();
-    this.initMoodData();
-    this.initHeartData();
+    if (!disableAll) {
+      this.foodData();
+      this.initMoodData();
+      this.initHeartData();
+    }
+  }
+
+  initTimelineEvents() {
+    CloudFunctions.getTimelineEvents({
+      startDate: new Date(),
+      numberOfDays: 2
+    }, (data, error) => {
+      console.log(data);
+      if (!error) {
+        this.zone.run(() => {
+          for (let i = 0; i < data.length; i++) {
+            this.timelineEvents.push(data[i]);
+          }
+        });
+      }
+    })
   }
 
   //Walking, running, biking and sleep data for last week from Health Plugin - Android only

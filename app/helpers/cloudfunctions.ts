@@ -117,5 +117,18 @@ export class CloudFunctions {
       }
     });
   }
+
+  public static getTimelineEvents(requestData, callback) {
+    Parse.Cloud.run('getTimelineEvents', requestData, {
+      success: (data) => {
+        //console.log('saveLocationData success');
+        callback(data);
+      },
+      error: (error) => {
+        console.log('Error calling getTimelineEvents:', error.message);
+        callback({}, error);
+      }
+    });
+  }
   
 }

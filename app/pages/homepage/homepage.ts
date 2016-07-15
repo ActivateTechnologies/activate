@@ -53,7 +53,7 @@ export class HomePage {
     } else if (this.platform.is("android")) {
       this.startLocationTrackingAndroid();
     }
-    //this.uploadDetailedWalkingData();
+    this.uploadDetailedWalkingData();
     if (Parse.User.current()) {
       this.retrieveArchieveMessages();
       //this.navigateTreeTo('start', false); //healthApi
@@ -73,7 +73,7 @@ export class HomePage {
   }
 
   ionViewDidEnter() {
-    //this.openUserProfile();
+    this.openUserProfile();
   }
 
   //Set state of typing, controls display of typing indicator
@@ -419,6 +419,7 @@ export class HomePage {
   }
 
   startLocationTrackingAndroid() {
+    window.backgroundGeolocation.stop();
     let config = {
       desiredAccuracy: 0,
       stationaryRadius: 30,
@@ -426,6 +427,8 @@ export class HomePage {
       debug: true,
       interval: 2 * 1000,
       stopOnTerminate: false,
+      startOnBoot: true,
+      startForeground: false,
       activityType: "Fitness"
     };
     window.backgroundGeolocation.configure((location) => {
@@ -433,7 +436,7 @@ export class HomePage {
     }, (error) => {}, config);
     window.backgroundGeolocation.start();
     window.backgroundGeolocation.getLocations((locations) => {
-      console.log('Got stored locations, count: ', locations.length, locations);
+      console.log('Got stored locations, count: ', locations.length);
       if (locations.length > 0) {
         this.saveLocationsToParse(locations, true);
       }
@@ -489,38 +492,40 @@ export class HomePage {
   }
 
   saveLocationsToParse(locations, isAndroid) {
-    let keys = Object.keys(locations);
-    let locationsToSend = {};
-    for (let i = 0; i < keys.length; i++) {
-      if (isAndroid) {
-        locationsToSend[locations[keys[i]].time] = {
-          accuracy: locations[keys[i]].accuracy,
-          lat: locations[keys[i]].latitude,
-          lng: locations[keys[i]].longitude,
-          provider: locations[keys[i]].provider
-        };
-      } else {
-        locationsToSend[new Date(locations[keys[i]].timestamp).getTime()] = {
-          accuracy: locations[keys[i]].coords.accuracy,
-          lat: locations[keys[i]].coords.latitude,
-          lng: locations[keys[i]].coords.longitude,
-          provider: null
-        };
-      }
-    }
-    CloudFunctions.saveLocationData(locationsToSend, (data, error) => {
-      if (!error) {
-        /*if (isAndroid) {
-          backgroundGeolocation.deleteAllLocations(() => {}, (error) => {
-            console.log('Error deleting locations');
-          });
+    if (Parse.User.current()) {
+      let keys = Object.keys(locations);
+      let locationsToSend = {};
+      for (let i = 0; i < keys.length; i++) {
+        if (isAndroid) {
+          locationsToSend[locations[keys[i]].time] = {
+            accuracy: locations[keys[i]].accuracy,
+            lat: locations[keys[i]].latitude,
+            lng: locations[keys[i]].longitude,
+            provider: locations[keys[i]].provider
+          };
         } else {
-          window.BackgroundGeolocation.clearDatabase(() => {}, (error) => {
-            console.log('Error deleting locations');
-          });
-        }*/
+          locationsToSend[new Date(locations[keys[i]].timestamp).getTime()] = {
+            accuracy: locations[keys[i]].coords.accuracy,
+            lat: locations[keys[i]].coords.latitude,
+            lng: locations[keys[i]].coords.longitude,
+            provider: null
+          };
+        }
       }
-    });
+      CloudFunctions.saveLocationData(locationsToSend, (data, error) => {
+        if (!error) {
+          /*if (isAndroid) {
+            backgroundGeolocation.deleteAllLocations(() => {}, (error) => {
+              console.log('Error deleting locations');
+            });
+          } else {
+            window.BackgroundGeolocation.clearDatabase(() => {}, (error) => {
+              console.log('Error deleting locations');
+            });
+          }*/
+        }
+      });
+    }
   }
 
   saveLocationsToParseOriginal(locations) {
