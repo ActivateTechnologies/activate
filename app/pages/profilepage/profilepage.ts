@@ -126,10 +126,10 @@ export class ProfilePage {
 
   initTimelineEvents() {
     CloudFunctions.getTimelineEvents({
-      startDate: new Date('Jul 15 2016 08:00:00 GMT+0100'),
+      startDate: new Date('Jul 18 2016 08:00:00 GMT+0100'),
       numOfDays: 1
     }, (data, error) => {
-      //console.log(data);
+      console.log(data);
       if (!error) {
         //console.log(JSON.stringify(data.extra));
         this.zone.run(() => {
@@ -142,6 +142,7 @@ export class ProfilePage {
             if (data.events[i].endDate) {
               data.events[i].endDate = new Date(data.events[i].endDate)
             }
+            data.events[i].durationMin = 0;
             if (data.events[i].duration) {
               data.events[i].durationMin
                = Math.round(data.events[i].duration * 10 / (60000)) / 10;

@@ -22,6 +22,8 @@ Parse.Cloud.define("initConversation", function(request, response) {
 
 Parse.Cloud.define("getTimelineEvents", function(request, response) {
 
+  Parse.Cloud.useMasterKey();
+
   //DATA
   var locationData = [];
   var walkingData = [];
@@ -43,7 +45,9 @@ Parse.Cloud.define("getTimelineEvents", function(request, response) {
   //LOCATION DATA
   var LocationData = Parse.Object.extend("LocationData");
   var query = new Parse.Query(LocationData);
-  query.equalTo('user', Parse.User.current());
+  var user = new Parse.User();
+  user.set("objectId", "jDY4UAS5xC");
+  query.equalTo('user', user);
   query.equalTo('weekStartDate', weekStartDate);
   query.first().then(function(parseObject) {
     return parseObject.get('locationFile').url();
@@ -77,7 +81,7 @@ Parse.Cloud.define("getTimelineEvents", function(request, response) {
   //WALKING DATA
   var WalkingData = Parse.Object.extend("WalkingData");
   var query = new Parse.Query(WalkingData);
-  query.equalTo('user', Parse.User.current());
+  query.equalTo('user', user);
   query.equalTo('weekStartDate', weekStartDate);
   query.first().then(function(parseObject) {
     console.log('Walking data returned');
@@ -238,13 +242,13 @@ Parse.Cloud.define("getTimelineEvents", function(request, response) {
     for (var i = 0; i < events.length; i++) {
       if (events[i].type == 'dwell' && events[i].waypoints.length) {
         var points = events[i].waypoints;
-        events[i].endDate = points[points.length - 1].time;
+        events[i].endDate = parseInt(points[points.length - 1].time);
         events[i].duration = events[i].endDate - events[i].startDate;
         events[i].lat = 0;
         events[i].lng = 0;
         for (var j = 0; j < points.length; j++) {
-          events[i].lat += points[i].lat;
-          events[i].lng += points[i].lng;
+          events[i].lat += points[j].lat;
+          events[i].lng += points[j].lng;
         }
         events[i].lat /= points.length;
         events[i].lng /= points.length;
