@@ -48,7 +48,6 @@ function smoothData() {
 		 		lngSum += locationDataArr[i + j].lng * multiplier;
 		 		lngSum += locationDataArr[i - j].lng * multiplier;
 		 	}
-		 	console.log(1);
 		 	locationDataArr[i].lat = latSum;
 			locationDataArr[i].lng = lngSum;
 		}
@@ -60,7 +59,6 @@ function smoothData() {
 function removeNonWalkingPoints() {
 	var a = 0, b = 0;
 	var filteredLocationData = [];
-	console.log(walkingData[0]);
 	while(a < locationDataArr.length && b < walkingData.length) {
 		if (locationDataArr[a].time < walkingData[b].startDate) {
 			a++;
@@ -79,7 +77,6 @@ function removeNonWalkingPoints() {
 function nonWalkingPoints() {
 	var a = 0, b = 0;
 	var filteredLocationData = [];
-	console.log(walkingData[0]);
 	while(a < locationDataArr.length && b < walkingData.length) {
 		if (locationDataArr[a].time < walkingData[b].startDate) {
 			filteredLocationData.push(locationDataArr[a]);

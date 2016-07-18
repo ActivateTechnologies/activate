@@ -23,87 +23,92 @@ Parse.Cloud.define("initConversation", function(request, response) {
 Parse.Cloud.define("getTimelineEvents", function(request, response) {
 
   //DATA
-  var locationFileUrl;
-  var locationData = {};
-  var walkingData = {};
+  var locationData = [];
+  var walkingData = [];
   var sleepingData = {};
-  var promises = [];
 
-  //INITIALIZE START WEEK
-  var todayStartDate = request.params.startDate;
-  todayStartDate.setTime(todayStartDate.getTime() - 
-    (todayStartDate.getTime() % (86400 * 1000)));
-  var weekStartDate = new Date(todayStartDate.getTime());
+  //INITIALIZE TIME VARIABLES AND PROMISES
+  //TODO: uncomment this: var numOfDays = request.params.numOfDays;
+  var numOfDays = 2;
+  var dayStartDate = request.params.startDate;
+  dayStartDate.setTime(dayStartDate.getTime() - 
+    (dayStartDate.getTime() % (86400 * 1000)));
+  var weekStartDate = new Date(dayStartDate.getTime());
   weekStartDate.setTime(weekStartDate.getTime() - 
     (weekStartDate.getDay() * 86400 * 1000));
 
-  //GET LOCATION DATA
+  var locationPromise = new Parse.Promise();
+  var walkingPromise = new Parse.Promise();
+
+  //LOCATION DATA
   var LocationData = Parse.Object.extend("LocationData");
   var query = new Parse.Query(LocationData);
   query.equalTo('user', Parse.User.current());
   query.equalTo('weekStartDate', weekStartDate);
-  promises.push(
-    query.first().then(
-      function (parseObject) {
-        console.log('Location data returned');
-        if (parseObject) {
-          locationFileUrl = parseObject.get('locationFile').url();
-          console.log(parseObject.get("locationFile").url());
-          Parse.Cloud.httpRequest({
-            url: parseObject.get("locationFile").url()
-          }).then(function(fileResponse) {
-            console.log(2);
-            var allLocData = JSON.parse(fileResponse.buffer.toString('utf8'));
-            var keys = Object.keys(allLocData);
-            console.log(3);
-            console.log('Raw locations length: ' + keys.length);
-            for (var i = 0; i < keys.length; i++) {
-              if (keys[i] >= todayStartDate.getTime() 
-               && keys[i] <= (todayStartDate.getTime() + 86400 * 1000)) {
-                locationData[keys[i]] = allLocData[keys[i]];
-              }
-            }
-            console.log('Filtered locations length: ' + Object.keys(locationData).length);
-            //clean location data to select only today
-          }, function (error) {
-            console.log("Error reading locationFile: " + error.message);
+  query.first().then(function(parseObject) {
+    return parseObject.get('locationFile').url();
+  }, function(error) {
+    console.log('Error 1: ' + error);
+  }).then(function(url) {
+    Parse.Cloud.httpRequest({
+      url: url
+    }).then(function(fileResponse) {
+      var allLocData = JSON.parse(fileResponse.buffer.toString('utf8'));
+      var keys = Object.keys(allLocData);
+      console.log('Raw locations length: ' + keys.length);
+      for (var i = 0; i < keys.length; i++) {
+        if (keys[i] >= dayStartDate.getTime() 
+         && keys[i] <= (dayStartDate.getTime() + 86400 * 1000 * numOfDays)) {
+          locationData.push({
+            time: keys[i],
+            lat: allLocData[keys[i]].lat,
+            lng: allLocData[keys[i]].lng
           });
-          console.log(4)
-        } else {
-          console.log('No location data found');
         }
-      }, function (error) {
-        console.log("Error finding locationData parse object: "
-          + error.message);
       }
-    )
-  );
-
-  //GET WAKING DATA
+      console.log('Filtered locations length: ' + locationData.length);
+      locationPromise.resolve();
+    }, function (error) {
+      console.log("Error reading locationFile: " + error.message);
+      locationPromise.reject(error);
+    });
+  });
+  
+  //WALKING DATA
   var WalkingData = Parse.Object.extend("WalkingData");
   var query = new Parse.Query(WalkingData);
   query.equalTo('user', Parse.User.current());
   query.equalTo('weekStartDate', weekStartDate);
-  promises.push(
-    query.first().then(
-      function(parseObject) {
-        console.log('Walking data returned');
-        if (parseObject) {
-          walkingData = parseObject.get("walkingArray");
-          //clean walking data to select only today
-        } else {
-          console.log('No walking data found');
+  query.first().then(function(parseObject) {
+    console.log('Walking data returned');
+    if (parseObject) {
+      allWalkingData = parseObject.get("walkingArray");
+      console.log('Raw walking length: ' + allWalkingData.length);
+      for (var i = 0; i < allWalkingData.length; i++) {
+        if (allWalkingData[i].endDate >= dayStartDate.getTime() 
+         && allWalkingData[i].endDate <= (dayStartDate.getTime()
+          + 86400 * 1000 * numOfDays)) {
+          walkingData.push(allWalkingData[i]);
         }
-      }, function(error) {
-        console.log("Error getting walkingData object");
       }
-    )
-  );
+      console.log('Filtered walking length: ' + walkingData.length);
+      walkingPromise.resolve();
+      //clean walking data to select only today
+    } else {
+      var errorMessage = "No walking data found.";
+      console.log(errorMessage);
+      walkingPromise.reject({message: errorMessage})
+    }
+  }, function(error) {
+    console.log("Error getting walkingData object");
+  });
 
-  Parse.Promise.when(promises).then(
+  //PROCESS DATA
+  Parse.Promise.when(locationPromise, walkingPromise).then(
     function() {
       console.log('All promises returned successfully!');
-      response.success([
+      var events = getWalkingEvents();
+      /*var events = [
         {
           type: 'location',
           message: '51.5249296,-0.1319759',
@@ -131,7 +136,13 @@ Parse.Cloud.define("getTimelineEvents", function(request, response) {
           distance: 0.2,
           steps: 400
         }
-      ]);
+      ]*/
+      response.success({
+        events: events,
+        extra: {
+          walkingData: walkingData
+        }
+      });
     }, function(error) {
       var errorMessage = "Error with the promises "
         + "(message from Parse.Promise.when): " + error.message;
@@ -139,7 +150,157 @@ Parse.Cloud.define("getTimelineEvents", function(request, response) {
       response.error({error: error, message: errorMessage});
     }
   );
-      
+
+  function constructEvents(walkingPoints) {
+    var events = [];
+    var tempMovingPoints = [];
+    for (var i = 0; i < walkingPoints; i++) {
+      if (walkingPoints[i].type == 'transitionLocationPoint') {
+        events.push({
+          type: 'location',
+          message: walkingPoints[i].lat + "," + walkingPoints[i].lng,
+          time: walkingPoints[i].time,
+          lat: walkingPoints[i].lat,
+          lng: walkingPoints[i].lng
+        });
+        if (tempMovingPoints.length > 0) {
+          events.push({
+            type: 'walk',
+            message: 'Walking',
+            startTime: walkingPoints[i].startTime,
+            endTime: walkingPoints[i].endTime,
+            distance: walkingPoints[i].value,
+            startLocation: {
+              lat: tempMovingPoints[0].lat,
+              lng: tempMovingPoints[0].lng
+            },
+            waypoints: tempMovingPoints
+          });
+          tempMovingPoints = [];
+        }
+      } else if (walkingPoints[i].type == 'movingLocationPoint') {
+        tempMovingPoints.push({
+          time: walkingPoints[i].time,
+          lat: walkingPoints[i].lat,
+          lng: walkingPoints[i].lng
+        });
+      }
+    }
+    return events;
+  }
+
+  function getWalkingEvents() {
+    var a = 0, b = 0;
+    var filteredLocationData = [];
+
+    var events = [];
+    var tempWaypoints = [];
+    while(a < locationData.length && b < walkingData.length) {
+      if (locationData[a].time < walkingData[b].startDate) {
+        a++;
+        if (events.length == 0 || events[events.length - 1].type != 'dwell') {
+          events.push({
+            type: 'dwell',
+            startDate: parseInt(locationData[a].time),
+            /*endDate: walkingData[b].endDate,*/
+            waypoints: []
+          });
+        }
+        if (locationData[a] != null) {
+          events[events.length - 1].waypoints.push(locationData[a])
+        }
+      } else if (locationData[a].time <= walkingData[b].endDate) {
+        if (events.length == 0 || events[events.length - 1].type != 'walk'
+          || locationData[a].time > walkingData[b].endDate) {
+          events.push({
+            type: 'walk',
+            startDate: walkingData[b].startDate,
+            endDate: walkingData[b].endDate,
+            distance: walkingData[b].value,
+            waypoints: []
+          });
+        }
+        if (locationData[a] != null) {
+          events[events.length - 1].waypoints.push(locationData[a])
+        }
+        a++;
+      } else {
+        b++;
+        /*events.push({
+          type: 'walk',
+          startDate: walkingData[b].startDate,
+          endDate: walkingData[b].endDate,
+          distance: walkingData[b].value,
+          waypoints: []
+        });*/
+      }
+    }
+    for (var i = 0; i < events.length; i++) {
+      if (events[i].type == 'dwell' && events[i].waypoints.length) {
+        var points = events[i].waypoints;
+        events[i].endDate = points[points.length - 1].time;
+        events[i].duration = events[i].endDate - events[i].startDate;
+        events[i].lat = 0;
+        events[i].lng = 0;
+        for (var j = 0; j < points.length; j++) {
+          events[i].lat += points[i].lat;
+          events[i].lng += points[i].lng;
+        }
+        events[i].lat /= points.length;
+        events[i].lng /= points.length;
+      }
+    }
+    return events;
+  }
+
+
+  function getWalkingPointsMessy() {
+    var a = 0, b = 0;
+    var filteredLocationData = [];
+    while(a < locationData.length && b < walkingData.length) {
+      if (locationData[a].time < walkingData[b].startDate) {
+        a++;
+        if (!(filteredLocationData.length > 0 &&
+          filteredLocationData[filteredLocationData.length-1].type &&
+          filteredLocationData[filteredLocationData.length-1].type
+           == 'transitionLocationPoint')) {
+          filteredLocationData.push({
+            type: 'transitionLocationPoint',
+            t: 'a',
+            time: locationData[a].time,
+            lat: locationData[a].lat,
+            lng: locationData[a].lng
+          });
+        }
+      } else if (locationData[a].time <= walkingData[b].endDate) {
+        filteredLocationData.push({
+          type: 'movingLocationPoint',
+          lat: locationData[a].lat,
+          lng: locationData[a].lng,
+          time: locationData[a].time
+        });
+        a++;
+      } else {
+        b++;
+        if (!(filteredLocationData.length > 0 &&
+          filteredLocationData[filteredLocationData.length-1].type &&
+          filteredLocationData[filteredLocationData.length-1].type
+           == 'transitionLocationPoint')) {
+          filteredLocationData.push({
+            type: 'transitionLocationPoint',
+            t: 'b',
+            time: locationData[a].time,
+            lat: locationData[a].lat,
+            lng: locationData[a].lng
+          });
+        }
+      }
+    }
+    console.log('Walking Location Data Length: ' 
+      + filteredLocationData.length);
+    return filteredLocationData;
+  }
+
 });
 
 Parse.Cloud.define("updateFriends", function(request, response) {
@@ -384,8 +545,10 @@ Parse.Cloud.define("saveLocationData", function(request, response) {
         }).then(function(fileResponse) {
           fileToDelete = parseObject.get("locationFile").name();
           //console.log("6 Time: " + ((new Date()).getTime() - timeNow));
-          var currentLocationsObject = JSON.parse(fileResponse.buffer.toString('utf8'));
-          var currentLocationsObjectKeys = Object.keys(currentLocationsObject);
+          var currentLocationsObject
+           = JSON.parse(fileResponse.buffer.toString('utf8'));
+          var currentLocationsObjectKeys
+           = Object.keys(currentLocationsObject);
           for (var i = 0; i < currentLocationsObjectKeys.length; i++) {
             mainArray[0][currentLocationsObjectKeys[i]] = 
               currentLocationsObject[currentLocationsObjectKeys[i]];
@@ -402,8 +565,10 @@ Parse.Cloud.define("saveLocationData", function(request, response) {
                     method: 'DELETE',
                     url: 'https://api.parse.com/1/files/' + fileToDelete,
                     headers: {
-                      "X-Parse-Application-Id": "v3NS4xBCONYmIqqtwASz1e3TuX9p1WDZod6dUxA7",
-                      "X-Parse-Master-Key": "lTfiVyxxddFhbaCbs9NhvZTBdjmTw8ldWRmv5KoH"
+                      "X-Parse-Application-Id": 
+                        "v3NS4xBCONYmIqqtwASz1e3TuX9p1WDZod6dUxA7",
+                      "X-Parse-Master-Key": 
+                        "lTfiVyxxddFhbaCbs9NhvZTBdjmTw8ldWRmv5KoH"
                     }
                   }).then(function() {
                     //console.log("12 Time: " + ((new Date()).getTime() - timeNow));
@@ -568,7 +733,8 @@ Parse.Cloud.define("saveLocationDataOriginal", function(request, response) {
   function saveAllWeeksLocationData() {
     var objectsToSave = [];
     for (var i = 0; i < mainArray.length; i++) {
-      var weekStartDate = new Date(firstWeekStartDate.getTime() + (i * 7 * 86400 * 1000));
+      var weekStartDate = new Date(firstWeekStartDate.getTime()
+       + (i * 7 * 86400 * 1000));
       var LocationData = Parse.Object.extend("LocationData");
       var locationData = new LocationData();
       locationData.set("user", Parse.User.current());
@@ -692,8 +858,8 @@ Parse.Cloud.afterSave("FoodDatabase", function(request) {
         //console.log({log: 'search terms saved successfully'});
       },
       error: function(object, error) {
-        console.log({log: 'Error saving description words for FoodDatabase object terms: '
-         + error.message});
+        console.log({log: 'Error saving description words for ' 
+          + ' FoodDatabase object terms: ' + error.message});
       }
     });
   } else {
@@ -837,11 +1003,13 @@ Parse.Cloud.define("processNutritionImage", function(request, response) {
             } else {
               parseObject.save({
                 success: function(parseObject) {
-                  console.log('FoodDatabase object pointer set and Nutrition object saved');
+                  console.log('FoodDatabase object pointer set '
+                    + 'and Nutrition object saved');
                   response.success({});
                 },
                 error: function(parseObject, error) {
-                  var errorMessage = 'Error saving nutrition object with FoodDatabase pointer'
+                  var errorMessage = 
+                    'Error saving nutrition object with FoodDatabase pointer'
                     + error.message;
                   console.log(errorMessage);
                   response.success({});
@@ -1114,7 +1282,6 @@ function findFoodObject2(nutritionObject, callbackFunction) {
       }
     });
   }
-  
 }
 
 /*Uses google's text recognition response as a string input and

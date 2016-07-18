@@ -126,16 +126,76 @@ export class ProfilePage {
 
   initTimelineEvents() {
     CloudFunctions.getTimelineEvents({
-      startDate: new Date(),
-      numberOfDays: 2
+      startDate: new Date('Jul 15 2016 08:00:00 GMT+0100'),
+      numOfDays: 1
     }, (data, error) => {
-      console.log(data);
+      //console.log(data);
       if (!error) {
+        //console.log(JSON.stringify(data.extra));
         this.zone.run(() => {
-          for (let i = 0; i < data.length; i++) {
-            this.timelineEvents.push(data[i]);
+          this.timelineEvents = [];
+          for (let i = 0; i < data.events.length; i++) {
+            data.events[i].showDetails = false;
+            if (data.events[i].startDate) {
+              data.events[i].startDate = new Date(data.events[i].startDate)
+            }
+            if (data.events[i].endDate) {
+              data.events[i].endDate = new Date(data.events[i].endDate)
+            }
+            if (data.events[i].duration) {
+              data.events[i].durationMin
+               = Math.round(data.events[i].duration * 10 / (60000)) / 10;
+            }
+            if (data.events[i].type == 'walk') {
+              data.events[i].path = '';
+              let points = data.events[i].waypoints;
+              for (let j = 0; j < points.length; j++) {
+                data.events[i].path += points[j].lat + ',' 
+                  + points[j].lng;
+                if (j < points.length - 1) {
+                  data.events[i].path += '|';
+                }
+              }
+            }
+            /*if (data.events[i].type == 'dwell') {
+              ((i) => {
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.onreadystatechange = function () {
+                  if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    data.events[i].address = JSON.parse(xmlhttp.responseText);
+                  }
+                }
+                xmlhttp.open("GET", "https://maps.googleapis.com/maps/api/geocode/json?latlng=51.52495505,-0.132002263&key=AIzaSyBXqWu65V_Uq9GeZi3GWdiiDE1Go5teGvE", true);
+                xmlhttp.setRequestHeader("Content-type", "application/json;"); 
+                xmlhttp.send();
+              })(i);
+            }*/
+            this.timelineEvents.push(data.events[i]);
           }
         });
+        for (let i = 0; i < this.timelineEvents.length; i++) {
+          if (this.timelineEvents[i].type == 'dwell') {
+            ((i) => {
+              let event = this.timelineEvents[i];
+              var xmlhttp = new XMLHttpRequest();
+              xmlhttp.onreadystatechange = () => {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                  this.zone.run(() => {
+                    let data = JSON.parse(xmlhttp.responseText);
+                    if (data.results.length) {
+                      this.timelineEvents[i].address = data.results[0].formatted_address;
+                    }
+                  })
+                }
+              }
+              xmlhttp.open("GET", "https://maps.googleapis.com/maps/api/geocode/json?"
+                + "latlng=" + event.lat + "," + event.lng
+                + "&key=AIzaSyBXqWu65V_Uq9GeZi3GWdiiDE1Go5teGvE", true);
+              //xmlhttp.setRequestHeader("Content-type", "application/json;"); 
+              xmlhttp.send();
+            })(i);
+          }
+        }
       }
     })
   }

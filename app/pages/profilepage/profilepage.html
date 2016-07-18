@@ -23,24 +23,37 @@
 	-->
 
 	<div class="containerProfilePageContent">
+		<span (click)="initTimelineEvents()">Refresh Timeline</span><br><br>
 		<b>Timeline of events:</b>
 		<div *ngFor="let event of timelineEvents">
-			<span *ngIf="event.type=='message'">
+			<!-- <span *ngIf="event.type=='message'">
 				{{event.time | date: 'shortTime'}}: <b>{{event.message}}</b>
-			</span>
-			<span *ngIf="event.type=='location'">
-				{{event.time | date: 'shortTime'}}: <b>{{event.lat}},{{event.lng}}</b>
 			</span>
 			<span *ngIf="event.type=='sleep'">
 				{{event.time | date: 'shortTime'}}: <b>Sleeping</b>
 			</span>
-			<span *ngIf="event.type=='walk'">
-				{{event.time | date: 'shortTime'}}:
-				<b>Walking ({{event.distance}}km)</b>
-			</span>
 			<span *ngIf="event.type=='run'">
 				{{event.time | date: 'shortTime'}}:
 				<b>Running ({{event.distance}}km)</b>
+			</span> -->
+			<span *ngIf="event.type=='walk'">
+				{{event.startDate | date: 'shortTime'}}:
+				<span style="font-weight:bold" (click)="event.showDetails = !event.showDetails">
+					Walking ({{event.distance}}m)
+				</span><br>
+				<div class="mapImageDiv" *ngIf="event.showDetails">
+					<img class="mapImage" src="https://maps.googleapis.com/maps/api/staticmap?size=200x200&maptype=map&path=color:red%7C{{event.path}}&key=AIzaSyBXqWu65V_Uq9GeZi3GWdiiDE1Go5teGvE"/>	
+				</div>
+			</span>
+			<span *ngIf="event.type=='dwell'">
+				{{event.startDate | date: 'shortTime'}}: 
+				<span style="font-weight:bold" (click)="event.showDetails = !event.showDetails">
+					Dwell for {{event.durationMin}} min
+				</span><br>
+				<div class="mapImageDiv" *ngIf="event.showDetails">
+					<img class="mapImage" src="https://maps.googleapis.com/maps/api/staticmap?center={{event.lat}},{{event.lng}}&zoom=16&size=200x200&maptype=map&markers=color:red%7C{{event.lat}},{{event.lng}}&key=AIzaSyBXqWu65V_Uq9GeZi3GWdiiDE1Go5teGvE"/>
+				</div>
+				<span *ngIf="event.showDetails">{{event.address}}</span>
 			</span>
 		</div><br>
 	</div>

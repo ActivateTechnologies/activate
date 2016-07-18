@@ -527,26 +527,4 @@ export class HomePage {
       });
     }
   }
-
-  saveLocationsToParseOriginal(locations) {
-    let keys = Object.keys(locations);
-    let locationsToSend = [];
-    for (let i = 0; i < keys.length; i++) {
-      locationsToSend.push({
-        accuracy: locations[keys[i]].accuracy,
-        lat: locations[keys[i]].latitude,
-        lng: locations[keys[i]].longitude,
-        provider: locations[keys[i]].provider,
-        time: locations[keys[i]].time,
-        debug: locations[keys[i]].debug
-      });
-    }
-    CloudFunctions.saveLocationData(locationsToSend, (data, error) => {
-      if (!error) {
-        /*backgroundGeolocation.deleteAllLocations(() => {}, (error) => {
-          console.log('Error deleting locations');
-        });*/
-      }
-    });
-  }
 }
